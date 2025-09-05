@@ -6,56 +6,30 @@
 //
 
 import SwiftUI
-import SwiftData
 
 struct ContentView: View {
-    @Environment(\.modelContext) private var modelContext
-    @Query private var items: [Item]
-
+    @Environment(\.managedObjectContext) private var viewContext
+    
+    @FetchRequest<Cart>(
+        sortDescriptors: [SortDescriptor(\.id)], animation: .default
+    ) private var cart
+    
+    @FetchRequest<Item>(
+        sortDescriptors: [SortDescriptor(\.id)], animation: .default
+    ) private var item
+    
     var body: some View {
-        NavigationSplitView {
-            List {
-                ForEach(items) { item in
-                    NavigationLink {
-                        Text("Item at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
-                    } label: {
-                        Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
-                    }
-                }
-                .onDelete(perform: deleteItems)
-            }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
-                ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
-                    }
-                }
-            }
-        } detail: {
-            Text("Select an item")
+        ForEach(cart) { list in
+            Text("Sample cart created at \(list.timestamp?.formatted() ?? "NaT")")
         }
-    }
-
-    private func addItem() {
-        withAnimation {
-            let newItem = Item(timestamp: Date())
-            modelContext.insert(newItem)
-        }
-    }
-
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            for index in offsets {
-                modelContext.delete(items[index])
-            }
+        
+        ForEach(item) { item in
+            Text("Sample item created at \(item.timestamp?.formatted() ?? "NaT")")
         }
     }
 }
 
 #Preview {
     ContentView()
-        .modelContainer(for: Item.self, inMemory: true)
+        .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
 }

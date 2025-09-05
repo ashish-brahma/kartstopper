@@ -1,6 +1,7 @@
 {
   "images" : [
     {
+      "filename" : "KS_light.png",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
@@ -12,6 +13,7 @@
           "value" : "dark"
         }
       ],
+      "filename" : "KS_dark.png",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
@@ -23,6 +25,7 @@
           "value" : "tinted"
         }
       ],
+      "filename" : "KS_tinted.png",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
