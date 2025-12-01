@@ -20,15 +20,41 @@ class ViewModel: ObservableObject {
     /// Total amount spent.
     @Published var totalSpend: Double = 0.00
     
+    /// Amount allocated for monthly budget.
+    @Published var budget: Double = 0.00
+    
+    /// Difficulty mode used for budget monitoring.
+    @Published var budgetMode: String = "Easy"
+    
+    /// Flag to lock budget for editing.
+    @Published var disableBudget: Bool = false
+    
     /// Status indicator of budget.
     @Published var status: String = "PositiveStatus"
     
     /// Query term used to conduct item search.
     @Published var itemQuery = ""
     
-    /// Update total carts.
+    /// Flag to check if
+    private(set) var hasOnboarded: Bool = false
+    
+    init() {
+        if hasOnboarded {
+            disableBudget = true
+        }
+    }
+    
+    /// Update dashboard.
     func update(context: NSManagedObjectContext) {
         totalCarts = CDCart.getTotalCarts(context: context)
         totalSpend = CDCart.getTotalSpend(context: context)
+    }
+    
+    /// Allow budget edits on the beginning of each month.
+    func updateBudgetLock() {
+        let date = Calendar.current.component(.day, from: .now)
+        if date == 1 {
+            disableBudget = false
+        }
     }
 }

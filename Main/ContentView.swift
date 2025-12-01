@@ -13,6 +13,8 @@ struct ContentView: View {
     @ObservedObject var viewModel: ViewModel
     @Environment(\.managedObjectContext) private var viewContext
     
+    @State private var showPreferences = false
+    
     let columns = [GridItem(.flexible()), GridItem(.flexible())]
     
     var totalSpend: String {
@@ -45,6 +47,15 @@ struct ContentView: View {
                 .navigationTitle(dynamicTitle)
                 .navigationTitleColor(fontColor)
                 .background(Color.background)
+                .toolbar {
+                    dashboardToolbar()
+                }
+            }
+            .sheet(isPresented: $showPreferences) {
+                NavigationStack {
+                    ManageView(viewModel: viewModel)
+                        .presentationDetents([.medium, .large])
+                }
             }
             .task {
                 viewModel.update(context: viewContext)
@@ -118,6 +129,17 @@ struct ContentView: View {
         .background(Color.cardLabel)
         .clipShape(.rect(cornerRadius: 25))
         .tint(Color.foreground)
+    }
+    
+    @ToolbarContentBuilder
+    private func dashboardToolbar() -> some ToolbarContent {
+        ToolbarItem(placement: .primaryAction) {
+            Button {
+                showPreferences = true
+            } label: {
+                Label("Settings", systemImage: "book.and.wrench")
+            }
+        }
     }
     
 }
