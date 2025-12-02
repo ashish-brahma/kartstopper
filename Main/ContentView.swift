@@ -18,16 +18,30 @@ struct ContentView: View {
     let columns = [GridItem(.flexible()), GridItem(.flexible())]
     
     var totalMonthlySpend: String {
-        viewModel.totalMonthlySpend
+        viewModel.budget.totalMonthlySpend
             .formatted(.currency(code: Locale.current.currency?.identifier ?? "USD"))
     }
     
     var fontColor: Color {
-        viewModel.status == "PositiveStatus" ?  .richBlack : .cowpeas
+        switch(viewModel.budget.status) {
+        case .positive:
+                .richBlack
+        case .neutral:
+                .letterJacket
+        case .negative:
+                .cowpeas
+        }
     }
     
     var dynamicTitle: String {
-        viewModel.status == "PositiveStatus" ? "You're Awesome" : "Slow Down"
+        switch(viewModel.budget.status) {
+        case .positive:
+            "You're Awesome"
+        case .neutral:
+            "Slow Down"
+        case .negative:
+            "You're broke"
+        }
     }
     
     var body: some View {
@@ -81,7 +95,7 @@ struct ContentView: View {
         .frame(maxWidth: .infinity)
         .frame(height: reader.size.height/2.8)
         .foregroundStyle(fontColor)
-        .background(Color(viewModel.status))
+        .background(Color(viewModel.budget.status.rawValue))
         .padding(.vertical, Design.Padding.vertical * 4)
     }
     

@@ -20,6 +20,11 @@ enum Constants {
         
         static let appName = "KartStopper"
         
+        static let developerName = PersonNameComponents(
+            givenName: "Ashish",
+            familyName: "Brahma"
+        )
+        
         static let faqURL = "https://kartstopper.netlify.app/support/"
         static let privacyURL = "https://kartstopper.netlify.app/legal-notice/"
         static let contactURL = "mailto:kartstopper@outlook.com"

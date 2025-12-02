@@ -17,15 +17,8 @@ struct ManageView: View {
     
     @State var budgetAmount: String = ""
     
-    private let developerName = PersonNameComponents(
-        givenName: "Ashish",
-        familyName: "Brahma"
-    )
-    
-    let modes = ["Easy","Medium","Hard"]
-    
     var budget: String {
-        viewModel.budget
+        viewModel.budget.budgetAmount
             .formatted(.currency(code: Locale.current.currency?.identifier ?? "USD"))
     }
     
@@ -33,7 +26,7 @@ struct ManageView: View {
         Form {
             Section {
                 budgetStepper()
-                    .disabled(viewModel.disableBudget)
+                    .disabled(viewModel.budget.disableBudget)
             } header: {
                 Text("Monthly Budget")
             } footer: {
@@ -69,7 +62,7 @@ struct ManageView: View {
         .navigationTitle("Preferences")
         .navigationTitleColor(Color.foreground)
         .task {
-            viewModel.updateBudgetLock()
+            viewModel.budget.updateBudgetLock()
         }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
@@ -86,12 +79,12 @@ struct ManageView: View {
             budgetField()
         } onIncrement: {
             viewModel.objectWillChange.send()
-            viewModel.budget += 1
+            viewModel.budget.budgetAmount += 1
         } onDecrement: {
             viewModel.objectWillChange.send()
-            viewModel.budget -= 1
-            if viewModel.budget < 1 {
-                viewModel.budget = 1
+            viewModel.budget.budgetAmount -= 1
+            if viewModel.budget.budgetAmount < 1 {
+                viewModel.budget.budgetAmount = 1
             }
         }
     }
@@ -102,15 +95,15 @@ struct ManageView: View {
             .foregroundStyle(Color.primary)
             .keyboardType(.decimalPad)
             .onChange(of: budgetAmount) { newValue in
-                viewModel.budget = Double(newValue) ?? 0.0
+                viewModel.budget.budgetAmount = Double(newValue) ?? 0.0
             }
     }
     
     @ViewBuilder
     private func difficultyPicker() -> some View {
-        Picker("Difficulty", selection: $viewModel.budgetMode) {
-            ForEach(modes, id: \.self) { mode in
-                Text(mode)
+        Picker("Difficulty", selection: $viewModel.budget.budgetMode) {
+            ForEach(Budget.modes.allCases) { mode in
+                Text(mode.rawValue)
             }
         }
     }
@@ -144,7 +137,7 @@ struct ManageView: View {
             }
             .padding()
             .frame(maxHeight: .infinity)
-            .navigationTitle(developerName.formatted())
+            .navigationTitle(Constants.Manage.developerName.formatted())
         }
     }
 }
