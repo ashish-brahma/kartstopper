@@ -7,6 +7,7 @@
 
 import Foundation
 import CoreData
+import Playgrounds
 
 extension PersistenceController {
     /// An in-memory container for displaying sample data in previews.
@@ -18,7 +19,7 @@ extension PersistenceController {
         for i in 0...2 {
             let sampleCart = CDCart(context: viewContext)
             sampleCart.id = Int32(i)
-            sampleCart.timestamp = Date()
+            sampleCart.timestamp = Date.random()
             sampleCart.name = "Cart \(i+1)"
             insertPreviewItems(in: sampleCart, withCount: i+1, context: viewContext)
             sampleCart.notes = """
@@ -43,7 +44,8 @@ extension PersistenceController {
         for i in 0...count-1 {
             let sampleItem = CDItem(context: context)
             sampleItem.id = Int32(i)
-            sampleItem.timestamp = Date()
+            sampleItem.isComplete = Bool.random()
+            sampleItem.timestamp = Date.random()
             sampleItem.price = Double.random(in: 0...20)
             sampleItem.name = "Item \(i+1)"
             sampleItem.notes = """
@@ -64,7 +66,7 @@ extension CDCart {
         cart.notes = """
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec ultricies mauris ante.
         """
-        cart.timestamp = Date()
+        cart.timestamp = Date.random()
         cart.addToItems(.preview)
         return cart
     }
@@ -77,8 +79,9 @@ extension CDItem {
         let item = CDItem(context: viewContext)
         item.id = Int32(1)
         item.name = "Item Title"
-        item.timestamp = Date()
-        item.price = 20.00
+        item.isComplete = Bool.random()
+        item.timestamp = Date.random()
+        item.price = Double.random(in: 0...20)
         item.notes = """
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec ultricies mauris ante.
         """
@@ -89,5 +92,21 @@ extension CDItem {
 extension ViewModel {
     static var preview: ViewModel {
         .init()
+    }
+}
+
+extension Date {
+    /// Returns random date and time.
+    static func random() -> Date {
+        var components = DateComponents()
+        components.day = Int.random(in: 1...30)
+        components.month = Int.random(in: 1...12)
+        components.year = Calendar.current.component(.year, from: .now)
+        components.hour = Int.random(in: 1...24)
+        components.minute = Int.random(in: 1...60)
+        components.second = Int.random(in: 1...60)
+        
+        let date = Calendar.current.date(from: components) ?? .now
+        return date
     }
 }

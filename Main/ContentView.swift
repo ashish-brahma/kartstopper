@@ -17,8 +17,8 @@ struct ContentView: View {
     
     let columns = [GridItem(.flexible()), GridItem(.flexible())]
     
-    var totalSpend: String {
-        viewModel.totalSpend
+    var totalMonthlySpend: String {
+        viewModel.totalMonthlySpend
             .formatted(.currency(code: Locale.current.currency?.identifier ?? "USD"))
     }
     
@@ -66,13 +66,13 @@ struct ContentView: View {
     @ViewBuilder
     private func statusCard(reader: GeometryProxy) -> some View {
         VStack(alignment: .leading) {
-            Text("You have spent")
+            Text("This month you have spent")
                 .font(Font.custom(Design.Fonts.italicCaption, size: 16))
                 .padding(.top, reader.size.height/30)
                 .padding(.leading, Design.Padding.leading)
-                .position(x: reader.size.width/6, y: reader.size.height/20)
+                .position(x: reader.size.width/3.8, y: reader.size.height/20)
             
-            Text(totalSpend)
+            Text(totalMonthlySpend)
                 .font(Font.custom(Design.Fonts.largeNumber, size: 80))
                 .padding(.top, reader.size.height/20)
                 .padding(.bottom, reader.size.height/10)

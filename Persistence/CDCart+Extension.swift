@@ -44,15 +44,22 @@ extension CDCart {
         return count
     }
     
-    static func getTotalSpend(context: NSManagedObjectContext) -> Double {
+    static func getTotalMonthlySpend(context: NSManagedObjectContext) -> Double {
         var amount = 0.00
         
         let request = CDItem.fetchRequest()
         guard let items = try? context.fetch(request), items.count != 0
         else { return 0.00 }
         
+        let currentMonth = Calendar.current.component(.month, from: .now)
+        
         for item in items {
-            amount += item.price * Double(item.quantity)
+            if let date = item.timestamp {
+                let month = Calendar.current.component(.month, from: date)
+                if item.isComplete && month == currentMonth {
+                    amount += item.price * Double(item.quantity)
+                }
+            }
         }
         return amount
     }

@@ -18,7 +18,7 @@ class ViewModel: ObservableObject {
     @Published var totalCarts: Int = 0
     
     /// Total amount spent.
-    @Published var totalSpend: Double = 0.00
+    @Published var totalMonthlySpend: Double = 0.00
     
     /// Amount allocated for monthly budget.
     @Published var budget: Double = 0.00
@@ -47,7 +47,7 @@ class ViewModel: ObservableObject {
     /// Update dashboard.
     func update(context: NSManagedObjectContext) {
         totalCarts = CDCart.getTotalCarts(context: context)
-        totalSpend = CDCart.getTotalSpend(context: context)
+        totalMonthlySpend = CDCart.getTotalMonthlySpend(context: context)
     }
     
     /// Allow budget edits on the beginning of each month.
