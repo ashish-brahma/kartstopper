@@ -80,5 +80,7 @@ struct EditCartView: View {
 }
 
 #Preview {
-    EditCartView(cart: .preview)
+    NavigationStack {
+        EditCartView(cart: .preview)
+    }
 }

@@ -96,5 +96,7 @@ struct EditItemView: View {
 }
 
 #Preview {
-    EditItemView(item: .preview)
+    NavigationStack {
+        EditItemView(item: .preview)
+    }
 }

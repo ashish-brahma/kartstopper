@@ -15,20 +15,17 @@ struct Budget {
     var budgetAmount: Double = 0.00
     
     /// Difficulty mode used for budget monitoring.
-    var budgetMode: String = "Easy"
+    var budgetMode: Mode = .medium
     
     /// Flag to lock budget for editing.
-    var disableBudget: Bool = false
+    var isLocked: Bool = false
     
     /// Status indicator of budget.
     var status: Status = .positive
     
     /// Allow budget edits on the beginning of each month.
-    mutating func updateBudgetLock() {
-        let date = Calendar.current.component(.day, from: .now)
-        if date == 1 {
-            disableBudget = false
-        }
+    mutating func updateBudgetLock(day: Int = Date.today) {
+        isLocked = day == 1 ? false : true
     }
     
     /// Determine status by fraction of amount spend from the allocated budget amount.
@@ -44,7 +41,7 @@ struct Budget {
     }
     
     /// Difficulty levels to determine strictness of monitoring.
-    enum modes: String, CaseIterable, Identifiable {
+    enum Mode: String, CaseIterable, Identifiable {
         var id : String {
             UUID().uuidString
         }
@@ -61,5 +58,11 @@ struct Budget {
         case positive = "PositiveStatus"
         case neutral = "NeutralStatus"
         case negative = "NegativeStatus"
+    }
+}
+
+extension Date {
+    static var today: Int {
+        Calendar.current.component(.day, from: .now)
     }
 }

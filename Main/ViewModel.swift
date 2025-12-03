@@ -18,23 +18,60 @@ class ViewModel: ObservableObject {
     @Published var totalCarts: Int = 0
     
     /// Instance of budget
-    @Published var budget: Budget = Budget()
+    @Published var budget: Budget
+    
+    /// Title displayed on home view.
+    @Published var dynamicTitle: String = ""
+    
+    /// Color code used on status card in home view.
+    @Published var fontColor: Color = .richBlack
     
     /// Query term used to conduct item search.
     @Published var itemQuery = ""
     
     /// Flag to check if user has onboarded.
-    private(set) var hasOnboarded: Bool = false
+    private(set) var hasOnboarded: Bool
     
-    init() {
-        if hasOnboarded {
-            budget.disableBudget = true
-        }
+    init(
+        budget: Budget,
+        hasOnboarded: Bool = false
+    ) {
+        self.budget = budget
+        self.hasOnboarded = hasOnboarded
     }
     
     /// Update dashboard.
     func update(context: NSManagedObjectContext) {
         totalCarts = CDCart.getTotalCarts(context: context)
         budget.totalMonthlySpend = CDCart.getTotalMonthlySpend(context: context)
+        budget.updateBudgetStatus()
+        dynamicTitle = setTitle()
+        fontColor = setFontColor()
+    }
+    
+    /// Set dynamic title based on budget status.
+    func setTitle() -> String {
+        switch(budget.status) {
+        case .positive:
+            "You're Awesome"
+        case .neutral:
+            "Slow Down"
+        case .negative:
+            "You're broke"
+        }
+    }
+    
+    /// Set font color based on status.
+    func setFontColor() -> Color {
+        switch(budget.status) {
+        case .positive:
+            .richBlack
+        case .neutral:
+            .letterJacket
+        case .negative:
+            .cowpeas
+        }
     }
 }
+
+

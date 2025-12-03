@@ -1,0 +1,24 @@
+{
+  "configurations" : [
+    {
+      "id" : "0D74F203-67EB-4D98-AF83-0A0AED4A289D",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "testTimeoutsEnabled" : true
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:KartStopper.xcodeproj",
+        "identifier" : "6D058F632EE066BE00DCDACF",
+        "name" : "KartStopperTests"
+      }
+    }
+  ],
+  "version" : 1
+}

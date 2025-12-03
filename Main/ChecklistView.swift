@@ -85,7 +85,6 @@ struct ChecklistView: View {
             }
             .textInputAutocapitalization(.never)
             .navigationTitle(cart.displayName)
-            .navigationTitleColor(Color.foreground)
             .scrollContentBackground(.hidden)
             .background(Color.background)
             .toolbar {
@@ -93,7 +92,7 @@ struct ChecklistView: View {
             }
             .sheet(isPresented: $showAddItem) {
                 NavigationStack {
-                    AddItemView(cart: cart)
+                    AddItemView(cart: cart, viewModel: viewModel)
                 }
             }
             .sheet(isPresented: $showEditCart) {

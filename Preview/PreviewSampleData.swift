@@ -7,7 +7,6 @@
 
 import Foundation
 import CoreData
-import Playgrounds
 
 extension PersistenceController {
     /// An in-memory container for displaying sample data in previews.
@@ -91,7 +90,34 @@ extension CDItem {
 
 extension ViewModel {
     static var preview: ViewModel {
-        .init()
+        .init(budget: .neutral,
+              hasOnboarded: true)
+    }
+}
+
+extension Budget {
+    static var positive: Budget {
+        .init(totalMonthlySpend: 12.00,
+              budgetAmount: 55.00,
+              budgetMode: .medium,
+              isLocked: true
+        )
+    }
+    
+    static var neutral: Budget {
+        .init(totalMonthlySpend: 30.00,
+              budgetAmount: 55.00,
+              budgetMode: .medium,
+              isLocked: true
+        )
+    }
+    
+    static var negative: Budget {
+        .init(totalMonthlySpend: 50.00,
+              budgetAmount: 55.00,
+              budgetMode: .medium,
+              isLocked: true
+        )
     }
 }
 

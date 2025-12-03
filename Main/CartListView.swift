@@ -45,7 +45,6 @@ struct CartListView: View {
             carts.nsPredicate = newValue.isEmpty ? nil : NSPredicate(format: "name CONTAINS[cd] %@", viewModel.cartQuery)
         }
         .navigationTitle("Carts")
-        .navigationTitleColor(Color.foreground)
         .textInputAutocapitalization(.never)
         .scrollContentBackground(.hidden)
         .background(Color.background)
@@ -54,7 +53,7 @@ struct CartListView: View {
         }
         .sheet(isPresented: $showAddCart) {
             NavigationStack {
-                AddCartView()
+                AddCartView(viewModel: viewModel)
             }
         }
         .task {

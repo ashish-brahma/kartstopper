@@ -10,7 +10,7 @@ import SwiftUI
 import CoreData
 
 struct AddCartView: View {
-    @ObservedObject var viewModel = ViewModel()
+    @ObservedObject var viewModel: ViewModel
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.dismiss) private var dismiss
     
@@ -74,6 +74,6 @@ struct AddCartView: View {
 
 #Preview {
     NavigationStack {
-        AddCartView()
+        AddCartView(viewModel: .preview)
     }
 }

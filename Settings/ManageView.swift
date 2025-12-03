@@ -26,7 +26,7 @@ struct ManageView: View {
         Form {
             Section {
                 budgetStepper()
-                    .disabled(viewModel.budget.disableBudget)
+                    .disabled(viewModel.budget.isLocked)
             } header: {
                 Text("Monthly Budget")
             } footer: {
@@ -62,7 +62,9 @@ struct ManageView: View {
         .navigationTitle("Preferences")
         .navigationTitleColor(Color.foreground)
         .task {
-            viewModel.budget.updateBudgetLock()
+            if viewModel.hasOnboarded {
+                viewModel.budget.updateBudgetLock()
+            }
         }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
@@ -102,8 +104,8 @@ struct ManageView: View {
     @ViewBuilder
     private func difficultyPicker() -> some View {
         Picker("Difficulty", selection: $viewModel.budget.budgetMode) {
-            ForEach(Budget.modes.allCases) { mode in
-                Text(mode.rawValue)
+            ForEach(Budget.Mode.allCases) { mode in
+                Text(mode.rawValue).tag(mode)
             }
         }
     }

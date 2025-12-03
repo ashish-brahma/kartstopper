@@ -12,7 +12,7 @@ import CoreData
 @main
 struct KartStopperApp: App {
     private var persistenceController = PersistenceController.shared
-    @StateObject private var viewModel = ViewModel()
+    @StateObject private var viewModel = ViewModel(budget: Budget())
 
     var body: some Scene {
         WindowGroup {

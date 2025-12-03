@@ -17,37 +17,12 @@ struct ContentView: View {
     
     let columns = [GridItem(.flexible()), GridItem(.flexible())]
     
-    var totalMonthlySpend: String {
-        viewModel.budget.totalMonthlySpend
-            .formatted(.currency(code: Locale.current.currency?.identifier ?? "USD"))
-    }
-    
-    var fontColor: Color {
-        switch(viewModel.budget.status) {
-        case .positive:
-                .richBlack
-        case .neutral:
-                .letterJacket
-        case .negative:
-                .cowpeas
-        }
-    }
-    
-    var dynamicTitle: String {
-        switch(viewModel.budget.status) {
-        case .positive:
-            "You're Awesome"
-        case .neutral:
-            "Slow Down"
-        case .negative:
-            "You're broke"
-        }
-    }
-    
     var body: some View {
         GeometryReader { reader in
             NavigationStack {
                 ScrollView {
+                    title(reader: reader)
+                    
                     statusCard(reader: reader)
                     
                     LazyVGrid(columns: columns) {
@@ -58,9 +33,10 @@ struct ContentView: View {
                     }
                     .padding(.horizontal, Design.Padding.horizontal * 2)
                 }
-                .navigationTitle(dynamicTitle)
-                .navigationTitleColor(fontColor)
+                .navigationTitle("Home")
+                .navigationTitleColor(Color.foreground)
                 .background(Color.background)
+                .toolbar(.hidden, for: .navigationBar)
                 .toolbar {
                     dashboardToolbar()
                 }
@@ -68,7 +44,6 @@ struct ContentView: View {
             .sheet(isPresented: $showPreferences) {
                 NavigationStack {
                     ManageView(viewModel: viewModel)
-                        .presentationDetents([.medium, .large])
                 }
             }
             .task {
@@ -78,23 +53,42 @@ struct ContentView: View {
     }
     
     @ViewBuilder
+    private func title(reader: GeometryProxy) -> some View {
+        HStack {
+            Text("\(viewModel.dynamicTitle)")
+                .font(.largeTitle)
+                .fontWeight(.bold)
+                .multilineTextAlignment(.leading)
+                .foregroundStyle(viewModel.fontColor)
+                .padding(.leading, Design.Padding.leading)
+                .padding(.bottom, -Design.Padding.bottom)
+            
+            Spacer()
+        }
+        .padding(.top, reader.size.height/20)
+    }
+    
+    @ViewBuilder
     private func statusCard(reader: GeometryProxy) -> some View {
         VStack(alignment: .leading) {
             Text("This month you have spent")
                 .font(Font.custom(Design.Fonts.italicCaption, size: 16))
                 .padding(.top, reader.size.height/30)
                 .padding(.leading, Design.Padding.leading)
-                .position(x: reader.size.width/3.8, y: reader.size.height/20)
+                .position(x: reader.size.width/3.8,
+                          y: reader.size.height/20)
             
-            Text(totalMonthlySpend)
+            setCurrency(for: viewModel.budget.totalMonthlySpend)
                 .font(Font.custom(Design.Fonts.largeNumber, size: 80))
                 .padding(.top, reader.size.height/20)
                 .padding(.bottom, reader.size.height/10)
-                .position(x: reader.size.width/2, y: reader.size.height/20)
+                .position(x: reader.size.width/2,
+                          y: reader.size.height/20)
+                
         }
         .frame(maxWidth: .infinity)
         .frame(height: reader.size.height/2.8)
-        .foregroundStyle(fontColor)
+        .foregroundStyle(viewModel.budget.status == .negative ? .cowpeas : .richBlack)
         .background(Color(viewModel.budget.status.rawValue))
         .padding(.vertical, Design.Padding.vertical * 4)
     }
@@ -147,7 +141,7 @@ struct ContentView: View {
     
     @ToolbarContentBuilder
     private func dashboardToolbar() -> some ToolbarContent {
-        ToolbarItem(placement: .primaryAction) {
+        ToolbarItem(placement: .bottomBar) {
             Button {
                 showPreferences = true
             } label: {

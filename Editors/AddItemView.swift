@@ -12,7 +12,7 @@ import CoreData
 struct AddItemView: View {
     let cart: CDCart
     
-    @ObservedObject var viewModel = ViewModel()
+    @ObservedObject var viewModel: ViewModel
     
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.dismiss) private var dismiss
@@ -94,7 +94,7 @@ struct AddItemView: View {
 
 #Preview {
     NavigationStack {
-        AddItemView(cart: .preview)
+        AddItemView(cart: .preview, viewModel: .preview)
     }
     .environment(\.locale, Locale(identifier: "en-IN"))
 }
