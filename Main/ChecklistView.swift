@@ -122,16 +122,6 @@ struct ChecklistView: View {
             .swipeActions(edge: .trailing) {
                 Button {
                     selection = item
-                    showItemInfo = true
-                } label: {
-                    Label("Info", systemImage: "info")
-                        .tint(.info)
-                        .labelStyle(.iconOnly)
-                }
-            }
-            .swipeActions(edge: .trailing) {
-                Button {
-                    selection = item
                     showEditItem = true
                 } label: {
                     Label("Edit", systemImage: "pencil")
@@ -154,6 +144,17 @@ struct ChecklistView: View {
                                        price: selection.price,
                                        notes: selection.displayNotes)
                         .presentationDragIndicator(.visible)
+                        .toolbar {
+                            ToolbarItem(placement: .topBarTrailing) {
+                                Button {
+                                    showEditItem = true
+                                } label: {
+                                    Label("Edit", systemImage: "pencil")
+                                        .tint(.edit)
+                                        .labelStyle(.iconOnly)
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -185,6 +186,10 @@ struct ChecklistView: View {
                         .frame(width: reader.size.width/2)
                         .padding(.horizontal, Design.Padding.horizontal)
                 }
+                
+                Spacer()
+                
+                infoButton(for: item)
             }
         }
     }
@@ -214,6 +219,19 @@ struct ChecklistView: View {
                 item.quantity = 1
             }
             saveContext()
+        }
+    }
+    
+    @ViewBuilder
+    private func infoButton(for item: CDItem) -> some View {
+        Button {
+            selection = item
+            showItemInfo = true
+        } label: {
+            Label("Info", systemImage: "info.circle")
+                .imageScale(.large)
+                .tint(.info)
+                .labelStyle(.iconOnly)
         }
     }
     

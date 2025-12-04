@@ -36,7 +36,7 @@ struct EditCartView: View {
         .navigationTitle(cart.displayName)
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
-                Button("Dismiss") {
+                Button("Cancel") {
                     dismiss()
                 }
             }

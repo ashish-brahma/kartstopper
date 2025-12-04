@@ -47,7 +47,7 @@ struct EditItemView: View {
         .navigationTitle(item.displayName)
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
-                Button("Dismiss") {
+                Button("Cancel") {
                     dismiss()
                 }
             }
