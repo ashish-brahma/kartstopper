@@ -54,13 +54,13 @@ struct ManageView: View {
             }
             
             Section {
+                legal()
                 developer()
             } header: {
                 Text("About")
             }
         }
         .navigationTitle("Preferences")
-        .navigationTitleColor(Color.foreground)
         .task {
             if viewModel.hasOnboarded {
                 viewModel.budget.updateBudgetLock()
@@ -140,6 +140,27 @@ struct ManageView: View {
             .padding()
             .frame(maxHeight: .infinity)
             .navigationTitle(Constants.Manage.developerName.formatted())
+        }
+    }
+    
+    @ViewBuilder
+    private func legal() -> some View {
+        NavigationLink("Legal") {
+            VStack(alignment: .leading) {
+                Text(Constants.Manage.legalLine1)
+                + Text(Constants.Manage.host).bold()
+                + Text(Constants.Manage.legalLine2)
+                + Text(Constants.Manage.license).bold()
+                + Text(".")
+                
+                linkButton(urlString: Constants.Manage.repositoryURL, title: "Github Repository")
+                    .padding(.top, Design.Padding.top)
+                
+                Spacer()
+            }
+            .padding(Design.Padding.standard * 1.89)
+            .frame(maxHeight: .infinity)
+            .navigationTitle("Legal")
         }
     }
 }
