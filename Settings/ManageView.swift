@@ -67,9 +67,16 @@ struct ManageView: View {
             }
         }
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                Button("Done") {
+            ToolbarItem(placement: .cancellationAction) {
+                Button("Dismiss") {
                     dismiss()
+                }
+            }
+            ToolbarItem(placement: .confirmationAction){
+                Button {
+                    // TODO: Add save action.
+                } label: {
+                    Label("Done", systemImage: "checkmark")
                 }
             }
         }

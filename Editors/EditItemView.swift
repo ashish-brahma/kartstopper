@@ -54,10 +54,12 @@ struct EditItemView: View {
             ToolbarItem(placement: .principal) {
                 Text("Edit Item Details")
             }
-            ToolbarItem(placement: .topBarTrailing) {
-                Button("Done") {
+            ToolbarItem(placement: .confirmationAction) {
+                Button {
                     updateItem()
                     dismiss()
+                } label: {
+                    Label("Done", systemImage: "checkmark")
                 }
             }
         }

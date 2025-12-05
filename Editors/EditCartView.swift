@@ -43,10 +43,12 @@ struct EditCartView: View {
             ToolbarItem(placement: .principal) {
                 Text("Edit Cart Details")
             }
-            ToolbarItem(placement: .topBarTrailing) {
-                Button("Done") {
+            ToolbarItem(placement: .confirmationAction) {
+                Button {
                     updateCart()
                     dismiss()
+                } label: {
+                    Label("Done", systemImage: "checkmark")
                 }
             }
         }
