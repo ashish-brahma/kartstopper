@@ -83,12 +83,3 @@ extension View {
     }
 }
 
-extension View {
-    /// Set currency format for amount.
-    @ViewBuilder
-    func setCurrency(for amount: Double) -> some View {
-        Text(amount
-                .formatted(.currency(code: Locale.current.currency?.identifier ?? "USD")))
-    }
-}
-

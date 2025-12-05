@@ -11,7 +11,9 @@ import CoreData
 
 struct ContentView: View {
     @ObservedObject var viewModel: ViewModel
+    
     @Environment(\.managedObjectContext) private var viewContext
+    @Environment(\.locale) private var locale
     
     @State private var showPreferences = false
     
@@ -77,8 +79,8 @@ struct ContentView: View {
                 .padding(.leading, Design.Padding.leading)
                 .position(x: reader.size.width/3.8,
                           y: reader.size.height/20)
-            
-            setCurrency(for: viewModel.budget.totalMonthlySpend)
+                
+            Text(viewModel.budget.totalMonthlySpend.formatted(.currency(code: locale.currency?.identifier ?? "USD")))
                 .font(Font.custom(Design.Fonts.largeNumber, size: 80))
                 .padding(.top, reader.size.height/20)
                 .padding(.bottom, reader.size.height/10)

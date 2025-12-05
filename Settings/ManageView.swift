@@ -14,13 +14,7 @@ struct ManageView: View {
     
     @Environment(\.openURL) private var openURL
     @Environment(\.dismiss) private var dismiss
-    
-    @State var budgetAmount: String = ""
-    
-    var budget: String {
-        viewModel.budget.budgetAmount
-            .formatted(.currency(code: Locale.current.currency?.identifier ?? "USD"))
-    }
+    @Environment(\.locale) private var locale
     
     var body: some View {
         Form {
@@ -100,12 +94,10 @@ struct ManageView: View {
     
     @ViewBuilder
     private func budgetField() -> some View {
-        TextField("\(budget)", text: $budgetAmount)
-            .foregroundStyle(Color.primary)
+        TextField("Budget",
+                  value: $viewModel.budget.budgetAmount,
+                  format: .currency(code: locale.currency?.identifier ?? "USD"))
             .keyboardType(.decimalPad)
-            .onChange(of: budgetAmount) { newValue in
-                viewModel.budget.budgetAmount = Double(newValue) ?? 0.0
-            }
     }
     
     @ViewBuilder
