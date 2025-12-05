@@ -21,3 +21,7 @@
 ## Contributing
 
 Please report any bugs/suggestions through email at [ashish.brahma@outlook.com](mailto:ashish.brahma@outlook.com)
+
+You may support this project financially-
+
+[![Buy Me A Chai](https://buymeachai.ezee.li/assets/images/buymeachai-button.png)](https://buymeachai.ezee.li/zen_dev_ashish)
