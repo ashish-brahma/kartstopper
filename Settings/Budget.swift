@@ -4,6 +4,8 @@
 //
 //  Created by Ashish Brahma on 02/12/25.
 //
+//  A structure that sets up the financial model used for budgeting.
+//  Parameters in the model are provided by user manually.
 
 import Foundation
 import SwiftUI
