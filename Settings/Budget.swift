@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftUI
 
 struct Budget {
     /// Total amount spent.
@@ -23,9 +24,22 @@ struct Budget {
     /// Status indicator of budget.
     var status: Status = .positive
     
+    /// Buget mode selected and saved by user.
+    var selectedMode: Mode {
+        Mode.allCases.filter {
+            $0.rawValue == UserDefaults.standard.string(forKey: "budgetMode")
+        }[0]
+    }
+    
     /// Allow budget edits on the beginning of each month.
     mutating func updateBudgetLock(day: Int = Date.today) {
         isLocked = day == 1 ? false : true
+    }
+    
+    /// Read preferences saved by user.
+    mutating func updateBudgetSettings() {
+        budgetAmount = UserDefaults.standard.double(forKey: "budgetAmount")
+        budgetMode = selectedMode
     }
     
     /// Determine status by fraction of amount spend from the allocated budget amount.

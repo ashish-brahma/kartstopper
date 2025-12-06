@@ -16,6 +16,9 @@ struct ManageView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.locale) private var locale
     
+    @AppStorage("budgetAmount") private var budgetLimit: Double = 0.00
+    @State private var difficulty: Budget.Mode = .medium
+    
     var body: some View {
         Form {
             Section {
@@ -59,6 +62,7 @@ struct ManageView: View {
             if viewModel.hasOnboarded {
                 viewModel.budget.updateBudgetLock()
             }
+            difficulty = viewModel.budget.selectedMode
         }
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
@@ -66,9 +70,11 @@ struct ManageView: View {
                     dismiss()
                 }
             }
-            ToolbarItem(placement: .confirmationAction){
+            ToolbarItem(placement: .confirmationAction) {
                 Button {
-                    // TODO: Add save action.
+                    UserDefaults.standard.set(difficulty.rawValue, forKey: "budgetMode")
+                    viewModel.budget.updateBudgetSettings()
+                    dismiss()
                 } label: {
                     Label("Done", systemImage: "checkmark")
                 }
@@ -82,12 +88,12 @@ struct ManageView: View {
             budgetField()
         } onIncrement: {
             viewModel.objectWillChange.send()
-            viewModel.budget.budgetAmount += 1
+            budgetLimit += 1
         } onDecrement: {
             viewModel.objectWillChange.send()
-            viewModel.budget.budgetAmount -= 1
-            if viewModel.budget.budgetAmount < 1 {
-                viewModel.budget.budgetAmount = 1
+            budgetLimit -= 1
+            if budgetLimit < 1 {
+                budgetLimit = 1
             }
         }
     }
@@ -95,14 +101,14 @@ struct ManageView: View {
     @ViewBuilder
     private func budgetField() -> some View {
         TextField("Budget",
-                  value: $viewModel.budget.budgetAmount,
+                  value: $budgetLimit,
                   format: .currency(code: locale.currency?.identifier ?? "USD"))
             .keyboardType(.decimalPad)
     }
     
     @ViewBuilder
     private func difficultyPicker() -> some View {
-        Picker("Difficulty", selection: $viewModel.budget.budgetMode) {
+        Picker("Difficulty", selection: $difficulty) {
             ForEach(Budget.Mode.allCases) { mode in
                 Text(mode.rawValue).tag(mode)
             }
