@@ -62,7 +62,9 @@ struct ManageView: View {
             if viewModel.hasOnboarded {
                 viewModel.budget.updateBudgetLock()
             }
-            difficulty = viewModel.budget.selectedMode
+            if let mode = viewModel.budget.selectedModes.first {
+                difficulty = mode
+            }
         }
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
@@ -73,6 +75,7 @@ struct ManageView: View {
             ToolbarItem(placement: .confirmationAction) {
                 Button {
                     UserDefaults.standard.set(difficulty.rawValue, forKey: "budgetMode")
+                    viewModel.objectWillChange.send()
                     viewModel.budget.updateBudgetSettings()
                     dismiss()
                 } label: {

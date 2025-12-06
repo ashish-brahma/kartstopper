@@ -24,11 +24,35 @@ struct Budget {
     /// Status indicator of budget.
     var status: Status = .positive
     
-    /// Buget mode selected and saved by user.
-    var selectedMode: Mode {
+    /// An array containing buget mode selected and saved by user
+    var selectedModes: [Mode] {
         Mode.allCases.filter {
             $0.rawValue == UserDefaults.standard.string(forKey: "budgetMode")
-        }[0]
+        }
+    }
+    
+    /// Cutoff ratio used to check positive status.
+    var positiveCutOff: Double {
+        switch budgetMode {
+        case .easy:
+            0.7
+        case .medium:
+            0.5
+        case .hard:
+            0.35
+        }
+    }
+    
+    /// Cutoff ratio used to check neurtal status.
+    var neutralCutOff: Double {
+        switch budgetMode {
+        case .easy:
+            0.95
+        case .medium:
+            0.8
+        case .hard:
+            0.65
+        }
     }
     
     /// Allow budget edits on the beginning of each month.
@@ -39,15 +63,15 @@ struct Budget {
     /// Read preferences saved by user.
     mutating func updateBudgetSettings() {
         budgetAmount = UserDefaults.standard.double(forKey: "budgetAmount")
-        budgetMode = selectedMode
+        budgetMode = selectedModes[0]
     }
     
     /// Determine status by fraction of amount spend from the allocated budget amount.
     mutating func updateBudgetStatus() {
         switch(totalMonthlySpend/budgetAmount) {
-        case 0.0..<0.5:
+        case 0.0..<positiveCutOff:
                 status = .positive
-        case 0.5..<0.8:
+        case positiveCutOff..<neutralCutOff:
                 status = .neutral
         default:
                 status = .negative
