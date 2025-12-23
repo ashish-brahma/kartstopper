@@ -30,11 +30,11 @@ class ViewModel: ObservableObject {
     @Published var itemQuery = ""
     
     /// Flag to check if user has onboarded.
-    private(set) var hasOnboarded: Bool
+    @Published var hasOnboarded: Bool = false
     
     init(
         budget: Budget,
-        hasOnboarded: Bool = false
+        hasOnboarded: Bool
     ) {
         self.budget = budget
         self.hasOnboarded = hasOnboarded
@@ -42,11 +42,26 @@ class ViewModel: ObservableObject {
     
     /// Update dashboard.
     func update(context: NSManagedObjectContext) {
+        self.objectWillChange.send()
+        
+        updateOnboardingState()
+        if hasOnboarded {
+            budget.updateBudgetSettings()
+        }
+        
         totalCarts = CDCart.getTotalCarts(context: context)
         budget.totalMonthlySpend = CDCart.getTotalMonthlySpend(context: context)
+        
         budget.updateBudgetStatus()
+        
         dynamicTitle = setTitle()
         fontColor = setFontColor()
+    }
+    
+    /// Set onboarding state of the user.
+    func updateOnboardingState() {
+        self.objectWillChange.send()
+        hasOnboarded = UserDefaults.standard.bool(forKey: "hasOnboarded")
     }
     
     /// Set dynamic title based on budget status.
@@ -58,6 +73,8 @@ class ViewModel: ObservableObject {
             "Slow Down"
         case .negative:
             "You're broke"
+        case .unassigned:
+            "Welcome"
         }
     }
     
@@ -70,6 +87,8 @@ class ViewModel: ObservableObject {
             .letterJacket
         case .negative:
             .cowpeas
+        case .unassigned:
+            .richBlack
         }
     }
 }

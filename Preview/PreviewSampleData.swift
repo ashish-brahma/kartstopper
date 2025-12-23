@@ -90,32 +90,35 @@ extension CDItem {
 
 extension ViewModel {
     static var preview: ViewModel {
-        .init(budget: .neutral,
+        .init(budget: Budget(totalMonthlySpend: 100.00,
+                             budgetAmount: 5500.00,
+                             budgetMode: .medium,
+                             isLocked: false),
               hasOnboarded: true)
     }
 }
 
 extension Budget {
     static var positive: Budget {
-        .init(totalMonthlySpend: 12.00,
-              budgetAmount: 55.00,
+        .init(totalMonthlySpend: 1200.00,
+              budgetAmount: 5500.00,
               budgetMode: .medium,
               isLocked: true
         )
     }
     
     static var neutral: Budget {
-        .init(totalMonthlySpend: 30.00,
-              budgetAmount: 55.00,
-              budgetMode: .medium,
+        .init(totalMonthlySpend: 3000.00,
+              budgetAmount: 5500.00,
+              budgetMode: .easy,
               isLocked: true
         )
     }
     
     static var negative: Budget {
-        .init(totalMonthlySpend: 50.00,
-              budgetAmount: 55.00,
-              budgetMode: .medium,
+        .init(totalMonthlySpend: 5000.00,
+              budgetAmount: 5500.00,
+              budgetMode: .hard,
               isLocked: true
         )
     }

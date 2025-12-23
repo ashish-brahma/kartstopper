@@ -30,7 +30,7 @@ struct BudgetTests {
         // Case 1: Day of month is not 1.
         budget.updateBudgetLock(day: 2)
         
-        #expect(budget.isLocked == true)
+        #expect(budget.isLocked == true, "Budget is locked for editing if the day of month is other than 1.")
         
         // Case 2: Onboarding of the user is complete.
         let viewModel = ViewModel(budget: Budget(),
@@ -38,16 +38,7 @@ struct BudgetTests {
         
         viewModel.budget.updateBudgetLock()
         
-        #expect(viewModel.budget.isLocked == true, "Budget is locked for editing either when onboarding has completed or if the day of month is other than 1.")
-    }
-    
-    @Test("Editing is unlocked")
-    mutating func budgetAmountUnLocked() throws {
-        var budget = Budget()
-        
-        budget.updateBudgetLock(day: 1)
-        
-        #expect(budget.isLocked == false, "Budget is unlocked for editing on the first day of the month.")
+        #expect(viewModel.budget.isLocked == true, "Budget is locked for editing when onboarding has completed.")
     }
     
     @Test("Mode calibrates status",

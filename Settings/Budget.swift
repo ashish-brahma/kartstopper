@@ -24,7 +24,7 @@ struct Budget {
     var isLocked: Bool = false
     
     /// Status indicator of budget.
-    var status: Status = .positive
+    var status: Status = .unassigned
     
     /// An array containing buget mode selected and saved by user
     var selectedModes: [Mode] {
@@ -72,11 +72,13 @@ struct Budget {
     mutating func updateBudgetStatus() {
         switch(totalMonthlySpend/budgetAmount) {
         case 0.0..<positiveCutOff:
-                status = .positive
+            status = .positive
         case positiveCutOff..<neutralCutOff:
-                status = .neutral
+            status = .neutral
+        case neutralCutOff...:
+            status = .negative
         default:
-                status = .negative
+            status = .unassigned
         }
     }
     
@@ -98,6 +100,7 @@ struct Budget {
         case positive = "PositiveStatus"
         case neutral = "NeutralStatus"
         case negative = "NegativeStatus"
+        case unassigned = "UnassignedStatus"
     }
 }
 

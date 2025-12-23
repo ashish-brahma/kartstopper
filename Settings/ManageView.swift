@@ -16,6 +16,7 @@ struct ManageView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.locale) private var locale
     
+    @AppStorage("hasOnboarded") private var hasOnboarded = false
     @AppStorage("budgetAmount") private var budgetLimit: Double = 0.00
     @State private var difficulty: Budget.Mode = .medium
     
@@ -24,6 +25,7 @@ struct ManageView: View {
             Section {
                 budgetStepper()
                     .disabled(viewModel.budget.isLocked)
+                    .foregroundStyle(viewModel.budget.isLocked ? .secondary : .primary)
             } header: {
                 Text("Monthly Budget")
             } footer: {
@@ -45,7 +47,8 @@ struct ManageView: View {
                 linkButton(urlString: Constants.Manage.privacyURL,
                            title: "Privacy Policy")
                 
-                linkButton(urlString: Constants.Manage.contactURL, title: "Write to us")
+                linkButton(urlString: Constants.Manage.contactURL,
+                           title: "Write to us")
             } header: {
                 Text("Help & Support")
             }
@@ -74,9 +77,14 @@ struct ManageView: View {
             }
             ToolbarItem(placement: .confirmationAction) {
                 Button {
+                    if !viewModel.hasOnboarded && budgetLimit > 0 {
+                        hasOnboarded = true
+                        viewModel.updateOnboardingState()
+                    }
+                    
                     UserDefaults.standard.set(difficulty.rawValue, forKey: "budgetMode")
-                    viewModel.objectWillChange.send()
                     viewModel.budget.updateBudgetSettings()
+                    
                     dismiss()
                 } label: {
                     Label("Done", systemImage: "checkmark")
@@ -103,10 +111,17 @@ struct ManageView: View {
     
     @ViewBuilder
     private func budgetField() -> some View {
-        TextField("Budget",
-                  value: $budgetLimit,
-                  format: .currency(code: locale.currency?.identifier ?? "USD"))
+        HStack {
+            if viewModel.budget.isLocked {
+                Label("Budget Lock", systemImage: "lock.fill")
+                    .labelStyle(.iconOnly)
+            }
+            
+            TextField("Budget",
+                      value: $budgetLimit,
+                      format: .currency(code: locale.currency?.identifier ?? "USD"))
             .keyboardType(.decimalPad)
+        }
     }
     
     @ViewBuilder
