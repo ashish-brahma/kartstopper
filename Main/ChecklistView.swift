@@ -146,12 +146,10 @@ struct ChecklistView: View {
                         .presentationDragIndicator(.visible)
                         .toolbar {
                             ToolbarItem(placement: .topBarTrailing) {
-                                Button {
-                                    showEditItem = true
+                                NavigationLink {
+                                    EditItemView(item: selection)
                                 } label: {
                                     Label("Edit", systemImage: "pencil")
-                                        .tint(.edit)
-                                        .labelStyle(.iconOnly)
                                 }
                             }
                         }

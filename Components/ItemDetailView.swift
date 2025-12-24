@@ -14,6 +14,8 @@ struct ItemDetailView: View {
     let price: Double
     let notes: String
     
+    @Environment(\.dismiss) private var dismiss
+    
     private var itemColor: Color {
         let seed = name.hashValue
         var generator: RandomNumberGenerator = SeededRandomGenerator(seed: seed)
@@ -35,6 +37,13 @@ struct ItemDetailView: View {
             }
             .navigationTitle(name)
             .navigationTitleColor(Color.foreground)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Dismiss") {
+                        dismiss()
+                    }
+                }
+            }
         }
     }
     
