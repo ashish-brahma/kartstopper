@@ -1,0 +1,562 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 90;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		6D0590262EE0712800DCDACF /* KSTestPlan.xctestplan in Resources */ = {isa = PBXBuildFile; fileRef = 6D0590252EE0712800DCDACF /* KSTestPlan.xctestplan */; };
+		6D977A752EE3128600D922E9 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 6D977A742EE3128600D922E9 /* PrivacyInfo.xcprivacy */; };
+		6DF552B82EBCA1120067EB93 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 6DF552B72EBCA1120067EB93 /* README.md */; };
+		6DF552B92EBCA1120067EB93 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 6DF552B62EBCA1120067EB93 /* LICENSE */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		6D058F682EE066BE00DCDACF /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 6D61060C2E79697500A11C91 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 6D6106132E79697500A11C91;
+			remoteInfo = KartStopper;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		6D058F642EE066BE00DCDACF /* KartStopperTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KartStopperTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		6D0590252EE0712800DCDACF /* KSTestPlan.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = KSTestPlan.xctestplan; sourceTree = "<group>"; };
+		6D977A742EE3128600D922E9 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		6D977A772EE3155800D922E9 /* CustomInfo.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = CustomInfo.plist; sourceTree = "<group>"; };
+		6D977A7A2EE3177500D922E9 /* KartStopper.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KartStopper.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		6DF552B62EBCA1120067EB93 /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
+		6DF552B72EBCA1120067EB93 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		6D71AC082EBDF3F30009182F /* Exceptions for "Editors" folder in "KartStopper" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				AddCartView.swift,
+				AddItemView.swift,
+				EditCartView.swift,
+				EditItemView.swift,
+			);
+			target = 6D6106132E79697500A11C91 /* KartStopper */;
+		};
+		6D71AC3B2EBE0AF40009182F /* Exceptions for "Components" folder in "KartStopper" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				CardLabelView.swift,
+				CartRowView.swift,
+				ItemDetailView.swift,
+				ItemRowView.swift,
+				StatusCardView.swift,
+			);
+			target = 6D6106132E79697500A11C91 /* KartStopper */;
+		};
+		6D81F7342EFD654300CFBD3E /* Exceptions for "Settings" folder in "KartStopperTests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				BudgetTests.swift,
+			);
+			target = 6D058F632EE066BE00DCDACF /* KartStopperTests */;
+		};
+		6D81F7362EFD658000CFBD3E /* Exceptions for "Settings" folder in "KartStopper" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				BudgetTests.swift,
+			);
+			target = 6D6106132E79697500A11C91 /* KartStopper */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		6D6106162E79697500A11C91 /* Main */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Main;
+			sourceTree = "<group>";
+		};
+		6D71ABF02EBDF3F30009182F /* Editors */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				6D71AC082EBDF3F30009182F /* Exceptions for "Editors" folder in "KartStopper" target */,
+			);
+			path = Editors;
+			sourceTree = "<group>";
+		};
+		6D71ABF42EBDF3F30009182F /* Support */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Support;
+			sourceTree = "<group>";
+		};
+		6D71AC092EBDF5470009182F /* Persistence */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Persistence;
+			sourceTree = "<group>";
+		};
+		6D71AC0B2EBDF8250009182F /* Assets */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Assets;
+			sourceTree = "<group>";
+		};
+		6D71AC382EBE0AF30009182F /* Components */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				6D71AC3B2EBE0AF40009182F /* Exceptions for "Components" folder in "KartStopper" target */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		6D71AC3C2EBE0B720009182F /* Preview */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Preview;
+			sourceTree = "<group>";
+		};
+		6D89C7C12ED9BD8C00EC4D3F /* Fonts */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Fonts;
+			sourceTree = "<group>";
+		};
+		6DCADE572EDD9D6300CD61F2 /* Settings */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				6D81F7362EFD658000CFBD3E /* Exceptions for "Settings" folder in "KartStopper" target */,
+				6D81F7342EFD654300CFBD3E /* Exceptions for "Settings" folder in "KartStopperTests" target */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		6D058F612EE066BE00DCDACF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+			);
+		};
+		6D6106112E79697500A11C91 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+			);
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		6D61060B2E79697500A11C91 = {
+			isa = PBXGroup;
+			children = (
+				6DCADE572EDD9D6300CD61F2 /* Settings */,
+				6D71AC092EBDF5470009182F /* Persistence */,
+				6D6106162E79697500A11C91 /* Main */,
+				6D71ABF02EBDF3F30009182F /* Editors */,
+				6D71ABF42EBDF3F30009182F /* Support */,
+				6D71AC0B2EBDF8250009182F /* Assets */,
+				6D71AC3C2EBE0B720009182F /* Preview */,
+				6D71AC382EBE0AF30009182F /* Components */,
+				6D89C7C12ED9BD8C00EC4D3F /* Fonts */,
+				6D977A7A2EE3177500D922E9 /* KartStopper.app */,
+				6D058F642EE066BE00DCDACF /* KartStopperTests.xctest */,
+				6D0590252EE0712800DCDACF /* KSTestPlan.xctestplan */,
+				6D977A772EE3155800D922E9 /* CustomInfo.plist */,
+				6D977A742EE3128600D922E9 /* PrivacyInfo.xcprivacy */,
+				6DF552B72EBCA1120067EB93 /* README.md */,
+				6DF552B62EBCA1120067EB93 /* LICENSE */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		6D058F632EE066BE00DCDACF /* KartStopperTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6D058F6A2EE066BE00DCDACF /* Build configuration list for PBXNativeTarget "KartStopperTests" */;
+			buildPhases = (
+				6D058F602EE066BE00DCDACF /* Sources */,
+				6D058F612EE066BE00DCDACF /* Frameworks */,
+				6D058F622EE066BE00DCDACF /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				6D058F692EE066BE00DCDACF /* PBXTargetDependency */,
+			);
+			name = KartStopperTests;
+			productName = KartStopperTests;
+			productReference = 6D058F642EE066BE00DCDACF /* KartStopperTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		6D6106132E79697500A11C91 /* KartStopper */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6D61063A2E79697800A11C91 /* Build configuration list for PBXNativeTarget "KartStopper" */;
+			buildPhases = (
+				6D6106102E79697500A11C91 /* Sources */,
+				6D6106112E79697500A11C91 /* Frameworks */,
+				6D6106122E79697500A11C91 /* Resources */,
+			);
+			buildRules = (
+			);
+			fileSystemSynchronizedGroups = (
+				6D6106162E79697500A11C91 /* Main */,
+				6D71ABF42EBDF3F30009182F /* Support */,
+				6D71AC092EBDF5470009182F /* Persistence */,
+				6D71AC0B2EBDF8250009182F /* Assets */,
+				6D71AC3C2EBE0B720009182F /* Preview */,
+				6D89C7C12ED9BD8C00EC4D3F /* Fonts */,
+				6DCADE572EDD9D6300CD61F2 /* Settings */,
+			);
+			name = KartStopper;
+			productName = kartstopper;
+			productReference = 6D977A7A2EE3177500D922E9 /* KartStopper.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		6D61060C2E79697500A11C91 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2610;
+				LastUpgradeCheck = 2610;
+				TargetAttributes = {
+					6D058F632EE066BE00DCDACF = {
+						CreatedOnToolsVersion = 26.1.1;
+						TestTargetID = 6D6106132E79697500A11C91;
+					};
+					6D6106132E79697500A11C91 = {
+						CreatedOnToolsVersion = 26.0;
+					};
+				};
+			};
+			buildConfigurationList = 6D61060F2E79697500A11C91 /* Build configuration list for PBXProject "KartStopper" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 6D61060B2E79697500A11C91;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+			);
+			preferredProjectObjectVersion = 90;
+			productRefGroup = 6D61060B2E79697500A11C91;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				6D6106132E79697500A11C91 /* KartStopper */,
+				6D058F632EE066BE00DCDACF /* KartStopperTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		6D058F622EE066BE00DCDACF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
+		};
+		6D6106122E79697500A11C91 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+				6DF552B82EBCA1120067EB93 /* README.md in Resources */,
+				6D977A752EE3128600D922E9 /* PrivacyInfo.xcprivacy in Resources */,
+				6D0590262EE0712800DCDACF /* KSTestPlan.xctestplan in Resources */,
+				6DF552B92EBCA1120067EB93 /* LICENSE in Resources */,
+			);
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		6D058F602EE066BE00DCDACF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
+		};
+		6D6106102E79697500A11C91 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		6D058F692EE066BE00DCDACF /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 6D6106132E79697500A11C91 /* KartStopper */;
+			targetProxy = 6D058F682EE066BE00DCDACF /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		6D058F6B2EE066BE00DCDACF /* Debug configuration for PBXNativeTarget "KartStopperTests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 24883L9UCA;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.goldendamsel.KartStopperTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/KartStopper.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/KartStopper";
+			};
+			name = Debug;
+		};
+		6D058F6C2EE066BE00DCDACF /* Release configuration for PBXNativeTarget "KartStopperTests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 24883L9UCA;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.goldendamsel.KartStopperTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/KartStopper.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/KartStopper";
+			};
+			name = Release;
+		};
+		6D6106382E79697800A11C91 /* Debug configuration for PBXProject "KartStopper" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 24883L9UCA;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		6D6106392E79697800A11C91 /* Release configuration for PBXProject "KartStopper" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 24883L9UCA;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		6D61063B2E79697800A11C91 /* Debug configuration for PBXNativeTarget "KartStopper" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 24883L9UCA;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CustomInfo.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = KartStopper;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.goldendamsel.kartstopper;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		6D61063C2E79697800A11C91 /* Release configuration for PBXNativeTarget "KartStopper" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 24883L9UCA;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CustomInfo.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = KartStopper;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.goldendamsel.kartstopper;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		6D058F6A2EE066BE00DCDACF /* Build configuration list for PBXNativeTarget "KartStopperTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6D058F6B2EE066BE00DCDACF /* Debug configuration for PBXNativeTarget "KartStopperTests" */,
+				6D058F6C2EE066BE00DCDACF /* Release configuration for PBXNativeTarget "KartStopperTests" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		6D61060F2E79697500A11C91 /* Build configuration list for PBXProject "KartStopper" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6D6106382E79697800A11C91 /* Debug configuration for PBXProject "KartStopper" */,
+				6D6106392E79697800A11C91 /* Release configuration for PBXProject "KartStopper" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		6D61063A2E79697800A11C91 /* Build configuration list for PBXNativeTarget "KartStopper" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6D61063B2E79697800A11C91 /* Debug configuration for PBXNativeTarget "KartStopper" */,
+				6D61063C2E79697800A11C91 /* Release configuration for PBXNativeTarget "KartStopper" */,
+			);
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 6D61060C2E79697500A11C91 /* Project object */;
+}
