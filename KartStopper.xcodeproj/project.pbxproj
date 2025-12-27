@@ -58,14 +58,14 @@
 		6D81F7342EFD654300CFBD3E /* Exceptions for "Settings" folder in "KartStopperTests" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				BudgetTests.swift,
+				SettingsTests/BudgetTests.swift,
 			);
 			target = 6D058F632EE066BE00DCDACF /* KartStopperTests */;
 		};
 		6D81F7362EFD658000CFBD3E /* Exceptions for "Settings" folder in "KartStopper" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				BudgetTests.swift,
+				SettingsTests/BudgetTests.swift,
 			);
 			target = 6D6106132E79697500A11C91 /* KartStopper */;
 		};

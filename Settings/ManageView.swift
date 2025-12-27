@@ -18,7 +18,7 @@ struct ManageView: View {
     
     @AppStorage("hasOnboarded") private var hasOnboarded = false
     @AppStorage("budgetAmount") private var budgetLimit: Double = 0.00
-    @State private var difficulty: Budget.Mode = .medium
+    @State private var difficulty: Mode = .medium
     
     var body: some View {
         Form {
@@ -127,7 +127,7 @@ struct ManageView: View {
     @ViewBuilder
     private func difficultyPicker() -> some View {
         Picker("Difficulty", selection: $difficulty) {
-            ForEach(Budget.Mode.allCases) { mode in
+            ForEach(Mode.allCases) { mode in
                 Text(mode.rawValue).tag(mode)
             }
         }

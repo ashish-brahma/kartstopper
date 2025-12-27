@@ -11,13 +11,17 @@ import Testing
 
 @MainActor
 struct BudgetTests {
-    let cases = [Budget.positive, Budget.neutral, Budget.negative]
+    var budget = Budget()
+    
+    let cases: [Budget] = [
+        MockBudget.positive,
+        MockBudget.neutral,
+        MockBudget.negative
+    ]
     
     @Test("Status correctness", arguments: 0...2)
     mutating func monthlySpendUpdatesBudgetStatus(_ index: Int) throws {
-        var budget = cases[index]
-        
-        budget.totalMonthlySpend = (budget.neutralCutOff + 1) * budget.budgetAmount
+        budget.totalMonthlySpend = (budget.neutralCutOff + 1) * cases[index].budgetAmount
         budget.updateBudgetStatus()
         
         #expect(budget.status == .negative, "When total monthly amount spent out of the allocated budget exceeds neutral cut-off ratio, a negative status is expected.")
@@ -25,8 +29,6 @@ struct BudgetTests {
     
     @Test("Editing is locked")
     mutating func budgetAmountLocked() throws {
-        var budget = Budget()
-        
         // Case 1: Day of month is not 1.
         budget.updateBudgetLock(day: 2)
         
@@ -42,12 +44,13 @@ struct BudgetTests {
     }
     
     @Test("Mode calibrates status",
-          arguments: zip(Budget.Mode.allCases, [false, true, true]))
+          arguments: zip(Mode.allCases, [false, true, true]))
     mutating func budgetModeUpdatesRatioCutOffs(
-        mode: Budget.Mode,
+        mode: Mode,
         isTrue: Bool
     ) throws {
-        var budget = Budget.negative
+        budget.budgetAmount = MockBudget.negative.budgetAmount
+        budget.totalMonthlySpend = MockBudget.negative.totalMonthlySpend
         
         budget.budgetMode = mode
         budget.updateBudgetStatus()
@@ -55,5 +58,4 @@ struct BudgetTests {
         let negativeState = (budget.status == .negative)
         #expect(negativeState == isTrue, "Easy mode has a higher cut-off for negative status.")
     }
-
 }

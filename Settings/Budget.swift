@@ -10,7 +10,7 @@
 import Foundation
 import SwiftUI
 
-struct Budget {
+struct Budget: BudgetProtocol {
     /// Total amount spent.
     var totalMonthlySpend: Double = 0.00
     
@@ -80,27 +80,6 @@ struct Budget {
         default:
             status = .unassigned
         }
-    }
-    
-    /// Difficulty levels to determine strictness of monitoring.
-    enum Mode: String, CaseIterable, Identifiable {
-        var id : String {
-            UUID().uuidString
-        }
-        case easy = "Easy"
-        case medium = "Medium"
-        case hard = "Hard"
-    }
-    
-    /// Categories to grade expenditure.
-    enum Status: String, CaseIterable, Identifiable {
-        var id : String {
-            UUID().uuidString
-        }
-        case positive = "PositiveStatus"
-        case neutral = "NeutralStatus"
-        case negative = "NegativeStatus"
-        case unassigned = "UnassignedStatus"
     }
 }
 

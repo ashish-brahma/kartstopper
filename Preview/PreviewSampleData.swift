@@ -4,6 +4,7 @@
 //
 //  Created by Ashish Brahma on 07/11/25.
 //
+//  Sample data for use in previews.
 
 import Foundation
 import CoreData
@@ -95,32 +96,6 @@ extension ViewModel {
                              budgetMode: .medium,
                              isLocked: false),
               hasOnboarded: true)
-    }
-}
-
-extension Budget {
-    static var positive: Budget {
-        .init(totalMonthlySpend: 1200.00,
-              budgetAmount: 5500.00,
-              budgetMode: .medium,
-              isLocked: true
-        )
-    }
-    
-    static var neutral: Budget {
-        .init(totalMonthlySpend: 3000.00,
-              budgetAmount: 5500.00,
-              budgetMode: .easy,
-              isLocked: true
-        )
-    }
-    
-    static var negative: Budget {
-        .init(totalMonthlySpend: 5000.00,
-              budgetAmount: 5500.00,
-              budgetMode: .hard,
-              isLocked: true
-        )
     }
 }
 

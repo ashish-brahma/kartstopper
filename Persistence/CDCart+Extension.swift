@@ -45,22 +45,17 @@ extension CDCart {
     }
     
     static func getTotalMonthlySpend(context: NSManagedObjectContext) -> Double {
-        var amount = 0.00
-        
         let request = CDItem.fetchRequest()
+        let start = Date.startOfMonth(from: .now) as NSDate
+        let end = Date.now as NSDate
+        
+        request.predicate = NSPredicate(format: "isComplete == true && %K >= %@ && %K <= %@",
+                                                "timestamp", start, "timestamp", end)
+        
         guard let items = try? context.fetch(request), items.count != 0
         else { return 0.00 }
         
-        let currentMonth = Calendar.current.component(.month, from: .now)
-        
-        for item in items {
-            if let date = item.timestamp {
-                let month = Calendar.current.component(.month, from: date)
-                if item.isComplete && month == currentMonth {
-                    amount += item.price * Double(item.quantity)
-                }
-            }
-        }
+        let amount = items.map { $0.price * Double($0.quantity) }.reduce(0, +)
         return amount
     }
 }
@@ -74,5 +69,13 @@ extension Date {
             .day(.twoDigits)
             .hour(.twoDigits(amPM: .abbreviated))
             .minute(.twoDigits)
+    }
+    
+    static func startOfMonth(from date: Date) -> Date {
+        var components = DateComponents()
+        components.day = 1
+        components.month = Calendar.current.component(.month, from: date)
+        components.year = Calendar.current.component(.year, from: date)
+        return Calendar.current.date(from: components) ?? date
     }
 }
