@@ -91,7 +91,7 @@ extension CDItem {
 
 extension ViewModel {
     static var preview: ViewModel {
-        .init(budget: Budget(totalMonthlySpend: 100.00,
+        .init(budget: Budget(totalMonthlySpend: 1000.00,
                              budgetAmount: 5500.00,
                              budgetMode: .medium,
                              isLocked: false),

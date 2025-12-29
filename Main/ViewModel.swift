@@ -23,8 +23,11 @@ class ViewModel: ObservableObject {
     /// Title displayed on home view.
     @Published var dynamicTitle: String = ""
     
-    /// Color code used on status card in home view.
+    /// Color code used for fonts on status card in home view.
     @Published var fontColor: Color = .richBlack
+    
+    /// Color code used for gauge on status card in home view.
+    @Published var gaugeColor: Color = .gray700
     
     /// Query term used to conduct item search.
     @Published var itemQuery = ""
@@ -55,6 +58,7 @@ class ViewModel: ObservableObject {
         
         dynamicTitle = setTitle()
         fontColor = setFontColor()
+        gaugeColor = setGaugeColor()
     }
     
     /// Set onboarding state of the user.
@@ -88,6 +92,20 @@ class ViewModel: ObservableObject {
             .cowpeas
         case .unassigned:
             .richBlack
+        }
+    }
+    
+    /// Set gauge color based on status.
+    func setGaugeColor() -> Color {
+        switch(budget.status) {
+        case .positive:
+                .gray700
+        case .neutral:
+                .letterJacket
+        case .negative:
+                .cowpeas
+        case .unassigned:
+                .richBlack
         }
     }
 }

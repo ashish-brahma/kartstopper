@@ -22,8 +22,6 @@ enum Design {
     static let avatarDetailCornerRadius = CGFloat(41)
     static let avatarDetailTextFontSize = CGFloat(144)
     
-    static let buttonShadowRadius = CGFloat(7)
-    
     enum Padding {
         static let vertical = CGFloat(4)
         static let horizontal = CGFloat(4)
@@ -36,7 +34,9 @@ enum Design {
     
     enum Fonts {
         static let largeNumber = "NewYorkLarge-Regular"
+        static let largeNumberFontSize = CGFloat(48)
         static let italicCaption = "NewYorkMedium-SemiboldItalic"
+        static let itaticCaptionFontSize = CGFloat(16)
     }
 }
 

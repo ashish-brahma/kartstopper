@@ -84,10 +84,10 @@ struct ContentView: View {
                                     count: 2),
         reader: GeometryProxy
     ) -> some View {
-        StatusCardView(reader: reader,
-                           viewModel: viewModel)
-        
         VStack {
+            StatusCardView(reader: reader,
+                           viewModel: viewModel)
+            
             gridTitle()
             
             if !viewModel.hasOnboarded {
