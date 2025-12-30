@@ -15,7 +15,6 @@ struct CardLabelView: View {
     var iconColor: Color = .gray700
     var fontColor: Color = Color.foreground
     var statColor: Color = .accent
-    var backgroundColor: Color = .cardLabel
     let reader: GeometryProxy
     
     var body: some View {
@@ -57,7 +56,6 @@ struct CardLabelView: View {
                       description: "Insights about the stat",
                       detailIcon: "arrowtriangle.up.square.fill",
                       fontColor: .primary,
-                      backgroundColor: .neon,
                       reader: reader)
         .frame(height: reader.size.height/4)
         .padding(.top, Design.Padding.top * 4)
