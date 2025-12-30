@@ -95,10 +95,15 @@ struct ContentView: View {
             }
             
             LazyVGrid(columns: columns) {
-                gridCard(title: "Total Carts",
-                         stat: "\(viewModel.totalCarts)",
-                         content: CartListView(viewModel: viewModel),
-                         reader: reader)
+                NavigationLink {
+                    CartListView(viewModel: viewModel)
+                } label: {
+                    CardLabelView(title: "Carts",
+                                  stat: "\(viewModel.totalCarts)",
+                                  description: "Top carts created by number of items",
+                                  detailIcon: "chevron.right.circle.fill",
+                                  reader: reader)
+                }
             }
         }
         .padding(.horizontal)
@@ -116,23 +121,6 @@ struct ContentView: View {
         }
         .padding(.top, Design.Padding.top)
         .padding(.bottom, Design.Padding.bottom)
-    }
-    
-    @ViewBuilder
-    private func gridCard(
-        title: String,
-        stat: String,
-        content: some View,
-        reader: GeometryProxy
-    ) -> some View {
-        NavigationLink {
-            content
-        } label: {
-            CardLabelView(title: title,
-                          stat: stat,
-                          detailIcon: "chevron.right.circle.fill",
-                          reader: reader)
-        }
     }
     
     // MARK: - Setup methods

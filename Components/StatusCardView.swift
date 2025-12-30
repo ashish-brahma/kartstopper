@@ -37,7 +37,7 @@ struct StatusCardView: View {
             .tint(viewModel.gaugeColor)
             .padding()
         }
-        .frame(height: reader.size.height/2.8)
+        .frame(height: reader.size.height/3.2)
         .padding()
         .background(.cardLabel.opacity(0.8))
         .clipShape(.rect(cornerRadius: 25))

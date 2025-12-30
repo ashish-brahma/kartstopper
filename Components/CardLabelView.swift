@@ -20,10 +20,26 @@ struct CardLabelView: View {
     
     var body: some View {
         VStack {
-            HStack {
-                Text(title)
-                    .font(.title2)
-                    .foregroundStyle(fontColor)
+            HStack(alignment: .top) {
+                VStack(alignment: .leading) {
+                    if !description.isEmpty {
+                        Text(description)
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
+                    
+                    Text(title)
+                        .font(.subheadline.bold())
+                        .foregroundStyle(fontColor)
+                    
+                    
+                    if !stat.isEmpty {
+                        Text(stat)
+                            .font(.title2)
+                            .foregroundStyle(statColor)
+                    }
+                }
+                .multilineTextAlignment(.leading)
                 
                 Spacer()
                 
@@ -32,21 +48,10 @@ struct CardLabelView: View {
                     .imageScale(.large)
                     .foregroundStyle(iconColor)
             }
+            .padding(.bottom, -Design.Padding.bottom)
             
             VStack {
-                if !stat.isEmpty {
-                    Text(stat)
-                        .font(.largeTitle)
-                        .foregroundStyle(statColor)
-                }
-                
-                if !description.isEmpty {
-                    Text(description)
-                        .font(.footnote.italic())
-                        .foregroundStyle(fontColor)
-                    
-                    Spacer(minLength: reader.size.height/20)
-                }
+                ProgressView()
             }
             .padding(.top, reader.size.height/60)
             .padding(.bottom, reader.size.height/25)
