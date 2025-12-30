@@ -72,6 +72,11 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		6D0AAB1B2F0425D9005987BD /* Charts */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Charts;
+			sourceTree = "<group>";
+		};
 		6D6106162E79697500A11C91 /* Main */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = Main;
@@ -146,6 +151,7 @@
 		6D61060B2E79697500A11C91 = {
 			isa = PBXGroup;
 			children = (
+				6D0AAB1B2F0425D9005987BD /* Charts */,
 				6DCADE572EDD9D6300CD61F2 /* Settings */,
 				6D71AC092EBDF5470009182F /* Persistence */,
 				6D6106162E79697500A11C91 /* Main */,
@@ -197,6 +203,7 @@
 			buildRules = (
 			);
 			fileSystemSynchronizedGroups = (
+				6D0AAB1B2F0425D9005987BD /* Charts */,
 				6D6106162E79697500A11C91 /* Main */,
 				6D71ABF42EBDF3F30009182F /* Support */,
 				6D71AC092EBDF5470009182F /* Persistence */,

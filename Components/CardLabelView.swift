@@ -19,47 +19,34 @@ struct CardLabelView: View {
     let reader: GeometryProxy
     
     var body: some View {
-        VStack {
-            HStack(alignment: .top) {
-                VStack(alignment: .leading) {
-                    if !description.isEmpty {
-                        Text(description)
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
-                    }
-                    
-                    Text(title)
-                        .font(.subheadline.bold())
-                        .foregroundStyle(fontColor)
-                    
-                    
-                    if !stat.isEmpty {
-                        Text(stat)
-                            .font(.title2)
-                            .foregroundStyle(statColor)
-                    }
+        HStack(alignment: .top) {
+            VStack(alignment: .leading) {
+                Text(title)
+                    .font(.headline)
+                    .foregroundStyle(fontColor)
+                
+                
+                if !stat.isEmpty {
+                    Text(stat)
+                        .font(.title2)
+                        .foregroundStyle(statColor)
                 }
-                .multilineTextAlignment(.leading)
                 
-                Spacer()
-                
-                Label("Detail", systemImage: detailIcon)
-                    .labelStyle(.iconOnly)
-                    .imageScale(.large)
-                    .foregroundStyle(iconColor)
+                if !description.isEmpty {
+                    Text(description)
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
             }
-            .padding(.bottom, -Design.Padding.bottom)
+            .multilineTextAlignment(.leading)
             
-            VStack {
-                ProgressView()
-            }
-            .padding(.top, reader.size.height/60)
-            .padding(.bottom, reader.size.height/25)
+            Spacer()
+            
+            Label("Detail", systemImage: detailIcon)
+                .labelStyle(.iconOnly)
+                .imageScale(.large)
+                .foregroundStyle(iconColor)
         }
-        .padding()
-        .background(backgroundColor)
-        .clipShape(.rect(cornerRadius: 25))
-        .tint(Color.foreground)
     }
 }
 

@@ -95,18 +95,32 @@ struct ContentView: View {
             }
             
             LazyVGrid(columns: columns) {
-                NavigationLink {
-                    CartListView(viewModel: viewModel)
-                } label: {
-                    CardLabelView(title: "Carts",
-                                  stat: "\(viewModel.totalCarts)",
-                                  description: "Top carts created by number of items",
-                                  detailIcon: "chevron.right.circle.fill",
-                                  reader: reader)
-                }
+                listsCard(reader: reader)
             }
         }
         .padding(.horizontal)
+    }
+    
+    @ViewBuilder
+    private func listsCard(reader: GeometryProxy) -> some View {
+        NavigationLink {
+            CartListView(viewModel: viewModel)
+        } label: {
+            VStack {
+                CardLabelView(title: "Carts",
+                              stat: "\(viewModel.totalCarts)",
+                              description: "Total carts",
+                              detailIcon: "chevron.right.circle.fill",
+                              reader: reader)
+                
+                TopCarts()
+            }
+            .padding()
+            .background(.cardLabel)
+            .clipShape(.rect(cornerRadius: 25))
+            .tint(Color.foreground)
+            
+        }
     }
     
     @ViewBuilder
