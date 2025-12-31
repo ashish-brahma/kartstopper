@@ -20,14 +20,14 @@ struct ContentView: View {
     var body: some View {
         GeometryReader { reader in
             NavigationStack {
-                ScrollView {
+                VStack {
                     customNavbar(reader: reader)
                     
                     dashboard(reader: reader)
                 }
+                .background(Color.background)
                 .navigationTitle("Home")
                 .navigationTitleColor(Color.foreground)
-                .background(Color.background)
                 .toolbar(.hidden, for: .navigationBar)
             }
             .sheet(isPresented: $showPreferences,
@@ -79,26 +79,28 @@ struct ContentView: View {
     // MARK: - Dashboard methods
     
     @ViewBuilder
-    private func dashboard(
-        columns: [GridItem] = Array(repeating: GridItem(.flexible()),
-                                    count: 2),
-        reader: GeometryProxy
-    ) -> some View {
-        VStack {
-            StatusCardView(reader: reader,
-                           viewModel: viewModel)
-            
-            gridTitle()
-            
-            if !viewModel.hasOnboarded {
-                setupView(reader: reader)
+    private func dashboard(reader: GeometryProxy) -> some View {
+        List {
+            Section {
+                StatusCardView(reader: reader,
+                               viewModel: viewModel)
             }
+            .listRowBackground(Color.cardLabel.opacity(0.8))
             
-            LazyVGrid(columns: columns) {
+            Section {
+                if !viewModel.hasOnboarded {
+                    setupView(reader: reader)
+                }
+            } header: {
+                gridTitle()
+            }
+            .listRowBackground(Color.gray100)
+            
+            Section {
                 listsCard(reader: reader)
             }
         }
-        .padding(.horizontal)
+        .scrollContentBackground(.hidden)
     }
     
     @ViewBuilder
@@ -110,7 +112,6 @@ struct ContentView: View {
                 CardLabelView(title: "Carts",
                               stat: "\(viewModel.totalCarts)",
                               description: "Total carts",
-                              detailIcon: "chevron.right.circle.fill",
                               reader: reader)
                 
                 TopCarts()
@@ -118,8 +119,6 @@ struct ContentView: View {
             .padding()
             .background(.cardLabel)
             .clipShape(.rect(cornerRadius: 25))
-            .tint(Color.foreground)
-            
         }
     }
     
@@ -149,9 +148,6 @@ struct ContentView: View {
             setupButton()
         }
         .padding()
-        .background(.gray100)
-        .clipShape(.rect(cornerRadius: 25))
-        .padding(.vertical, Design.Padding.vertical)
     }
     
     @ViewBuilder

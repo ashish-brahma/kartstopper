@@ -39,7 +39,6 @@ struct StatusCardView: View {
         }
         .frame(height: reader.size.height/3.2)
         .padding()
-        .background(.cardLabel.opacity(0.8))
         .clipShape(.rect(cornerRadius: 25))
         .foregroundStyle(viewModel.budget.status == .negative ? .cowpeas : .richBlack)
         .padding(.vertical, Design.Padding.vertical * 4)

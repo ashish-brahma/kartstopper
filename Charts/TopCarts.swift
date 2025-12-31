@@ -20,43 +20,55 @@ struct TopCarts: View {
         for cart in carts {
             data.append(
                 .init(name: cart.displayName,
-                      items: CDCart.getTotalItems(for: cart,          context: viewContext))
+                      itemCount: CDCart.getTotalItems(for: cart,          context: viewContext))
             )
         }
-        data = data.sorted { $0.items > $1.items }
+        data = data.sorted { $0.itemCount > $1.itemCount }
         return Array(data.prefix(5))
     }
     
+    var maxCount: Int? {
+        data.map { $0.itemCount }.max()
+    }
+    
     var topCartName: String {
-        let max = data.map { $0.items }.max()
-        let name = data.first(where: { $0.items == max })?.name
+        let name = data.first(where: { $0.itemCount == maxCount })?.name
         return name ?? ""
     }
     
     var body: some View {
         VStack(alignment: .leading) {
             Text("Top Cart: \(topCartName)")
-                .font(.caption)
+                .font(.callout.bold())
             
-            Chart(data, id: \.name) { element in
+            Chart(data) { element in
                 BarMark(
-                    x: .value("Items", element.items),
+                    x: .value("Items", element.itemCount),
                     y: .value("Name", element.name)
                 )
-                .foregroundStyle(element.items == data.map { $0.items }.max() ? .accent : .secondary)
+                .foregroundStyle(element.itemCount == maxCount ? .mint : .secondary)
+            }
+            .chartXAxis(.hidden)
+            .chartYAxis {
+                AxisMarks(stroke: StrokeStyle(lineWidth: 0))
             }
         }
     }
 }
 
-struct CartCountData {
+struct CartCountData: Identifiable {
     let name: String
-    let items: Int
+    let itemCount: Int
+    var id: String { name }
 }
 
 #Preview {
-    TopCarts()
-        .environment(\.managedObjectContext,
-                      PersistenceController.preview.container.viewContext)
+    VStack {
+        TopCarts()
+            .frame(height: 300)
+            .environment(\.managedObjectContext,
+                          PersistenceController.preview.container.viewContext)
+    }
+    .padding()
 }
 

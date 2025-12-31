@@ -11,7 +11,6 @@ struct CardLabelView: View {
     let title: String
     var stat: String = ""
     var description: String = ""
-    var detailIcon: String = "arrowtriangle.up.square.fill"
     var iconColor: Color = .gray700
     var fontColor: Color = Color.foreground
     var statColor: Color = .accent
@@ -21,7 +20,7 @@ struct CardLabelView: View {
         HStack(alignment: .top) {
             VStack(alignment: .leading) {
                 Text(title)
-                    .font(.headline)
+                    .font(.title.bold())
                     .foregroundStyle(fontColor)
                 
                 
@@ -40,12 +39,8 @@ struct CardLabelView: View {
             .multilineTextAlignment(.leading)
             
             Spacer()
-            
-            Label("Detail", systemImage: detailIcon)
-                .labelStyle(.iconOnly)
-                .imageScale(.large)
-                .foregroundStyle(iconColor)
         }
+        .padding(.bottom, Design.Padding.bottom)
     }
 }
 
@@ -54,7 +49,6 @@ struct CardLabelView: View {
         CardLabelView(title: "Stat",
                       stat: "0",
                       description: "Insights about the stat",
-                      detailIcon: "arrowtriangle.up.square.fill",
                       fontColor: .primary,
                       reader: reader)
         .frame(height: reader.size.height/4)
