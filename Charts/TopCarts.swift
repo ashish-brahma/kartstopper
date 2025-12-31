@@ -38,8 +38,14 @@ struct TopCarts: View {
     
     var body: some View {
         VStack(alignment: .leading) {
-            Text("Top Cart: \(topCartName)")
+            Text("\(topCartName)").font(.callout.bold())
+            + Text(" contains ").font(.callout)
+            + Text("\(maxCount ?? 0)").font(.callout.bold())
+            + Text(" items").font(.callout)
+            
+            Text("Top Cart")
                 .font(.callout.bold())
+                .foregroundStyle(.secondary)
             
             Chart(data) { element in
                 BarMark(

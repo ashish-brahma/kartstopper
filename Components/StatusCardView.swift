@@ -35,13 +35,10 @@ struct StatusCardView: View {
                 currencyLabel(for: maxValue)
             }
             .tint(viewModel.gaugeColor)
-            .padding()
         }
-        .frame(height: reader.size.height/3.2)
         .padding()
         .clipShape(.rect(cornerRadius: 25))
         .foregroundStyle(viewModel.budget.status == .negative ? .cowpeas : .richBlack)
-        .padding(.vertical, Design.Padding.vertical * 4)
         .task {
             current = viewModel.budget.totalMonthlySpend
             maxValue = viewModel.budget.budgetAmount

@@ -22,7 +22,6 @@ struct ContentView: View {
             NavigationStack {
                 VStack {
                     customNavbar(reader: reader)
-                    
                     dashboard(reader: reader)
                 }
                 .background(Color.background)
@@ -48,8 +47,7 @@ struct ContentView: View {
     private func customNavbar(reader: GeometryProxy) -> some View {
         HStack {
             Text(viewModel.dynamicTitle)
-                .font(.largeTitle)
-                .fontWeight(.bold)
+                .font(.title.bold())
                 .foregroundStyle(viewModel.fontColor)
                 .padding(.leading, Design.Padding.leading/1.4)
             
@@ -91,13 +89,13 @@ struct ContentView: View {
                 if !viewModel.hasOnboarded {
                     setupView(reader: reader)
                 }
-            } header: {
-                gridTitle()
             }
             .listRowBackground(Color.gray100)
             
             Section {
                 listsCard(reader: reader)
+            } header: {
+                gridTitle()
             }
         }
         .scrollContentBackground(.hidden)
@@ -111,7 +109,7 @@ struct ContentView: View {
             VStack {
                 CardLabelView(title: "Carts",
                               stat: "\(viewModel.totalCarts)",
-                              description: "Total carts",
+                              description: "Total Carts",
                               reader: reader)
                 
                 TopCarts()
@@ -126,8 +124,7 @@ struct ContentView: View {
     private func gridTitle() -> some View {
         HStack {
             Text(viewModel.totalCarts == 0 ? "Start Listing" : "Continue Listing")
-                .font(.title)
-                .fontWeight(.bold)
+                .font(.title2.bold())
                 .foregroundStyle(Color.foreground)
             
             Spacer()

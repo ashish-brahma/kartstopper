@@ -32,7 +32,7 @@ struct CardLabelView: View {
                 
                 if !description.isEmpty {
                     Text(description)
-                        .font(.caption2)
+                        .font(.callout.bold())
                         .foregroundStyle(.secondary)
                 }
             }
