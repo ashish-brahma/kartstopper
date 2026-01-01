@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct CardLabelView: View {
+struct CardLabelView<Content: View>: View {
     let title: String
     var stat: String = ""
     var description: String = ""
@@ -15,32 +15,37 @@ struct CardLabelView: View {
     var fontColor: Color = Color.foreground
     var statColor: Color = .accent
     let reader: GeometryProxy
+    var content: Content
     
     var body: some View {
-        HStack(alignment: .top) {
-            VStack(alignment: .leading) {
-                Text(title)
-                    .font(.title.bold())
-                    .foregroundStyle(fontColor)
-                
-                
-                if !stat.isEmpty {
-                    Text(stat)
-                        .font(.title2)
-                        .foregroundStyle(statColor)
+        VStack {
+            HStack(alignment: .top) {
+                VStack(alignment: .leading) {
+                    Text(title)
+                        .font(.title.bold())
+                        .foregroundStyle(fontColor)
+                    
+                    
+                    if !stat.isEmpty {
+                        Text(stat)
+                            .font(.title2)
+                            .foregroundStyle(statColor)
+                    }
+                    
+                    if !description.isEmpty {
+                        Text(description)
+                            .font(.callout.bold())
+                            .foregroundStyle(.secondary)
+                    }
                 }
+                .multilineTextAlignment(.leading)
                 
-                if !description.isEmpty {
-                    Text(description)
-                        .font(.callout.bold())
-                        .foregroundStyle(.secondary)
-                }
+                Spacer()
             }
-            .multilineTextAlignment(.leading)
+            .padding(.bottom, Design.Padding.bottom)
             
-            Spacer()
+            content
         }
-        .padding(.bottom, Design.Padding.bottom)
     }
 }
 
@@ -50,7 +55,8 @@ struct CardLabelView: View {
                       stat: "0",
                       description: "Insights about the stat",
                       fontColor: .primary,
-                      reader: reader)
+                      reader: reader,
+                      content: TopCarts())
         .frame(height: reader.size.height/4)
         .padding(.top, Design.Padding.top * 4)
     }

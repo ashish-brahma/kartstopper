@@ -4,6 +4,7 @@
 //
 //  Created by Ashish Brahma on 30/12/25.
 //
+//  A chart view which visualizes the top 5 carts by item count.
 
 import SwiftUI
 import Charts
@@ -37,26 +38,28 @@ struct TopCarts: View {
     }
     
     var body: some View {
-        VStack(alignment: .leading) {
-            Text("\(topCartName)").font(.callout.bold())
-            + Text(" contains ").font(.callout)
-            + Text("\(maxCount ?? 0)").font(.callout.bold())
-            + Text(" items").font(.callout)
-            
-            Text("Top Cart")
-                .font(.callout.bold())
-                .foregroundStyle(.secondary)
-            
-            Chart(data) { element in
-                BarMark(
-                    x: .value("Items", element.itemCount),
-                    y: .value("Name", element.name)
-                )
-                .foregroundStyle(element.itemCount == maxCount ? .mint : .secondary)
-            }
-            .chartXAxis(.hidden)
-            .chartYAxis {
-                AxisMarks(stroke: StrokeStyle(lineWidth: 0))
+        if !data.isEmpty {
+            VStack(alignment: .leading) {
+                Text("\(topCartName)").font(.callout.bold())
+                + Text(" contains ").font(.callout)
+                + Text("\(maxCount ?? 0)").font(.callout.bold())
+                + Text(" items").font(.callout)
+                
+                Text("Top Cart")
+                    .font(.callout.bold())
+                    .foregroundStyle(.secondary)
+                
+                Chart(data) { element in
+                    BarMark(
+                        x: .value("Items", element.itemCount),
+                        y: .value("Name", element.name)
+                    )
+                    .foregroundStyle(element.itemCount == maxCount ? .mint : .secondary)
+                }
+                .chartXAxis(.hidden)
+                .chartYAxis {
+                    AxisMarks(stroke: StrokeStyle(lineWidth: 0))
+                }
             }
         }
     }

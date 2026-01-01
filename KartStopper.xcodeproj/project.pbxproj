@@ -44,17 +44,6 @@
 			);
 			target = 6D6106132E79697500A11C91 /* KartStopper */;
 		};
-		6D71AC3B2EBE0AF40009182F /* Exceptions for "Components" folder in "KartStopper" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				CardLabelView.swift,
-				CartRowView.swift,
-				ItemDetailView.swift,
-				ItemRowView.swift,
-				StatusCardView.swift,
-			);
-			target = 6D6106132E79697500A11C91 /* KartStopper */;
-		};
 		6D81F7342EFD654300CFBD3E /* Exceptions for "Settings" folder in "KartStopperTests" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -75,6 +64,21 @@
 		6D0AAB1B2F0425D9005987BD /* Charts */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = Charts;
+			sourceTree = "<group>";
+		};
+		6D2429952F068BD1002FEB62 /* Setup */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Setup;
+			sourceTree = "<group>";
+		};
+		6D2429A62F068C23002FEB62 /* Components */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Components;
+			sourceTree = "<group>";
+		};
+		6D2429B52F069420002FEB62 /* Buttons */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Buttons;
 			sourceTree = "<group>";
 		};
 		6D6106162E79697500A11C91 /* Main */ = {
@@ -103,14 +107,6 @@
 		6D71AC0B2EBDF8250009182F /* Assets */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = Assets;
-			sourceTree = "<group>";
-		};
-		6D71AC382EBE0AF30009182F /* Components */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				6D71AC3B2EBE0AF40009182F /* Exceptions for "Components" folder in "KartStopper" target */,
-			);
-			path = Components;
 			sourceTree = "<group>";
 		};
 		6D71AC3C2EBE0B720009182F /* Preview */ = {
@@ -151,15 +147,17 @@
 		6D61060B2E79697500A11C91 = {
 			isa = PBXGroup;
 			children = (
-				6D0AAB1B2F0425D9005987BD /* Charts */,
-				6DCADE572EDD9D6300CD61F2 /* Settings */,
-				6D71AC092EBDF5470009182F /* Persistence */,
-				6D6106162E79697500A11C91 /* Main */,
-				6D71ABF02EBDF3F30009182F /* Editors */,
 				6D71ABF42EBDF3F30009182F /* Support */,
+				6D2429B52F069420002FEB62 /* Buttons */,
+				6D2429A62F068C23002FEB62 /* Components */,
+				6D71ABF02EBDF3F30009182F /* Editors */,
+				6D0AAB1B2F0425D9005987BD /* Charts */,
+				6D2429952F068BD1002FEB62 /* Setup */,
+				6DCADE572EDD9D6300CD61F2 /* Settings */,
+				6D6106162E79697500A11C91 /* Main */,
+				6D71AC092EBDF5470009182F /* Persistence */,
 				6D71AC0B2EBDF8250009182F /* Assets */,
 				6D71AC3C2EBE0B720009182F /* Preview */,
-				6D71AC382EBE0AF30009182F /* Components */,
 				6D89C7C12ED9BD8C00EC4D3F /* Fonts */,
 				6D977A7A2EE3177500D922E9 /* KartStopper.app */,
 				6D058F642EE066BE00DCDACF /* KartStopperTests.xctest */,
@@ -204,6 +202,9 @@
 			);
 			fileSystemSynchronizedGroups = (
 				6D0AAB1B2F0425D9005987BD /* Charts */,
+				6D2429952F068BD1002FEB62 /* Setup */,
+				6D2429A62F068C23002FEB62 /* Components */,
+				6D2429B52F069420002FEB62 /* Buttons */,
 				6D6106162E79697500A11C91 /* Main */,
 				6D71ABF42EBDF3F30009182F /* Support */,
 				6D71AC092EBDF5470009182F /* Persistence */,
