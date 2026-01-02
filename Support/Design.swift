@@ -12,6 +12,7 @@ enum Design {
     static let itemNameFontSize = CGFloat(16)
     static let itemCountFontSize = CGFloat(36)
     static let contentUnavailableImageFontSize = CGFloat(36)
+    static let setupImageFontSize = CGFloat(32)
     
     static let descriptionFieldLineLimit = 5
     static let descriptionFieldHeight = CGFloat(150.0)

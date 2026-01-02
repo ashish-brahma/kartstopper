@@ -13,7 +13,6 @@ struct ContentView: View {
     @ObservedObject var viewModel: ViewModel
     
     @Environment(\.managedObjectContext) private var viewContext
-    @Environment(\.locale) private var locale
     
     @State private var showPreferences = false
     
@@ -41,9 +40,6 @@ struct ContentView: View {
                 NavigationStack {
                     ManageView(viewModel: viewModel)
                 }
-            }
-            .task {
-                viewModel.update(context: viewContext)
             }
         }
     }

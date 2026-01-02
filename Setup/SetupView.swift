@@ -10,20 +10,49 @@ import SwiftUI
 
 struct SetupView: View {
     @Binding var showPreferences: Bool
+    @State var dismiss: Bool = false
     
     var body: some View {
-        VStack {
-            ContentView.unavailableView(label: "Create Budget",
-                                        symbolName: "wrench.fill",
-                                        description: "Budget amount would be used to track items marked as complete.")
-            
-            SettingsButton(showPreferences: $showPreferences,
-                           configuration: .setup)
+        if !dismiss {
+            HStack(alignment: .top) {
+                Image(systemName: "chart.line.uptrend.xyaxis.circle.fill")
+                    .imageScale(.large)
+                    .font(.system(size: Design.setupImageFontSize,
+                                  weight: .medium))
+                    .foregroundStyle(.gray900)
+                    .padding(.vertical, Design.Padding.vertical)
+                
+                VStack(alignment: .leading) {
+                    HStack(alignment: .top) {
+                        Text("Create Budget")
+                            .font(.headline)
+                            .foregroundStyle(Color.foreground)
+                        Spacer()
+                        Button {
+                            dismiss = true
+                        } label: {
+                            Label("Close", systemImage: "xmark")
+                                .fontWeight(.medium)
+                                .labelStyle(.iconOnly)
+                                .foregroundStyle(.gray)
+                        }
+                    }
+                    
+                    HStack(alignment: .bottom) {
+                        Text("Budget amount would be used to track items marked as complete.")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                        Spacer()
+                        SettingsButton(showPreferences: $showPreferences,
+                                       configuration: .setup)
+                    }
+                }
+            }
         }
-        .padding()
     }
 }
 
 #Preview {
     SetupView(showPreferences: .constant(false))
+        .frame(height: 80)
 }

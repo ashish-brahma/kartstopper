@@ -38,29 +38,39 @@ struct TopCarts: View {
     }
     
     var body: some View {
-        if !data.isEmpty {
-            VStack(alignment: .leading) {
-                Text("\(topCartName)").font(.callout.bold())
-                + Text(" contains ").font(.callout)
-                + Text("\(maxCount ?? 0)").font(.callout.bold())
-                + Text(" items").font(.callout)
-                
-                Text("Top Cart")
-                    .font(.callout.bold())
+        categoryCard()
+        
+        Chart(data) { element in
+            BarMark(
+                x: .value("Items", element.itemCount),
+                y: .value("Name", element.name)
+            )
+            .foregroundStyle(element.itemCount == maxCount ? .mint : .secondary)
+        }
+        .chartXAxis(.hidden)
+        .chartYAxis {
+            AxisMarks(stroke: StrokeStyle(lineWidth: 0))
+        }
+        .overlay {
+            if data.isEmpty {
+                Text("No data")
+                    .font(.subheadline)
                     .foregroundStyle(.secondary)
-                
-                Chart(data) { element in
-                    BarMark(
-                        x: .value("Items", element.itemCount),
-                        y: .value("Name", element.name)
-                    )
-                    .foregroundStyle(element.itemCount == maxCount ? .mint : .secondary)
-                }
-                .chartXAxis(.hidden)
-                .chartYAxis {
-                    AxisMarks(stroke: StrokeStyle(lineWidth: 0))
-                }
             }
+        }
+        .frame(height: 80)
+    }
+    
+    @ViewBuilder
+    private func categoryCard() -> some View {
+        VStack(alignment: .leading) {
+            Text("Top Cart")
+                .font(.callout)
+                .foregroundStyle(.secondary)
+            
+            Text(data.isEmpty ? "-" : "\(topCartName)")
+                .font(.title2.bold())
+                .foregroundStyle(Color.foreground)
         }
     }
 }

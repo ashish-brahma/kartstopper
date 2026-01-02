@@ -19,7 +19,9 @@ struct SettingsButtonContentView: View {
             switch configuration {
             case .setup:
                 Label("Setup", systemImage: "plus.circle.fill")
-                    .foregroundStyle(.gray300)
+                    .bold()
+                    .foregroundStyle(.gray700)
+                    .labelStyle(.titleOnly)
             case .toolbar:
                 Label("Manage", systemImage: "gearshape.fill")
                     .foregroundStyle(.accent)
@@ -27,7 +29,6 @@ struct SettingsButtonContentView: View {
                     .labelStyle(.iconOnly)
             }
         }
-        .padding(Design.Padding.standard)
     }
 }
 
@@ -39,7 +40,7 @@ struct SettingsButton: View {
         switch configuration {
         case .setup:
             content()
-                .buttonStyle(.borderedProminent)
+                .buttonStyle(.borderless)
         case .toolbar:
             content()
                 .buttonStyle(.plain)

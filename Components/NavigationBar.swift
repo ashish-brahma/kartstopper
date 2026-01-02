@@ -26,6 +26,7 @@ struct NavigationBar: View {
             
             SettingsButton(showPreferences: $showPreferences,
                            configuration: .toolbar)
+            .padding(Design.Padding.standard)
         }
         .padding(.top, reader.size.height/20)
         .padding(.horizontal, Design.Padding.horizontal)
