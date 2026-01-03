@@ -45,18 +45,13 @@ extension CDCart {
     }
     
     static func getTotalMonthlySpend(context: NSManagedObjectContext) -> Double {
-        let request = CDItem.fetchRequest()
-        let start = Date.startOfMonth(from: .now) as NSDate
-        let end = Date.now as NSDate
+        let start = Date.startOfMonth(from: .now)
+        let end = Date.now
         
-        request.predicate = NSPredicate(format: "isComplete == true && %K >= %@ && %K <= %@",
-                                                "timestamp", start, "timestamp", end)
+        let items = CDItem.getExpenditure(in: start...end,
+                                          context: context)
         
-        guard let items = try? context.fetch(request), items.count != 0
-        else { return 0.00 }
-        
-        let amount = items.map { $0.price * Double($0.quantity) }.reduce(0, +)
-        return amount
+        return items.map { $0.price * Double($0.quantity) }.reduce(0, +)
     }
 }
 

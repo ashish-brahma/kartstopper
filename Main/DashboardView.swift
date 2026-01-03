@@ -43,11 +43,11 @@ struct DashboardView: View {
             }
             
             Section {
-                expensesCard()
+                ExpenditureOverview()
                 
                 NavigationLink {
                     // FIXME: Replace with detailed chart
-                    Text("Last 7 days expenditure details")
+                    Text("Expenditure details")
                 } label: {
                     Text("View Details")
                 }
@@ -73,23 +73,6 @@ struct DashboardView: View {
             Text("\(viewModel.totalCarts) Carts")
                 .font(.title2.bold())
                 .foregroundStyle(Color.foreground)
-        }
-    }
-    
-    @ViewBuilder
-    private func expensesCard() -> some View {
-        VStack(alignment: .leading) {
-            Text("Total Weekly Expenditure")
-                .font(.callout)
-                .foregroundStyle(.secondary)
-            
-            // FIXME: Replace with correct data
-            currencyLabel(for: viewModel.budget.totalMonthlySpend/4)
-                .font(.title2.bold())
-                .foregroundStyle(Color.foreground)
-            
-            // FIXME: Replace with overview chart
-            Text("Last 7 days expenditure overview")
         }
     }
     

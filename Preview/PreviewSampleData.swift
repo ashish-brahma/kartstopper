@@ -16,7 +16,7 @@ extension PersistenceController {
         let viewContext = result.container.viewContext
         
         // Insert sample carts and items.
-        for i in 0...2 {
+        for i in 0...4 {
             let sampleCart = CDCart(context: viewContext)
             sampleCart.id = Int32(i)
             sampleCart.timestamp = Date.random()
@@ -104,7 +104,7 @@ extension Date {
     static func random() -> Date {
         var components = DateComponents()
         components.day = Int.random(in: 1...30)
-        components.month = Int.random(in: 1...12)
+        components.month = Int.random(in: 4...5)
         components.year = Calendar.current.component(.year, from: .now)
         components.hour = Int.random(in: 1...24)
         components.minute = Int.random(in: 1...60)
