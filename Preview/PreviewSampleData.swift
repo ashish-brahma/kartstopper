@@ -44,9 +44,10 @@ extension PersistenceController {
         for i in 0...count-1 {
             let sampleItem = CDItem(context: context)
             sampleItem.id = Int32(i)
-            sampleItem.isComplete = Bool.random()
+            sampleItem.isComplete = true
             sampleItem.timestamp = Date.random()
-            sampleItem.price = Double.random(in: 0...20)
+            sampleItem.price = Double.random(in: 100...320)
+            sampleItem.quantity = Int32.random(in: 1...4)
             sampleItem.name = "Item \(i+1)"
             sampleItem.notes = """
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec ultricies mauris ante.

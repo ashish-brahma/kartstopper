@@ -20,6 +20,14 @@ struct ExpenditureOverviewChart: View {
         }
         .chartXAxis(.hidden)
         .chartYAxis(.hidden)
+        .foregroundStyle(.sanskrit)
+        .overlay {
+            if data.isEmpty {
+                Text("No data")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+        }
     }
 }
 
@@ -30,8 +38,8 @@ struct ExpenditureOverview: View {
     @Environment(\.locale) private var locale
     
     var data: [ExpenditureData] {
-        return ExpenditureData.periodicData(range: range,
-                                            context: viewContext)
+        ExpenditureData.periodicData(range: range,
+                                     context: viewContext)
     }
     
     var totalExpenditure: Double {
@@ -54,28 +62,14 @@ struct ExpenditureOverview: View {
     }
 }
 
-struct ExpenditureData: Identifiable {
-    let date: Date
-    let expense: Double
-    var id: Date { date }
-}
-
-extension ExpenditureData {
-    static func periodicData(
-        range: ClosedRange<Date>,
-        context: NSManagedObjectContext
-    ) ->  [ExpenditureData] {
-        let items = CDItem.getExpenditure(in: range,
-                                          context: context)
-        return items.map {
-            ExpenditureData(date: $0.timestamp ?? .now,
-                            expense: $0.price * Double($0.quantity))
-        }
-    }
-}
-
 #Preview {
-    ExpenditureOverview(range: CDItem.dateRange(context: PersistenceController.preview.container.viewContext))
+    let dateRange = CDItem.dateRange(context: PersistenceController.preview.container.viewContext)
+    
+    let start = dateRange.upperBound.addingTimeInterval(-1 * 3600 * 24 * 30)
+    
+    let end = dateRange.upperBound
+    
+    ExpenditureOverview(range: start...end)
         .environment(\.managedObjectContext,
                       PersistenceController.preview.container.viewContext)
 }

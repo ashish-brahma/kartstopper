@@ -46,8 +46,7 @@ struct DashboardView: View {
                 ExpenditureOverview()
                 
                 NavigationLink {
-                    // FIXME: Replace with detailed chart
-                    Text("Expenditure details")
+                    ExpenditureDetails()
                 } label: {
                     Text("View Details")
                 }
