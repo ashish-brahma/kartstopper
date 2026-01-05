@@ -33,29 +33,32 @@ struct DashboardView: View {
             }
             
             Section {
-                listsCard()
-                
                 NavigationLink {
                     CartListView(viewModel: viewModel)
                 } label: {
-                    Text(viewModel.totalCarts == 0 ? "Start Listing" : "Continue Listing")
+                    listsCard()
                 }
+                
+                TopCarts(reader: reader)
+            } header: {
+                Text(viewModel.totalCarts == 0 ? "Start Listing" : "Continue Listing")
+                    .font(.title2.bold())
+                    .foregroundStyle(Color.foreground)
             }
             
             Section {
-                ExpenditureOverview()
-                
                 NavigationLink {
                     ExpenditureDetails()
                 } label: {
-                    Text("View Details")
+                    ExpenditureOverview()
                 }
-            }
-            
-            Section {
-                TopCarts()
+            } header: {
+                Text("How You Spent")
+                    .font(.title2.bold())
+                    .foregroundStyle(Color.foreground)
             }
         }
+        .listRowSpacing(Design.Spacing.listRow)
         .scrollContentBackground(.hidden)
         .task {
             viewModel.update(context: viewContext)

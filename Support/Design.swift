@@ -33,6 +33,10 @@ enum Design {
         static let bottom = CGFloat(8)
     }
     
+    enum Spacing {
+        static let listRow = CGFloat(8)
+    }
+    
     enum Fonts {
         static let largeNumber = "NewYorkLarge-Regular"
         static let largeNumberFontSize = CGFloat(48)
