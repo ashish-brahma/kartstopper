@@ -11,6 +11,7 @@ import CoreData
 
 struct ContentView: View {
     @ObservedObject var viewModel: ViewModel
+    var timeRange: ClosedRange<Date> = .startOfMonth(from: .now) ... .now
     
     @Environment(\.managedObjectContext) private var viewContext
     
@@ -26,6 +27,7 @@ struct ContentView: View {
                     
                     DashboardView(viewModel: viewModel,
                                   showPreferences: $showPreferences,
+                                  timeRange: timeRange,
                                   reader: reader)
                 }
                 .background(Color.background)
@@ -46,7 +48,14 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView(viewModel: .preview)
+    let dateRange = CDItem.dateRange(context: PersistenceController.preview.container.viewContext)
+    
+    let start = dateRange.upperBound.addingTimeInterval(-1 * 3600 * 24 * 30)
+    
+    let end = dateRange.upperBound
+    
+    ContentView(viewModel: .preview,
+                timeRange: start...end)
         .environment(\.managedObjectContext,
                                PersistenceController.preview.container.viewContext)
 }

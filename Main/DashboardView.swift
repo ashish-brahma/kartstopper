@@ -13,6 +13,7 @@ struct DashboardView: View {
     @ObservedObject var viewModel: ViewModel
     
     @Binding var showPreferences: Bool
+    var timeRange: ClosedRange<Date> = .startOfMonth(from: .now) ... .now
     let reader: GeometryProxy
     
     @Environment(\.managedObjectContext) private var viewContext
@@ -50,7 +51,7 @@ struct DashboardView: View {
                 NavigationLink {
                     ExpenditureDetails()
                 } label: {
-                    ExpenditureOverview()
+                    ExpenditureOverview(range: timeRange)
                 }
             } header: {
                 Text("How You Spent")
@@ -80,14 +81,21 @@ struct DashboardView: View {
 }
 
 #Preview {
+    let dateRange = CDItem.dateRange(context: PersistenceController.preview.container.viewContext)
+    
+    let start = dateRange.upperBound.addingTimeInterval(-1 * 3600 * 24 * 30)
+    
+    let end = dateRange.upperBound
+    
     GeometryReader { reader in
         NavigationStack {
             DashboardView(viewModel: .preview,
                           showPreferences: .constant(false),
+                          timeRange: start...end,
                           reader: reader)
             .background(Color.background)
         }
-        .environment(\.managedObjectContext,
-                      PersistenceController.preview.container.viewContext)
     }
+    .environment(\.managedObjectContext,
+                  PersistenceController.preview.container.viewContext)
 }

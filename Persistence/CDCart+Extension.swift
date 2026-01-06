@@ -55,8 +55,8 @@ extension CDCart {
     }
 }
 
-// Date Formatting used for display.
 extension Date {
+    // Date Formatting used for display.
     static var customStyle: Date.FormatStyle {
         Date.FormatStyle()
             .year(.defaultDigits)
@@ -66,6 +66,7 @@ extension Date {
             .minute(.twoDigits)
     }
     
+    // Extract start of the month from a given date
     static func startOfMonth(from date: Date) -> Date {
         var components = DateComponents()
         components.day = 1

@@ -32,7 +32,7 @@ struct ExpenditureOverviewChart: View {
 }
 
 struct ExpenditureOverview: View {
-    var range: ClosedRange<Date> = .startOfMonth(from: .now) ... .now
+    var range: ClosedRange<Date>
     
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.locale) private var locale
