@@ -77,10 +77,6 @@ struct DashboardView: View {
                 .foregroundStyle(Color.foreground)
         }
     }
-    
-    func currencyLabel(for amount: Double) -> some View {
-        Text(amount, format: .currency(code: locale.currency?.identifier ?? "USD"))
-    }
 }
 
 #Preview {

@@ -27,4 +27,18 @@ extension ExpenditureData {
                             expense: $0.price * Double($0.quantity))
         }
     }
+    
+    static func top5Data(
+        range: ClosedRange<Date>,
+        context: NSManagedObjectContext
+    ) -> [(name: String, expense: Double)] {
+        let items = CDItem.getExpenditure(in: range,
+                                          context: context)
+        var data = items.map {
+            (name: $0.displayName,
+             expense: $0.price * Double($0.quantity))
+        }
+        data = data.sorted { $0.expense > $1.expense }
+        return Array(data.prefix(5))
+    }
 }
