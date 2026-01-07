@@ -15,13 +15,7 @@ extension PersistenceController {
         let result = PersistenceController(inMemory: true)
         let viewContext = result.container.viewContext
         
-        // Insert sample carts and items.
-        let sampleCart = CDCart(context: viewContext)
-        sampleCart.id = Int32(0)
-        sampleCart.timestamp = Date.sampleDate()
-        sampleCart.name = "Therapy"
-        insertPreviewItems(in: sampleCart, context: viewContext)
-        sampleCart.notes = "Boutique items from spa."
+        insertPreviewItems(context: viewContext)
         
         do {
             try viewContext.save()
@@ -32,10 +26,14 @@ extension PersistenceController {
         return result
     }()
     
-    static func insertPreviewItems(
-        in cart: CDCart,
-        context: NSManagedObjectContext
-    ) {
+    // Insert sample carts and items.
+    static func insertPreviewItems(context: NSManagedObjectContext) {
+        let cart1 = CDCart(context: context)
+        cart1.id = Int32(0)
+        cart1.timestamp = Date.sampleDate()
+        cart1.name = "Therapy"
+        cart1.notes = "Boutique items from spa."
+        
         let item1 = CDItem(context: context)
         item1.id = Int32(0)
         item1.isComplete = true
@@ -44,7 +42,7 @@ extension PersistenceController {
         item1.quantity = 5
         item1.name = "Sesame oil"
         item1.notes = "Oil for body massage"
-        item1.cart = cart
+        item1.cart = cart1
         
         let item2 = CDItem(context: context)
         item2.id = Int32(1)
@@ -54,37 +52,54 @@ extension PersistenceController {
         item2.quantity = 5
         item2.name = "Towels"
         item2.notes = "Gentle material which aborbs maximum moisture."
-        item2.cart = cart
+        item2.cart = cart1
         
         let item3 = CDItem(context: context)
         item3.id = Int32(2)
-        item3.isComplete = true
+        item3.isComplete = false
         item3.timestamp = Date.previewDate(year: 2024, month: 5, day: 5)
-        item3.price = 2500
+        item3.price = 2500.00
         item3.quantity = 1
         item3.name = "Pumice Stone"
         item3.notes = "Feet scrubber"
-        item3.cart = cart
+        item3.cart = cart1
         
         let item4 = CDItem(context: context)
         item4.id = Int32(3)
         item4.isComplete = true
         item4.timestamp = Date.previewDate(year: 2024, month: 5, day: 6)
-        item4.price = 1000
+        item4.price = 1000.00
         item4.quantity = 1
-        item4.name = "Weighting Scale"
+        item4.name = "Weighing Scale"
         item4.notes = "Measure body weight"
-        item4.cart = cart
+        item4.cart = cart1
         
         let item5 = CDItem(context: context)
         item5.id = Int32(4)
-        item5.isComplete = true
+        item5.isComplete = false
         item5.timestamp = Date.previewDate(year: 2024, month: 5, day: 6)
-        item5.price = 100
+        item5.price = 100.00
         item5.quantity = 1
         item5.name = "Beathable strap"
         item5.notes = "Sweat abosorption material for wrist, knees and waist."
-        item5.cart = cart
+        item5.cart = cart1
+        
+        let cart2 = CDCart(context: context)
+        cart2.id = Int32(1)
+        cart2.timestamp = Date.sampleDate()
+        cart2.name = "Gadgets"
+        cart2.notes = "Workout companions."
+        
+        let item6 = CDItem(context: context)
+        item6.id = Int32(5)
+        item6.isComplete = true
+        item6.timestamp = Date.previewDate(year: 2024, month: 5, day: 1)
+        item6.price = 3520.52
+        item6.quantity = 1
+        item6.name = "JBL Earbuds"
+        item6.notes = "In-ear wireless with sweat protection, ANC and amibient noise control."
+        item6.cart = cart2
+        
     }
 }
 

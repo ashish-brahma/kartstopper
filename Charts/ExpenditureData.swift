@@ -42,3 +42,31 @@ extension ExpenditureData {
         return Array(data.prefix(5))
     }
 }
+
+struct CartExpenseData: Identifiable {
+    let name: String
+    let expense: Double
+    var id: String { name }
+}
+
+extension CartExpenseData {
+    static func topCartsData(
+        carts: Array<CDCart>,
+        context: NSManagedObjectContext
+    ) -> [CartExpenseData] {
+        var data = [CartExpenseData]()
+        for cart in carts {
+            data.append(
+                .init(name: cart.name ?? "",
+                      expense: CDCart.getTotalExpenses(for: cart,
+                                                       context: context))
+            )
+        }
+        data = data.sorted { $0.expense > $1.expense }
+        return Array(data.prefix(5))
+    }
+    
+    static func getMaxExpense(data: [CartExpenseData]) -> Double? {
+        data.map { $0.expense }.max()
+    }
+}

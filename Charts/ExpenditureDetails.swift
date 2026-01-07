@@ -2,7 +2,7 @@
 //  ExpenditureDetails.swift
 //  KartStopper
 //
-//  Created by Ashish Brahma on 30/12/25.
+//  Created by Ashish Brahma on 04/01/26.
 //
 //  A chart which depicts expediture details.
 

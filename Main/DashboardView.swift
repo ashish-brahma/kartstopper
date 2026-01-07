@@ -40,7 +40,7 @@ struct DashboardView: View {
                     listsCard()
                 }
                 
-                TopCarts(reader: reader)
+                TopFrequentCarts(reader: reader)
             } header: {
                 Text(viewModel.totalCarts == 0 ? "Start Listing" : "Continue Listing")
                     .font(.title2.bold())
@@ -52,6 +52,12 @@ struct DashboardView: View {
                     ExpenditureDetails()
                 } label: {
                     ExpenditureOverview(range: timeRange)
+                }
+                
+                NavigationLink {
+                    Text("Top Expensive Carts details")
+                } label: {
+                    ExpensiveCartsOverview(reader: reader)
                 }
             } header: {
                 Text("How You Spent")

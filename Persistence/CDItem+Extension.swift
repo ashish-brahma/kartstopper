@@ -45,6 +45,7 @@ extension CDItem {
         return items
     }
     
+    // FIXME: Sort by date before fetch.
     static func dateRange(context: NSManagedObjectContext) -> ClosedRange<Date> {
         let request = CDItem.fetchRequest()
         guard let items = try? context.fetch(request), items.count != 0,

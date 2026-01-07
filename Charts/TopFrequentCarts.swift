@@ -1,5 +1,5 @@
 //
-//  TopCarts.swift
+//  TopFrequentCarts.swift
 //  KartStopper
 //
 //  Created by Ashish Brahma on 30/12/25.
@@ -40,7 +40,7 @@ struct CartsFrequencyChart: View {
     }
 }
 
-struct TopCarts: View {
+struct TopFrequentCarts: View {
     let reader: GeometryProxy
     
     @Environment(\.managedObjectContext) private var viewContext
@@ -100,7 +100,8 @@ extension CartCountData {
         for cart in carts {
             data.append(
                 .init(name: cart.displayName,
-                      itemCount: CDCart.getTotalItems(for: cart,          context: context))
+                      itemCount: CDCart.getTotalItems(for: cart,
+                                                      context: context))
             )
         }
         data = data.sorted { $0.itemCount > $1.itemCount }
@@ -115,7 +116,7 @@ extension CartCountData {
 #Preview {
     GeometryReader { reader in
         VStack {
-            TopCarts(reader: reader)
+            TopFrequentCarts(reader: reader)
                 .frame(height: 300)
         }
         .padding()
