@@ -37,7 +37,7 @@ extension PersistenceController {
         let item1 = CDItem(context: context)
         item1.id = Int32(0)
         item1.isComplete = true
-        item1.timestamp = Date.previewDate(year: 2024, month: 5, day: 2)
+        item1.timestamp = Date.previewDate(year: 2024, month: 2, day: 29)
         item1.price = 350.00
         item1.quantity = 5
         item1.name = "Sesame oil"
@@ -67,7 +67,7 @@ extension PersistenceController {
         let item4 = CDItem(context: context)
         item4.id = Int32(3)
         item4.isComplete = true
-        item4.timestamp = Date.previewDate(year: 2024, month: 5, day: 6)
+        item4.timestamp = Date.previewDate(year: 2023, month: 11, day: 28)
         item4.price = 1000.00
         item4.quantity = 1
         item4.name = "Weighing Scale"
@@ -93,7 +93,7 @@ extension PersistenceController {
         let item6 = CDItem(context: context)
         item6.id = Int32(5)
         item6.isComplete = true
-        item6.timestamp = Date.previewDate(year: 2024, month: 5, day: 1)
+        item6.timestamp = Date.previewDate(year: 2024, month: 2, day: 28)
         item6.price = 3520.52
         item6.quantity = 1
         item6.name = "JBL Earbuds"

@@ -76,11 +76,6 @@
 			path = Components;
 			sourceTree = "<group>";
 		};
-		6D2429B52F069420002FEB62 /* Buttons */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Buttons;
-			sourceTree = "<group>";
-		};
 		6D6106162E79697500A11C91 /* Main */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = Main;
@@ -148,7 +143,6 @@
 			isa = PBXGroup;
 			children = (
 				6D71ABF42EBDF3F30009182F /* Support */,
-				6D2429B52F069420002FEB62 /* Buttons */,
 				6D2429A62F068C23002FEB62 /* Components */,
 				6D71ABF02EBDF3F30009182F /* Editors */,
 				6D0AAB1B2F0425D9005987BD /* Charts */,
@@ -204,7 +198,6 @@
 				6D0AAB1B2F0425D9005987BD /* Charts */,
 				6D2429952F068BD1002FEB62 /* Setup */,
 				6D2429A62F068C23002FEB62 /* Components */,
-				6D2429B52F069420002FEB62 /* Buttons */,
 				6D6106162E79697500A11C91 /* Main */,
 				6D71ABF42EBDF3F30009182F /* Support */,
 				6D71AC092EBDF5470009182F /* Persistence */,

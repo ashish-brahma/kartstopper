@@ -45,9 +45,9 @@ extension CDItem {
         return items
     }
     
-    // FIXME: Sort by date before fetch.
     static func dateRange(context: NSManagedObjectContext) -> ClosedRange<Date> {
         let request = CDItem.fetchRequest()
+        request.sortDescriptors = [NSSortDescriptor(keyPath: \CDItem.timestamp, ascending: true)]
         guard let items = try? context.fetch(request), items.count != 0,
               let first = items.first?.timestamp,
               let last = items.last?.timestamp else { return .distantPast ... .distantFuture }

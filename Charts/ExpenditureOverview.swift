@@ -32,13 +32,18 @@ struct ExpenditureOverviewChart: View {
 }
 
 struct ExpenditureOverview: View {
-    var range: ClosedRange<Date>
-    
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.locale) private var locale
     
+    var timeRange: ClosedRange<Date> {
+        ExpenditureData.lastNDaysRange(
+            days: TimeRange.last30days.rawValue,
+            context: viewContext
+        )
+    }
+    
     var data: [ExpenditureData] {
-        ExpenditureData.periodicData(range: range,
+        ExpenditureData.periodicData(range: timeRange,
                                      context: viewContext)
     }
     
@@ -63,13 +68,7 @@ struct ExpenditureOverview: View {
 }
 
 #Preview {
-    let dateRange = CDItem.dateRange(context: PersistenceController.preview.container.viewContext)
-    
-    let start = dateRange.upperBound.addingTimeInterval(-1 * 3600 * 24 * 30)
-    
-    let end = dateRange.upperBound
-    
-    ExpenditureOverview(range: start...end)
+    ExpenditureOverview()
         .environment(\.managedObjectContext,
                       PersistenceController.preview.container.viewContext)
 }
