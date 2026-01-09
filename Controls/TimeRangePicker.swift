@@ -30,6 +30,7 @@ enum TimeRange: TimeInterval {
 }
 
 #Preview {
+    TimeRangePicker(value: .constant(TimeRange.last7days))
     TimeRangePicker(value: .constant(TimeRange.last30days))
     TimeRangePicker(value: .constant(TimeRange.last365days))
 }

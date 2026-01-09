@@ -46,15 +46,24 @@ struct CategoriesOverviewChart: View {
 }
 
 struct CategoriesOverview : View {
-    let reader: GeometryProxy
+    var reader: GeometryProxy
+    @State private var timeRange: TimeRange = .last30days
     
     @Environment(\.managedObjectContext) private var viewContext
     
     @FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \CDCart.id, ascending: true)])
     private var carts: FetchedResults<CDCart>
     
+    var filterDateRange: ClosedRange<Date> {
+        ExpenditureData.lastNDaysRange(
+            days: timeRange.rawValue,
+            context: viewContext
+        )
+    }
+    
     var data: [CartExpenseData] {
-        CartExpenseData.topCartsData(carts: Array(carts),
+        CartExpenseData.topCartsData(range: filterDateRange,
+                                     carts: Array(carts),
                                      context: viewContext)
     }
     
@@ -75,8 +84,15 @@ struct CategoriesOverview : View {
                 .font(.title2.bold())
                 .foregroundStyle(Color.foreground)
             
-            CategoriesOverviewChart(data: data)
-                .frame(height: 80)
+            Text("Latest \(timeRange.rawValue, format: .number) Day Streak")
+                .font(.headline)
+                .foregroundStyle(.accent)
+            
+            HStack {
+                Spacer(minLength: reader.size.width / 2.8)
+                CategoriesOverviewChart(data: data)
+                    .frame(height: 80)
+            }
         }
         .overlay {
             if data.isEmpty {

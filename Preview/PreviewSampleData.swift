@@ -30,7 +30,7 @@ extension PersistenceController {
     static func insertPreviewItems(context: NSManagedObjectContext) {
         let cart1 = CDCart(context: context)
         cart1.id = Int32(0)
-        cart1.timestamp = Date.sampleDate()
+        cart1.timestamp = Date.previewDate(year: 2023, month: 11, day: 9)
         cart1.name = "Therapy"
         cart1.notes = "Boutique items from spa."
         
@@ -86,7 +86,7 @@ extension PersistenceController {
         
         let cart2 = CDCart(context: context)
         cart2.id = Int32(1)
-        cart2.timestamp = Date.sampleDate()
+        cart2.timestamp = Date.previewDate(year: 2024, month: 2, day: 28)
         cart2.name = "Gadgets"
         cart2.notes = "Workout companions."
         

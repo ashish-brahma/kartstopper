@@ -123,9 +123,9 @@
 			path = Settings;
 			sourceTree = "<group>";
 		};
-		6DD8F5C62F112B5400164707 /* Buttons */ = {
+		6DD8F5C62F112B5400164707 /* Controls */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Buttons;
+			path = Controls;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -148,7 +148,7 @@
 			isa = PBXGroup;
 			children = (
 				6D71ABF42EBDF3F30009182F /* Support */,
-				6DD8F5C62F112B5400164707 /* Buttons */,
+				6DD8F5C62F112B5400164707 /* Controls */,
 				6D2429A62F068C23002FEB62 /* Components */,
 				6D71ABF02EBDF3F30009182F /* Editors */,
 				6D0AAB1B2F0425D9005987BD /* Charts */,
@@ -211,7 +211,7 @@
 				6D71AC3C2EBE0B720009182F /* Preview */,
 				6D89C7C12ED9BD8C00EC4D3F /* Fonts */,
 				6DCADE572EDD9D6300CD61F2 /* Settings */,
-				6DD8F5C62F112B5400164707 /* Buttons */,
+				6DD8F5C62F112B5400164707 /* Controls */,
 			);
 			name = KartStopper;
 			productName = kartstopper;

@@ -54,7 +54,7 @@ struct DashboardView: View {
                 }
                 
                 NavigationLink {
-                    Text("Top Expensive Carts details")
+                    CategoryDetails()
                 } label: {
                     CategoriesOverview(reader: reader)
                 }

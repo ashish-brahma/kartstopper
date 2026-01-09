@@ -169,7 +169,7 @@ struct ExpenditureDetails: View {
                 expenses(data: showAllData ? data : top5Data)
                 
                 if data.count > 5 {
-                    expandButton()
+                    ExpandButton(showAllData: $showAllData)
                 }
             }
         }
@@ -218,7 +218,7 @@ struct ExpenditureDetails: View {
     
     @ViewBuilder
     private func expenses(data: [ExpenditureData]) -> some View {
-        ForEach(data, id: \.name) { item in
+        ForEach(data) { item in
             HStack(alignment: .center) {
                 VStack(alignment: .leading) {
                     Text("\(item.date.formatted(Date.customStyle))")
@@ -241,15 +241,6 @@ struct ExpenditureDetails: View {
                     .foregroundStyle(.secondary)
                     .padding(.bottom, Design.Padding.bottom)
             }
-        }
-    }
-    
-    @ViewBuilder
-    private func expandButton() -> some View {
-        Button {
-            showAllData.toggle()
-        } label: {
-            Text(showAllData ? "Show Less" : "Show More")
         }
     }
 }

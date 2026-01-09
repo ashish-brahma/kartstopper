@@ -88,27 +88,39 @@ extension ExpenditureData {
 
 struct CartExpenseData: Identifiable {
     let name: String
+    let date: Date
     let expense: Double
     var id: String { name }
 }
 
 extension CartExpenseData {
     static func topCartsData(
+        range: ClosedRange<Date>,
         carts: Array<CDCart>,
+        sortBy: SortParameter = .expense,
         context: NSManagedObjectContext
     ) -> [CartExpenseData] {
         var data = [CartExpenseData]()
         
         for cart in carts {
             let expense = CDCart.getTotalExpenses(for: cart,
+                                                  in: range,
                                                   context: context)
             
             data.append(.init(name: cart.name ?? "",
+                              date: cart.timestamp ?? .now,
                               expense: expense))
         }
         
-        data = data.sorted { $0.expense > $1.expense }
-        return Array(data.prefix(5))
+        data = data.sorted {
+            switch sortBy {
+            case .expense:
+                $0.expense > $1.expense
+            case .time:
+                $0.date > $1.date
+            }
+        }
+        return data
     }
     
     static func getMaxExpense(data: [CartExpenseData]) -> Double? {
