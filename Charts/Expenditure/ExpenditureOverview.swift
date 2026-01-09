@@ -32,18 +32,21 @@ struct ExpenditureOverviewChart: View {
 }
 
 struct ExpenditureOverview: View {
+    var reader: GeometryProxy
+    @State private var timeRange: TimeRange = .last7days
+    
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.locale) private var locale
     
-    var timeRange: ClosedRange<Date> {
+    var filterDateRange: ClosedRange<Date> {
         ExpenditureData.lastNDaysRange(
-            days: TimeRange.last30days.rawValue,
+            days: timeRange.rawValue,
             context: viewContext
         )
     }
     
     var data: [ExpenditureData] {
-        ExpenditureData.periodicData(range: timeRange,
+        ExpenditureData.periodicData(range: filterDateRange,
                                      context: viewContext)
     }
     
@@ -61,15 +64,28 @@ struct ExpenditureOverview: View {
                 .font(.title2.bold())
                 .foregroundStyle(Color.foreground)
             
-            ExpenditureOverviewChart(data: data)
-                .frame(height: 100)
+            Text("Latest \(timeRange.rawValue, format: .number) Day Streak")
+                .font(.headline)
+                .foregroundStyle(.accent)
+            
+            HStack {
+                Spacer(minLength: reader.size.width / 2.8)
+                ExpenditureOverviewChart(data: data)
+                    .frame(height: 60)
+            }
+            .padding(.top, -1.5 * Design.Padding.top)
         }
     }
 }
 
 #Preview {
-    ExpenditureOverview()
-        .environment(\.managedObjectContext,
-                      PersistenceController.preview.container.viewContext)
+    GeometryReader { reader in
+        VStack {
+            ExpenditureOverview(reader: reader)
+        }
+        .frame(height: 300)
+    }
+    .environment(\.managedObjectContext,
+                  PersistenceController.preview.container.viewContext)
 }
 

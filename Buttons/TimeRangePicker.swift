@@ -10,10 +10,12 @@ import SwiftUI
 
 struct TimeRangePicker: View {
     @Binding var value: TimeRange
+    
     var body: some View {
         Picker(selection: $value.animation(.easeInOut)) {
-            Text("30 Days").tag(TimeRange.last30days)
-            Text("12 Months").tag(TimeRange.last365days)
+            Text("W").tag(TimeRange.last7days)
+            Text("M").tag(TimeRange.last30days)
+            Text("Y").tag(TimeRange.last365days)
         } label: {
             EmptyView()
         }
@@ -22,6 +24,7 @@ struct TimeRangePicker: View {
 }
 
 enum TimeRange: TimeInterval {
+    case last7days = 7
     case last30days = 30
     case last365days = 365
 }

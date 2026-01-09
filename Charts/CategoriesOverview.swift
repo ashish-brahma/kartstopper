@@ -1,5 +1,5 @@
 //
-//  ExpensiveCartsOverview.swift
+//  CategoriesOverview.swift
 //  KartStopper
 //
 //  Created by Ashish Brahma on 07/01/26.
@@ -10,7 +10,7 @@ import SwiftUI
 import Charts
 import CoreData
 
-struct CartsValueOverviewChart: View {
+struct CategoriesOverviewChart: View {
     var data: [CartExpenseData]
     
     var topCartName: String {
@@ -45,7 +45,7 @@ struct CartsValueOverviewChart: View {
     }
 }
 
-struct ExpensiveCartsOverview : View {
+struct CategoriesOverview : View {
     let reader: GeometryProxy
     
     @Environment(\.managedObjectContext) private var viewContext
@@ -75,9 +75,8 @@ struct ExpensiveCartsOverview : View {
                 .font(.title2.bold())
                 .foregroundStyle(Color.foreground)
             
-            CartsValueOverviewChart(data: data)
-                .padding(.top, Design.Padding.top)
-                .frame(height: 100)
+            CategoriesOverviewChart(data: data)
+                .frame(height: 80)
         }
         .overlay {
             if data.isEmpty {
@@ -92,7 +91,7 @@ struct ExpensiveCartsOverview : View {
 #Preview {
     GeometryReader { reader in
         VStack {
-            ExpensiveCartsOverview(reader: reader)
+            CategoriesOverview(reader: reader)
                 .frame(height: 300)
         }
         .padding()

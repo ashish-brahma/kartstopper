@@ -50,13 +50,13 @@ struct DashboardView: View {
                 NavigationLink {
                     ExpenditureDetails()
                 } label: {
-                    ExpenditureOverview()
+                    ExpenditureOverview(reader: reader)
                 }
                 
                 NavigationLink {
                     Text("Top Expensive Carts details")
                 } label: {
-                    ExpensiveCartsOverview(reader: reader)
+                    CategoriesOverview(reader: reader)
                 }
             } header: {
                 Text("How You Spent")

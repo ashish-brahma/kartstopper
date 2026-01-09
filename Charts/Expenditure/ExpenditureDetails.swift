@@ -12,6 +12,7 @@ import CoreData
 
 struct DailyExpenditureChart: View {
     var data: [ExpenditureData]
+    var timeRange: TimeRange
     
     @Environment(\.locale) private var locale
     
@@ -37,11 +38,20 @@ struct DailyExpenditureChart: View {
         }
         .foregroundStyle(.sanskrit)
         .chartXAxis {
-            AxisMarks(values: .stride(by: .day, count: 7)) {
-                AxisTick()
-                AxisGridLine()
-                AxisValueLabel(format: .dateTime.month().day())
+            if timeRange == .last30days {
+                AxisMarks(values: .stride(by: .day, count: 7)) {
+                    AxisTick()
+                    AxisGridLine()
+                    AxisValueLabel(format: .dateTime.month().day())
+                }
+            } else if timeRange == .last7days {
+                AxisMarks(values: .stride(by: .day, count: 1)) {
+                    AxisTick()
+                    AxisGridLine()
+                    AxisValueLabel(format: .dateTime.weekday())
+                }
             }
+            
         }
         .overlay {
             if data.isEmpty {
@@ -97,7 +107,9 @@ struct MonthlyExpenditureChart: View {
 }
 
 struct ExpenditureDetails: View {
-    @State private var timeRange: TimeRange = .last30days
+    @State private var timeRange: TimeRange = .last7days
+    @State private var sortParameter: SortParameter = .expense
+    @State private var showAllData: Bool = false
     
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.locale) private var locale
@@ -110,21 +122,23 @@ struct ExpenditureDetails: View {
     }
     
     var timeRangeStart: String {
-        dateLabel(for: filterDateRange.lowerBound)
+        let date = filterDateRange.lowerBound
+        return date.formatted(.dateTime.year().month().day())
     }
     
     var timeRangeEnd: String {
-        filterDateRange.upperBound.formatted(.dateTime.year().month().day())
+        let date = filterDateRange.upperBound
+        return date.formatted(.dateTime.year().month().day())
     }
     
     var data: [ExpenditureData] {
         ExpenditureData.periodicData(range: filterDateRange,
+                                     sortBy: sortParameter,
                                      context: viewContext)
     }
     
-    var top5Data: [TopExpenseData] {
-        ExpenditureData.top5Data(range: filterDateRange,
-                                 context: viewContext)
+    var top5Data: [ExpenditureData] {
+        Array(data.prefix(5))
     }
     
     var totalExpenditure: Double {
@@ -139,10 +153,24 @@ struct ExpenditureDetails: View {
         List {
             Section {
                 chartContent()
+            } header: {
+                TimeRangePicker(value: $timeRange)
             }
             
-            Section("Top Expenses") {
-                topExpenses()
+            Section {
+                SortButton(value: $sortParameter)
+            } header: {
+                Text("Expenses")
+                    .font(.title2.bold())
+                    .foregroundStyle(Color.foreground)
+            }
+            
+            Section {
+                expenses(data: showAllData ? data : top5Data)
+                
+                if data.count > 5 {
+                    expandButton()
+                }
             }
         }
         .navigationTitle("Expenditure")
@@ -154,9 +182,6 @@ struct ExpenditureDetails: View {
     @ViewBuilder
     private func chartContent() -> some View {
         VStack(alignment: .leading) {
-            TimeRangePicker(value: $timeRange)
-                .padding(.bottom, Design.Padding.bottom)
-            
             Text("Total Expenditure")
                 .font(.callout)
                 .foregroundStyle(.secondary)
@@ -180,8 +205,9 @@ struct ExpenditureDetails: View {
                 .foregroundStyle(.secondary)
             
             switch timeRange {
-            case .last30days:
-                DailyExpenditureChart(data: data)
+            case .last7days, .last30days:
+                DailyExpenditureChart(data: data,
+                                      timeRange: timeRange)
                     .frame(height: 240)
             case .last365days:
                 MonthlyExpenditureChart(data: data)
@@ -191,8 +217,8 @@ struct ExpenditureDetails: View {
     }
     
     @ViewBuilder
-    private func topExpenses() -> some View {
-        ForEach(top5Data, id: \.name) { item in
+    private func expenses(data: [ExpenditureData]) -> some View {
+        ForEach(data, id: \.name) { item in
             HStack(alignment: .center) {
                 VStack(alignment: .leading) {
                     Text("\(item.date.formatted(Date.customStyle))")
@@ -211,19 +237,19 @@ struct ExpenditureDetails: View {
                 
                 Spacer()
                 
-                    Text("\(item.expense, format: .currency(code: locale.currency?.identifier ?? "USD"))")
-                        .foregroundStyle(.secondary)
-                        .padding(.bottom, Design.Padding.bottom)
+                Text("\(item.expense, format: .currency(code: locale.currency?.identifier ?? "USD"))")
+                    .foregroundStyle(.secondary)
+                    .padding(.bottom, Design.Padding.bottom)
             }
         }
     }
     
-    private func dateLabel(for date: Date) -> String {
-        switch timeRange {
-        case .last30days:
-            date.formatted(.dateTime.month().day())
-        case .last365days:
-            date.formatted(.dateTime.year().month().day())
+    @ViewBuilder
+    private func expandButton() -> some View {
+        Button {
+            showAllData.toggle()
+        } label: {
+            Text(showAllData ? "Show Less" : "Show More")
         }
     }
 }

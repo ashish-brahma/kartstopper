@@ -49,7 +49,7 @@ struct TopFrequentCarts: View {
     private var carts: FetchedResults<CDCart>
     
     var data: [CartCountData] {
-        CartCountData.topCartsData(carts: carts,
+        CartCountData.topCartsData(carts: Array(carts),
                                    context: viewContext)
     }
     
@@ -61,55 +61,22 @@ struct TopFrequentCarts: View {
     }
     
     var body: some View {
-        HStack(alignment: .top) {
-            VStack(alignment: .leading) {
-                Text("Most Frequent Cart")
-                    .font(.callout)
-                    .foregroundStyle(.secondary)
-                
-                Text(data.isEmpty ? "-" : "\(topCartName)")
-                    .font(.title2.bold())
-                    .foregroundStyle(Color.foreground)
-            }
+        VStack(alignment: .leading) {
+            Text("Most Frequent Cart")
+                .font(.callout)
+                .foregroundStyle(.secondary)
             
-            Spacer(minLength: reader.size.width/10)
+            Text(data.isEmpty ? "-" : "\(topCartName)")
+                .font(.title2.bold())
+                .foregroundStyle(Color.foreground)
             
-            VStack {
-                Spacer()
+            HStack {
+                Spacer(minLength: reader.size.width / 3)
                 CartsFrequencyChart(data: data)
-                    .padding(.top, Design.Padding.top)
+                    .padding(.top, -1.5 * Design.Padding.top)
                     .frame(height: 60)
             }
         }
-        .frame(height: 100)
-    }
-}
-
-struct CartCountData: Identifiable {
-    let name: String
-    let itemCount: Int
-    var id: String { name }
-}
-
-extension CartCountData {
-    static func topCartsData(
-        carts: FetchedResults<CDCart>,
-        context: NSManagedObjectContext
-    ) -> [CartCountData] {
-        var data = [CartCountData]()
-        for cart in carts {
-            data.append(
-                .init(name: cart.displayName,
-                      itemCount: CDCart.getTotalItems(for: cart,
-                                                      context: context))
-            )
-        }
-        data = data.sorted { $0.itemCount > $1.itemCount }
-        return Array(data.prefix(5))
-    }
-    
-    static func getMaxCount(data: [CartCountData]) -> Int? {
-        data.map { $0.itemCount }.max()
     }
 }
 
