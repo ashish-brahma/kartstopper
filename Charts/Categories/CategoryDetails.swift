@@ -15,6 +15,10 @@ struct CategoryDetailsChart: View {
     
     @Environment(\.locale) private var locale
     
+    var chartData: [CartExpenseData] {
+        CartExpenseData.sort(data, by: .expense)
+    }
+    
     var topCartName: String {
         let name = data.first {
             $0.expense == CartExpenseData.getMaxExpense(data: data)
@@ -27,56 +31,87 @@ struct CategoryDetailsChart: View {
     }
     
     var body: some View {
-        Chart(data) { element in
-            if #available(iOS 17.0, *) {
-                SectorMark(
-                    angle: .value("Expenses", element.expense),
-                    innerRadius: .ratio(0.618),
-                    angularInset: 1.5
-                )
-                .cornerRadius(5.0)
-                .foregroundStyle(by: .value("Name", element.name))
-                .opacity(element.name == topCartName ? 1 : 0.3)
-            } else {
-                BarMark(
-                    x: .value("Expenses", element.expense),
-                    y: .value("Name", element.name)
-                )
-                .foregroundStyle(element.name == topCartName ? .pink : .secondary)
-            }
-        }
-        .chartLegend(alignment: .center, spacing: 18)
-        .chartXAxis(.hidden)
-        .chartYAxis(.hidden)
-        .scaledToFit()
-        .chartBackground { chartProxy in
-            GeometryReader { reader in
+        GeometryReader { reader in
+            VStack {
                 if #available(iOS 17.0, *) {
-                    if let anchor = chartProxy.plotFrame {
-                        VStack {
-                            Text(data.isEmpty ? "-" : "\(topCartName)")
-                                .font(.title2.bold())
-                                .foregroundStyle(Color.foreground)
-                            
-                            Text("Most Expensive Cart worth \(maxExpense, format: .currency(code: locale.currency?.identifier ?? "USD"))")
+                    // Use chart background to display label.
+                } else {
+                    HStack {
+                        chartLabel(reader: reader,
+                                   horizontalAlignment: .leading)
+                        Spacer()
+                    }
+                }
+                
+                Chart(chartData) { element in
+                    if #available(iOS 17.0, *) {
+                        SectorMark(
+                            angle: .value("Expenses", element.expense),
+                            innerRadius: .ratio(0.618),
+                            angularInset: 1.5
+                        )
+                        .cornerRadius(5.0)
+                        .foregroundStyle(by: .value("Name", element.name))
+                        .opacity(element.name == topCartName ? 1 : 0.3)
+                    } else {
+                        BarMark(
+                            x: .value("Expenses", element.expense),
+                            y: .value("Name", element.name)
+                        )
+                        .foregroundStyle(element.name == topCartName ? .pink : .secondary)
+                        .annotation(position: .overlay) {
+                            Text("\(element.expense, format: .currency(code: locale.currency?.identifier ?? "USD"))")
                                 .font(.callout)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(.white)
+                        }
+                    }
+                }
+                .chartLegend(alignment: .center, spacing: 18)
+                .chartBackground { chartProxy in
+                    GeometryReader { reader in
+                        if #available(iOS 17.0, *) {
+                            if let anchor = chartProxy.plotFrame {
+                                chartLabel(
+                                    reader: reader,
+                                    horizontalAlignment: .center
+                                )
                                 .multilineTextAlignment(.center)
                                 .frame(maxWidth: reader.size.width / 2.2)
-
+                                    .position(x: reader[anchor].midX,
+                                              y: reader[anchor].midY)
+                            }
                         }
-                        .position(x: reader[anchor].midX,
-                                  y: reader[anchor].midY)
                     }
                 }
             }
-        }
-        .overlay {
-            if data.isEmpty {
-                Text("No data")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+            .overlay {
+                if data.isEmpty {
+                    Text("No data")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
             }
+        }
+    }
+    
+    @ViewBuilder
+    private func chartLabel(
+        reader: GeometryProxy,
+        horizontalAlignment: HorizontalAlignment
+    ) -> some View {
+        VStack(alignment: horizontalAlignment) {
+            Text("Most Expensive Cart")
+                .font(.callout)
+                .foregroundStyle(.secondary)
+            
+            Text(data.isEmpty ? "-" : "\(topCartName)")
+                .font(.title2.bold())
+                .foregroundStyle(Color.foreground)
+            
+            Text("worth \(maxExpense, format: .currency(code: locale.currency?.identifier ?? "USD"))")
+                .font(.callout)
+                .foregroundStyle(.secondary)
+                .padding(.bottom, Design.Padding.bottom)
         }
     }
 }
@@ -110,21 +145,17 @@ struct CategoryDetails : View {
     }
     
     var data: [CartExpenseData] {
-        CartExpenseData.topCartsData(range: filterDateRange,
-                                     carts: Array(carts),
-                                     sortBy: sortParameter,
-                                     context: viewContext)
+        let data = CartExpenseData.periodicData(
+            range: filterDateRange,
+            carts: Array(carts),
+            context: viewContext
+        )
+        
+        return CartExpenseData.sort(data, by: sortParameter)
     }
     
     var top5data: [CartExpenseData] {
         Array(data.prefix(5))
-    }
-    
-    var chartData: [CartExpenseData] {
-        CartExpenseData.topCartsData(range: filterDateRange,
-                                     carts: Array(carts),
-                                     sortBy: .expense,
-                                     context: viewContext)
     }
     
     var topCartName: String {
@@ -135,33 +166,40 @@ struct CategoryDetails : View {
     }
     
     var body: some View {
-        List {
-            Section {
-                CategoryDetailsChart(data: chartData)
-            } header: {
-                TimeRangePicker(value: $timeRange)
-            }
-            
-            Section {
-                SortButton(value: $sortParameter)
-            } header: {
-                Text("Cart Value")
-                    .font(.title2.bold())
-                    .foregroundStyle(Color.foreground)
-            }
-            
-            Section {
-                expenses(data: showAllData ? data : top5data)
+        GeometryReader { reader in
+            List {
+                Section {
+                    CategoryDetailsChart(data: data)
+                        .frame(height: reader.size.height/2)
+                } header: {
+                    TimeRangePicker(value: $timeRange)
+                } footer: {
+                    Text("\(timeRangeStart) - \(timeRangeEnd)")
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
+                }
                 
-                if data.count > 5 {
-                    ExpandButton(showAllData: $showAllData)
+                Section {
+                    SortButton(value: $sortParameter)
+                } header: {
+                    Text("Cart Value")
+                        .font(.title2.bold())
+                        .foregroundStyle(Color.foreground)
+                }
+                
+                Section {
+                    expenses(data: showAllData ? data : top5data)
+                    
+                    if data.count > 5 {
+                        ExpandButton(showAllData: $showAllData)
+                    }
                 }
             }
+            .navigationTitle("Category")
+            .navigationBarTitleDisplayMode(.inline)
+            .scrollContentBackground(.hidden)
+            .background(Color.background)
         }
-        .navigationTitle("Category")
-        .navigationBarTitleDisplayMode(.inline)
-        .scrollContentBackground(.hidden)
-        .background(Color.background)
     }
     
     @ViewBuilder
@@ -176,16 +214,26 @@ struct CategoryDetails : View {
                     Text("\(cart.name)")
                         .font(.title3)
                         .foregroundStyle(.primary)
-                        .padding(.bottom, -Design.Padding.bottom)
+                    
+                    Group {
+                        Text("\(percentage(expense: cart.expense), format: .percent.precision(.significantDigits(3)))")
+                        + Text(" (^[\(cart.itemCount) Item](inflect: true))")
+                    }
+                    .font(.caption.bold())
+                    .foregroundStyle(Color.foreground)
                 }
                 
                 Spacer()
                 
                 Text("\(cart.expense, format: .currency(code: locale.currency?.identifier ?? "USD"))")
                     .foregroundStyle(.secondary)
-                    .padding(.bottom, Design.Padding.bottom)
             }
         }
+    }
+    
+    private func percentage(expense: Double) -> Double {
+        return CartExpenseData.getPercentage(of: data,
+                                             for: expense)
     }
 }
 

@@ -13,6 +13,8 @@ import CoreData
 struct CategoriesOverviewChart: View {
     var data: [CartExpenseData]
     
+    @Environment(\.locale) private var locale
+    
     var topCartName: String {
         let name = data.first {
             $0.expense == CartExpenseData.getMaxExpense(data: data)
@@ -37,6 +39,13 @@ struct CategoriesOverviewChart: View {
                     y: .value("Name", element.name)
                 )
                 .foregroundStyle(element.name == topCartName ? .pink : .secondary)
+                .annotation {
+                    if element.name == topCartName {
+                        Text("\(element.expense, format: .currency(code: locale.currency?.identifier ?? "USD"))")
+                            .font(.callout)
+                            .foregroundStyle(.secondary)
+                    }
+                }
             }
         }
         .chartLegend(.hidden)
@@ -62,9 +71,13 @@ struct CategoriesOverview : View {
     }
     
     var data: [CartExpenseData] {
-        CartExpenseData.topCartsData(range: filterDateRange,
-                                     carts: Array(carts),
-                                     context: viewContext)
+        let data = CartExpenseData.periodicData(
+            range: filterDateRange,
+            carts: Array(carts),
+            context: viewContext
+        )
+        
+        return CartExpenseData.sort(data, by: .expense)
     }
     
     var topCartName: String {

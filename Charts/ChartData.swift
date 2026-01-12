@@ -90,14 +90,14 @@ struct CartExpenseData: Identifiable {
     let name: String
     let date: Date
     let expense: Double
+    let itemCount: Int
     var id: String { name }
 }
 
 extension CartExpenseData {
-    static func topCartsData(
+    static func periodicData(
         range: ClosedRange<Date>,
         carts: Array<CDCart>,
-        sortBy: SortParameter = .expense,
         context: NSManagedObjectContext
     ) -> [CartExpenseData] {
         var data = [CartExpenseData]()
@@ -107,12 +107,23 @@ extension CartExpenseData {
                                                   in: range,
                                                   context: context)
             
+            let count = CDCart.getTotalItems(for: cart,
+                                             context: context)
+            
             data.append(.init(name: cart.name ?? "",
                               date: cart.timestamp ?? .now,
-                              expense: expense))
+                              expense: expense,
+                              itemCount: count))
         }
         
-        data = data.sorted {
+        return data
+    }
+    
+    static func sort(
+        _ data: [CartExpenseData],
+        by sortBy: SortParameter
+    ) -> [CartExpenseData] {
+        return data.sorted {
             switch sortBy {
             case .expense:
                 $0.expense > $1.expense
@@ -120,10 +131,17 @@ extension CartExpenseData {
                 $0.date > $1.date
             }
         }
-        return data
     }
     
     static func getMaxExpense(data: [CartExpenseData]) -> Double? {
         data.map { $0.expense }.max()
+    }
+    
+    static func getPercentage(
+        of data: [CartExpenseData],
+        for expense: Double
+    ) -> Double {
+        let total = data.map { $0.expense }.reduce(0, +)
+        return expense / total
     }
 }
