@@ -64,10 +64,10 @@ struct CategoriesOverview : View {
     private var carts: FetchedResults<CDCart>
     
     var filterDateRange: ClosedRange<Date> {
-        ExpenditureData.lastNDaysRange(
-            days: timeRange.rawValue,
-            context: viewContext
-        )
+        let dateRange = CDItem.dateRange(context: viewContext)
+        let start = dateRange.upperBound.addingTimeInterval(-1 * 3600 * 24 * timeRange.rawValue)
+        let end = dateRange.upperBound
+        return start...end
     }
     
     var data: [CartExpenseData] {

@@ -13,6 +13,7 @@ import CoreData
 struct DailyExpenditureChart: View {
     var data: [ExpenditureData]
     var timeRange: TimeRange
+    @Binding var scrollPosition: Date
     
     @Environment(\.locale) private var locale
     
@@ -21,37 +22,67 @@ struct DailyExpenditureChart: View {
         return total / Double(data.count)
     }
     
+    var axisMarkCount: Int {
+        var count = 0
+        if timeRange == .last30days {
+            count = 7
+        } else if timeRange == .last7days {
+            count = 1
+        }
+        return count
+    }
+    
+    var axisValueLabelFormat: Date.FormatStyle {
+        var format = Date.FormatStyle.dateTime
+        if timeRange == .last30days {
+            format = .dateTime.month().day()
+        } else if timeRange == .last7days {
+            format = .dateTime.weekday()
+        }
+        return format
+    }
+    
     var body: some View {
+        if #available(iOS 17.0, *) {
+            chartView()
+                .chartScrollableAxes(.horizontal)
+                .chartXVisibleDomain(length: 3600 * 24 * timeRange.rawValue)
+                .chartScrollTargetBehavior(
+                    .valueAligned(
+                        matching: .init(hour: 0),
+                        majorAlignment: .matching(.init(day: 1))
+                    ))
+                .chartScrollPosition(x: $scrollPosition)
+        } else {
+            chartView()
+        }
+    }
+    
+    @ViewBuilder
+    private func chartView() -> some View {
         Chart {
             ForEach(data) {
                 BarMark(x: .value("Day", $0.date, unit: .day),
                         y: .value("Expenses", $0.expense))
             }
+            .foregroundStyle(.sanskrit)
             
             RuleMark(y: .value("Average", averageExpenditure))
                 .foregroundStyle(.accent)
                 .lineStyle(StrokeStyle(lineWidth: 3, dash: [5,3]))
-                .annotation(position: .trailing) {
+                .annotation(position: .automatic) {
                     Text("avg")
                         .foregroundStyle(.accent)
                 }
         }
-        .foregroundStyle(.sanskrit)
         .chartXAxis {
-            if timeRange == .last30days {
-                AxisMarks(values: .stride(by: .day, count: 7)) {
+            if timeRange != .last365days {
+                AxisMarks(values: .stride(by: .day, count: axisMarkCount)) {
                     AxisTick()
                     AxisGridLine()
-                    AxisValueLabel(format: .dateTime.month().day())
-                }
-            } else if timeRange == .last7days {
-                AxisMarks(values: .stride(by: .day, count: 1)) {
-                    AxisTick()
-                    AxisGridLine()
-                    AxisValueLabel(format: .dateTime.weekday())
+                    AxisValueLabel(format: axisValueLabelFormat)
                 }
             }
-            
         }
         .overlay {
             if data.isEmpty {
@@ -62,6 +93,8 @@ struct DailyExpenditureChart: View {
         }
     }
 }
+
+// MARK: - Monthly Chart
 
 struct MonthlyExpenditureChart: View {
     var data: [ExpenditureData]
@@ -106,29 +139,35 @@ struct MonthlyExpenditureChart: View {
     }
 }
 
+// MARK: - Details view
+
 struct ExpenditureDetails: View {
     @State private var timeRange: TimeRange = .last7days
     @State private var sortParameter: SortParameter = .expense
     @State private var showAllData: Bool = false
+    @State private var scrollPositionStart: Date = .distantPast
     
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.locale) private var locale
     
     var filterDateRange: ClosedRange<Date> {
-        ExpenditureData.lastNDaysRange(
-            days: timeRange.rawValue,
-            context: viewContext
-        )
+        let dateRange = CDItem.dateRange(context: viewContext)
+        let days: TimeInterval = timeRange == .last7days ? TimeRange.last30days.rawValue : TimeRange.last365days.rawValue
+        let start = dateRange.upperBound.addingTimeInterval(-1 * 3600 * 24 * days)
+        let end = dateRange.upperBound
+        return start...end
     }
     
-    var timeRangeStart: String {
-        let date = filterDateRange.lowerBound
-        return date.formatted(.dateTime.year().month().day())
+    var scrollPositionEnd: Date {
+        scrollPositionStart.addingTimeInterval(3600 * 24 * timeRange.rawValue)
     }
     
-    var timeRangeEnd: String {
-        let date = filterDateRange.upperBound
-        return date.formatted(.dateTime.year().month().day())
+    var scrollTimeRangeStart: String {
+        scrollPositionStart.formatted(.dateTime.year().month().day())
+    }
+    
+    var scrollTimeRangeEnd: String {
+        scrollPositionEnd.formatted(.dateTime.year().month().day())
     }
     
     var data: [ExpenditureData] {
@@ -177,6 +216,9 @@ struct ExpenditureDetails: View {
         .navigationBarTitleDisplayMode(.inline)
         .scrollContentBackground(.hidden)
         .background(Color.background)
+        .task {
+            scrollPositionStart = CDItem.dateRange(context: viewContext).upperBound.addingTimeInterval(-1 * 3600 * 24 * timeRange.rawValue)
+        }
     }
     
     @ViewBuilder
@@ -200,14 +242,17 @@ struct ExpenditureDetails: View {
                 .foregroundStyle(Color.foreground)
                 .padding(.bottom, Design.Padding.bottom)
             
-            Text("\(timeRangeStart) - \(timeRangeEnd)")
+            Text("\(scrollTimeRangeStart) - \(scrollTimeRangeEnd)")
                 .font(.callout)
                 .foregroundStyle(.secondary)
             
             switch timeRange {
             case .last7days, .last30days:
-                DailyExpenditureChart(data: data,
-                                      timeRange: timeRange)
+                DailyExpenditureChart(
+                    data: data,
+                    timeRange: timeRange,
+                    scrollPosition: $scrollPositionStart
+                )
                     .frame(height: 240)
             case .last365days:
                 MonthlyExpenditureChart(data: data)

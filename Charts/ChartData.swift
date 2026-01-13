@@ -74,16 +74,6 @@ extension ExpenditureData {
         
         return data
     }
-    
-    static func lastNDaysRange(
-        days: TimeInterval,
-        context: NSManagedObjectContext
-    ) -> ClosedRange<Date> {
-        let dateRange = CDItem.dateRange(context: context)
-        let start = dateRange.upperBound.addingTimeInterval(-1 * 3600 * 24 * days)
-        let end = dateRange.upperBound
-        return start...end
-    }
 }
 
 struct CartExpenseData: Identifiable {
