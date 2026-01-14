@@ -123,10 +123,6 @@ extension CartExpenseData {
         }
     }
     
-    static func getMaxExpense(data: [CartExpenseData]) -> Double? {
-        data.map { $0.expense }.max()
-    }
-    
     static func getPercentage(
         of data: [CartExpenseData],
         for expense: Double

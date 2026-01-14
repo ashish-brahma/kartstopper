@@ -16,10 +16,7 @@ struct CategoriesOverviewChart: View {
     @Environment(\.locale) private var locale
     
     var topCartName: String {
-        let name = data.first {
-            $0.expense == CartExpenseData.getMaxExpense(data: data)
-        }?.name
-        return name ?? ""
+        data.first?.name ?? "Unknown"
     }
     
     var body: some View {
@@ -81,10 +78,7 @@ struct CategoriesOverview : View {
     }
     
     var topCartName: String {
-        let name = data.first {
-            $0.expense == CartExpenseData.getMaxExpense(data: data)
-        }?.name
-        return name ?? ""
+        data.first?.name ?? "Unknown"
     }
     
     var body: some View {
