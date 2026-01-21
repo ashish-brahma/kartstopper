@@ -37,6 +37,8 @@ struct ItemDetailView: View {
             }
             .navigationTitle(name)
             .navigationTitleColor(Color.foreground)
+            .scrollContentBackground(.hidden)
+            .background(Color.background)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Dismiss") {

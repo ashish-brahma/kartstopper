@@ -34,6 +34,8 @@ struct EditCartView: View {
             }
         }
         .navigationTitle(cart.displayName)
+        .scrollContentBackground(.hidden)
+        .background(Color.background)
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
                 Button("Cancel") {

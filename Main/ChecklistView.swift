@@ -16,6 +16,7 @@ struct ChecklistView: View {
     @ObservedObject var viewModel: ViewModel
     
     @Environment(\.managedObjectContext) private var viewContext
+    @Environment(\.editMode) private var editMode
     
     @FetchRequest private var itemList: FetchedResults<CDItem>
     
@@ -37,7 +38,6 @@ struct ChecklistView: View {
     
     @State private var selection: CDItem?
     @State private var showAddItem = false
-    @State private var showEditCart = false
     @State private var showEditItem = false
     @State private var showItemInfo = false
     
@@ -79,7 +79,8 @@ struct ChecklistView: View {
                     )
                 }
             }
-            .searchable(text: $viewModel.itemQuery, prompt: "Find an item")
+            .searchable(text: $viewModel.itemQuery,
+                        prompt: "Find an item")
             .onChange(of: viewModel.itemQuery) { newValue in
                 itemList.nsPredicate = newValue.isEmpty ? cartPredicate : searchPredicate
             }
@@ -95,11 +96,6 @@ struct ChecklistView: View {
                     AddItemView(cart: cart, viewModel: viewModel)
                 }
             }
-            .sheet(isPresented: $showEditCart) {
-                NavigationStack {
-                    EditCartView(cart: cart)
-                }
-            }
         }
     }
     
@@ -111,6 +107,7 @@ struct ChecklistView: View {
         reader: GeometryProxy
     ) -> some View {
         itemNavLabel(for: item, reader: reader)
+            .opacity(editMode?.wrappedValue.isEditing ?? true ? 0.5 : 1)
             .swipeActions(edge: .trailing) {
                 Button(role: .destructive) {
                     deleteItem(item)
@@ -165,7 +162,7 @@ struct ChecklistView: View {
     ) -> some View {
         VStack(alignment: .leading) {
             HStack {
-                displayStatus(for: item)
+                checkLabel(for: item)
                     .padding(.trailing, Design.Padding.trailing)
                     .onTapGesture {
                         toggleStatus(for: item)
@@ -193,12 +190,14 @@ struct ChecklistView: View {
     }
     
     @ViewBuilder
-    private func displayStatus(for item: CDItem) -> some View {
-        Label("Checkcircle",
-              systemImage: item.isComplete ? "checkmark.circle.fill" : "circle")
-        .imageScale(.large)
-        .labelStyle(.iconOnly)
-        .foregroundStyle(Color.accentColor)
+    private func checkLabel(for item: CDItem) -> some View {
+        if editMode?.wrappedValue.isEditing == false {
+            Label("Checkcircle",
+                  systemImage: item.isComplete ? "checkmark.circle.fill" : "circle")
+            .imageScale(.large)
+            .labelStyle(.iconOnly)
+            .foregroundStyle(Color.accentColor)
+        }
     }
     
     @ViewBuilder
@@ -222,37 +221,32 @@ struct ChecklistView: View {
     
     @ViewBuilder
     private func infoButton(for item: CDItem) -> some View {
-        Button {
-            selection = item
-            showItemInfo = true
-        } label: {
-            Label("Info", systemImage: "info.circle")
-                .imageScale(.large)
-                .tint(.info)
-                .labelStyle(.iconOnly)
+        if editMode?.wrappedValue.isEditing == false {
+            Button {
+                selection = item
+                showItemInfo = true
+            } label: {
+                Label("Info", systemImage: "info.circle")
+                    .imageScale(.large)
+                    .tint(.info)
+                    .labelStyle(.iconOnly)
+            }
         }
     }
     
     @ToolbarContentBuilder
     private func editorToolbar() -> some ToolbarContent {
-        ToolbarItem(placement: .topBarTrailing) {
+        ToolbarItem(placement: .primaryAction) {
             EditButton()
                 .disabled(itemList.isEmpty)
         }
-        ToolbarItem(placement: .topBarTrailing) {
+        ToolbarItem(placement: .bottomBar) {
             Button {
                 viewModel.objectWillChange.send()
                 showAddItem.toggle()
             } label: {
                 Label("Add item", systemImage: "plus")
-            }
-        }
-        ToolbarItem(placement: .primaryAction) {
-            Button {
-                viewModel.objectWillChange.send()
-                showEditCart.toggle()
-            } label: {
-                Label("Edit cart details", systemImage: "pencil")
+                    .labelStyle(.titleAndIcon)
             }
         }
     }
@@ -277,21 +271,26 @@ struct ChecklistView: View {
     
     private func deleteItem(_ item: CDItem) {
         viewModel.objectWillChange.send()
+        if item.objectID == selection?.objectID {
+            selection = nil
+        }
         viewContext.delete(item)
         saveContext()
     }
     
     private func move(from source: IndexSet, to destination: Int) {
-        viewModel.objectWillChange.send()
-        var itemArray = Array(itemList)
-        itemArray.move(fromOffsets: source, toOffset: destination)
-        for i in 0..<itemArray.count {
-            itemArray[i].id = Int32(i)
+        withAnimation {
+            viewModel.objectWillChange.send()
+            var itemArray = Array(itemList)
+            itemArray.move(fromOffsets: source, toOffset: destination)
+            for i in 0..<itemArray.count {
+                itemArray[i].id = Int32(i)
+            }
+            saveContext()
         }
-        saveContext()
     }
     
-    func toggleStatus(for item: CDItem) {
+    private func toggleStatus(for item: CDItem) {
         viewModel.objectWillChange.send()
         item.isComplete.toggle()
         saveContext()
@@ -299,9 +298,14 @@ struct ChecklistView: View {
 }
 
 #Preview {
+    let result = PersistenceController.preview
+    let viewContext = result.container.viewContext
+    
+    let request = CDCart.fetchRequest()
+    let cart = try! viewContext.fetch(request).first { $0.id == 0 }
+    
     NavigationStack {
-        ChecklistView(cart: .preview, viewModel: .preview)
-            .environment(\.managedObjectContext,
-                          PersistenceController.preview.container.viewContext)
+        ChecklistView(cart: cart!, viewModel: .preview)
     }
+    .environment(\.managedObjectContext, viewContext)
 }

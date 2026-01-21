@@ -102,15 +102,16 @@ struct CartListView: View {
     
     @ToolbarContentBuilder
     private func editorToolbar() -> some ToolbarContent {
-        ToolbarItem(placement: .topBarTrailing) {
+        ToolbarItem(placement: .primaryAction) {
             EditButton()
                 .disabled(carts.isEmpty)
         }
-        ToolbarItem(placement: .primaryAction) {
+        ToolbarItem(placement: .bottomBar) {
             Button {
                 showAddCart.toggle()
             } label: {
                 Label("Add cart", systemImage: "plus")
+                    .labelStyle(.titleAndIcon)
             }
         }
     }
@@ -143,20 +144,22 @@ struct CartListView: View {
     }
     
     private func move(from source: IndexSet, to destination: Int) {
-        viewModel.objectWillChange.send()
-        var cartArray = Array(carts)
-        cartArray.move(fromOffsets: source, toOffset: destination)
-        for i in 0..<cartArray.count {
-            cartArray[i].id = Int32(i)
+        withAnimation {
+            viewModel.objectWillChange.send()
+            var cartArray = Array(carts)
+            cartArray.move(fromOffsets: source, toOffset: destination)
+            for i in 0..<cartArray.count {
+                cartArray[i].id = Int32(i)
+            }
+            saveContext()
         }
-        saveContext()
     }
 }
 
 #Preview {
     NavigationStack {
         CartListView(viewModel: .preview)
-            .environment(\.managedObjectContext,
-                          PersistenceController.preview.container.viewContext)
     }
+    .environment(\.managedObjectContext,
+                  PersistenceController.preview.container.viewContext)
 }

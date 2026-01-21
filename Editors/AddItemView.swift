@@ -52,6 +52,8 @@ struct AddItemView: View {
             }
         }
         .navigationTitle("Add Item")
+        .scrollContentBackground(.hidden)
+        .background(Color.background)
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
                 Button("Cancel") {
