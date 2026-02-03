@@ -78,7 +78,7 @@ struct DashboardView: View {
                 .font(.callout)
                 .foregroundStyle(.secondary)
             
-            Text("\(viewModel.totalCarts) Carts")
+            Text("^[\(viewModel.totalCarts) Carts](inflect: true)")
                 .font(.title2.bold())
                 .foregroundStyle(Color.foreground)
         }

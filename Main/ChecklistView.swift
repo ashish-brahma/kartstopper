@@ -72,15 +72,10 @@ struct ChecklistView: View {
                         description: "New items you add will appear here."
                     )
                 } else if itemList.isEmpty {
-                    ChecklistView.unavailableView(
-                        label: "No Results",
-                        symbolName: "magnifyingglass",
-                        description: "Tap on return to search online or try a new search."
-                    )
+                    ChecklistView.searchUnavailableView
                 }
             }
-            .searchable(text: $viewModel.itemQuery,
-                        prompt: "Find an item")
+            .searchable(text: $viewModel.itemQuery)
             .onChange(of: viewModel.itemQuery) { newValue in
                 itemList.nsPredicate = newValue.isEmpty ? cartPredicate : searchPredicate
             }
