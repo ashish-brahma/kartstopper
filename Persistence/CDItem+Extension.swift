@@ -28,6 +28,12 @@ extension CDItem {
         return timestamp.formatted(Date.customStyle)
     }
     
+    var itemColor: Color {
+        let seed = name.hashValue
+        var generator: RandomNumberGenerator = SeededRandomGenerator(seed: seed)
+        return .random(using: &generator)
+    }
+    
     static func getExpenditure(
         in range: ClosedRange<Date>,
         context: NSManagedObjectContext

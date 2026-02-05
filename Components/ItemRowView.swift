@@ -13,14 +13,8 @@ struct ItemRowView: View {
     let date: String
     let name: String
     let price: Double
+    var itemColor: Color
     let reader: GeometryProxy
-    let isSearching: Bool
-    
-    var itemColor: Color {
-        let seed = name.hashValue
-        var generator: RandomNumberGenerator = SeededRandomGenerator(seed: seed)
-        return .random(using: &generator)
-    }
     
     var body: some View {
         HStack(alignment: .top) {
@@ -36,9 +30,7 @@ struct ItemRowView: View {
     
     private func itemDetails() -> some View {
         VStack(alignment: .leading) {
-            if !isSearching {
-                displayDate()
-            }
+            displayDate()
             
             Text(name)
                 .foregroundStyle(Color.foreground)
@@ -100,8 +92,8 @@ struct ItemRowView: View {
                     date: item.displayDate,
                     name: item.displayName,
                     price: item.price,
-                    reader: reader,
-                    isSearching: true)
+                    itemColor: item.itemColor,
+                    reader: reader)
         .frame(height: reader.size.height/5)
         .position(x: reader.size.width/2, y: reader.size.height/2)
     }

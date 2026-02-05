@@ -7,96 +7,43 @@
 //  A SwiftUI view that adds a new item.
 
 import SwiftUI
-import CoreData
 
 struct AddItemView: View {
-    let cart: CDCart
+    @Binding var name: String
+    @Binding var price: Double
+    @FocusState private var isEditing
     
-    @ObservedObject var viewModel: ViewModel
-    
-    @Environment(\.managedObjectContext) private var viewContext
-    @Environment(\.dismiss) private var dismiss
     @Environment(\.locale) private var locale
     
-    @State private var name = ""
-    @State private var notes = ""
-    @State private var price: Double = 0.00
-    
-    private var totalItems: Int {
-        CDCart.getTotalItems(for: cart, context: viewContext)
-    }
-    
     var body: some View {
-        Form {
-            Section(header: Text("Item Name")) {
-                Group {
-                    TextField("Enter a name for the item", text: $name)
-                }
-            }
+        HStack {
+            Label("Checkcircle", systemImage: "circle")
+                .imageScale(.large)
+                .labelStyle(.iconOnly)
+                .foregroundStyle(Color.accentColor)
+                .padding(.trailing, Design.Padding.trailing)
             
-            Section(header: Text("Price")) {
-                Group {
-                    TextField("Price",
-                              value: $price,
-                              format: .currency(code: locale.currency?.identifier ?? "USD"))
-                    .keyboardType(.decimalPad)
-                }
-            }
-            
-            Section(header: Text("Item Description")) {
-                Group {
-                    TextField("Add notes (optional)", text: $notes, axis: .vertical)
-                        .lineLimit(Design.descriptionFieldLineLimit)
-                        .frame(height: Design.descriptionFieldHeight, alignment: .top)
-                }
+            VStack {
+                TextField("Item Name", text: $name)
+                    .focused($isEditing)
+                Divider()
+                TextField("Price",
+                          value: $price,
+                          format: .currency(code: locale.currency?.identifier ?? "USD"),
+                          prompt: Text("Price"))
+                .keyboardType(.decimalPad)
             }
         }
-        .navigationTitle("Add Item")
-        .scrollContentBackground(.hidden)
-        .background(Color.background)
-        .toolbar {
-            ToolbarItem(placement: .cancellationAction) {
-                Button("Cancel") {
-                    dismiss()
-                }
-            }
-            ToolbarItem(placement: .topBarTrailing) {
-                Button("Done") {
-                    addItem(to: cart)
-                    viewModel.itemQuery = ""
-                    dismiss()
-                }
-                .disabled(name.isEmpty)
-            }
-        }
-    }
-    
-    private func addItem(to cart: CDCart) {
-        withAnimation {
-            let newItem = CDItem(context: viewContext)
-            newItem.id = Int32(totalItems + 1)
-            newItem.name = name
-            newItem.timestamp = Date()
-            newItem.price = price
-            newItem.notes = notes
-            newItem.cart = cart
-            saveContext()
-        }
-    }
-    
-    private func saveContext() {
-        do {
-            try viewContext.save()
-        } catch {
-            let nsError = error as NSError
-            fatalError("Unresolved error \(nsError)")
+        .onAppear {
+            name = ""
+            price = 0.00
+            isEditing = true
         }
     }
 }
 
 #Preview {
-    NavigationStack {
-        AddItemView(cart: .preview, viewModel: .preview)
-    }
-    .environment(\.locale, Locale(identifier: "en-IN"))
+    AddItemView(name: .constant(CDItem.preview.displayName),
+                price: .constant(CDItem.preview.price))
+        .environment(\.locale, Locale(identifier: "en-IN"))
 }

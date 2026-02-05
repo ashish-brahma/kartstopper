@@ -37,9 +37,11 @@ struct ChecklistView: View {
     }
     
     @State private var selection: CDItem?
-    @State private var showAddItem = false
     @State private var showEditItem = false
     @State private var showItemInfo = false
+    
+    @State private var name = ""
+    @State private var price: Double = 0.00
     
     init(
         cart: CDCart,
@@ -63,6 +65,18 @@ struct ChecklistView: View {
                 }
                 .onDelete(perform: deleteItem(at:))
                 .onMove(perform: move)
+                
+                
+                Section {
+                    // FIXME: Scroll to this section automatically
+                    AddItemView(name: $name,
+                                price: $price)
+                    .onSubmit {
+                        if !name.isEmpty && price != 0.00 {
+                            addItem(to: cart)
+                        }
+                    }
+                }
             }
             .overlay {
                 if totalItems == 0 {
@@ -85,11 +99,6 @@ struct ChecklistView: View {
             .background(Color.background)
             .toolbar {
                 editorToolbar()
-            }
-            .sheet(isPresented: $showAddItem) {
-                NavigationStack {
-                    AddItemView(cart: cart, viewModel: viewModel)
-                }
             }
         }
     }
@@ -131,20 +140,7 @@ struct ChecklistView: View {
             .sheet(isPresented: $showItemInfo) {
                 if let selection = selection {
                     NavigationStack {
-                        ItemDetailView(imageURL: selection.imageURL,
-                                       name: selection.displayName,
-                                       price: selection.price,
-                                       notes: selection.displayNotes)
-                        .presentationDragIndicator(.visible)
-                        .toolbar {
-                            ToolbarItem(placement: .topBarTrailing) {
-                                NavigationLink {
-                                    EditItemView(item: selection)
-                                } label: {
-                                    Label("Edit", systemImage: "pencil")
-                                }
-                            }
-                        }
+                        EditItemView(item: selection)
                     }
                 }
             }
@@ -168,8 +164,8 @@ struct ChecklistView: View {
                                 date: item.displayDate,
                                 name: item.displayName,
                                 price: item.price,
-                                reader: reader,
-                                isSearching: false)
+                                itemColor: item.itemColor,
+                                reader: reader)
                     .frame(height: reader.size.height/6)
                     
                     quantityStepper(for: item)
@@ -235,15 +231,6 @@ struct ChecklistView: View {
             EditButton()
                 .disabled(itemList.isEmpty)
         }
-        ToolbarItem(placement: .bottomBar) {
-            Button {
-                viewModel.objectWillChange.send()
-                showAddItem.toggle()
-            } label: {
-                Label("Add item", systemImage: "plus")
-                    .labelStyle(.titleAndIcon)
-            }
-        }
     }
     
     // MARK: - Core Data Methods
@@ -254,6 +241,18 @@ struct ChecklistView: View {
         } catch {
             let nsError = error as NSError
             fatalError("Unresolved error \(nsError)")
+        }
+    }
+    
+    private func addItem(to cart: CDCart) {
+        withAnimation {
+            let newItem = CDItem(context: viewContext)
+            newItem.id = Int32(totalItems + 1)
+            newItem.name = name
+            newItem.timestamp = Date()
+            newItem.price = price
+            newItem.cart = cart
+            saveContext()
         }
     }
     

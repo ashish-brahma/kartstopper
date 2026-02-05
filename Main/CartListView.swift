@@ -21,6 +21,9 @@ struct CartListView: View {
     @State private var showAddCart = false
     @State private var showEditCart = false
     
+    @State private var name = ""
+    @State private var notes = ""
+    
     var body: some View {
         List(selection: $selection) {
             ForEach(carts) { cart in
@@ -28,6 +31,13 @@ struct CartListView: View {
             }
             .onDelete(perform: deleteCart(at:))
             .onMove(perform: move)
+            
+            if showAddCart {
+                Section {
+                    AddCartView(name: $name,
+                                notes: $notes)
+                }
+            }
         }
         .overlay {
             if viewModel.totalCarts == 0 {
@@ -50,11 +60,6 @@ struct CartListView: View {
         .background(Color.background)
         .toolbar {
             editorToolbar()
-        }
-        .sheet(isPresented: $showAddCart) {
-            NavigationStack {
-                AddCartView(viewModel: viewModel)
-            }
         }
         .task {
             viewModel.update(context: viewContext)
@@ -102,16 +107,31 @@ struct CartListView: View {
     
     @ToolbarContentBuilder
     private func editorToolbar() -> some ToolbarContent {
-        ToolbarItem(placement: .primaryAction) {
-            EditButton()
-                .disabled(carts.isEmpty)
-        }
         ToolbarItem(placement: .bottomBar) {
             Button {
                 showAddCart.toggle()
             } label: {
                 Label("Add cart", systemImage: "plus")
                     .labelStyle(.titleAndIcon)
+            }
+        }
+        if showAddCart {
+            ToolbarItem(placement: .cancellationAction) {
+                Button("Cancel") {
+                    showAddCart = false
+                }
+            }
+            ToolbarItem(placement: .topBarTrailing) {
+                Button("Done") {
+                    addCart()
+                    showAddCart = false
+                }
+                .disabled(name.isEmpty)
+            }
+        } else {
+            ToolbarItem(placement: .primaryAction) {
+                EditButton()
+                    .disabled(carts.isEmpty)
             }
         }
     }
@@ -124,6 +144,18 @@ struct CartListView: View {
         } catch {
             let nsError = error as NSError
             fatalError("Unresolved error \(nsError)")
+        }
+    }
+    
+    private func addCart() {
+        withAnimation {
+            let newCart = CDCart(context: viewContext)
+            newCart.id = Int32(viewModel.totalCarts + 1)
+            newCart.name = name
+            newCart.timestamp = Date()
+            newCart.notes = notes
+            saveContext()
+            viewModel.update(context: viewContext)
         }
     }
     

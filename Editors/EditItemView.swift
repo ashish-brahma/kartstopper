@@ -18,58 +18,91 @@ struct EditItemView: View {
     @State private var name = ""
     @State private var notes = ""
     @State private var price: Double = 0.00
+    @FocusState private var isEditing
     
     var body: some View {
-        Form {
-            Section(header: Text("Item Name")) {
-                Group {
-                    TextField("Enter a name for the item", text: $name)
+        GeometryReader { reader in
+            Form {
+                Section {
+                    if item.imageURL != nil {
+                        displayImage(reader: reader)
+                    } else {
+                        placeholderImage(reader: reader)
+                    }
                 }
-            }
-            
-            Section(header: Text("Price")) {
-                Group {
+                .listRowBackground(Color.clear)
+                
+                Section(header: Text("Item Name")) {
+                    TextField("Enter a name for the item", text: $name)
+                        .focused($isEditing)
+                }
+                
+                Section(header: Text("Price")) {
                     TextField("Price",
                               value: $price,
                               format: .currency(code: locale.currency?.identifier ?? "USD"))
                     .keyboardType(.decimalPad)
                 }
-            }
-            
-            Section(header: Text("Item Description")) {
-                Group {
+                
+                Section(header: Text("Item Description")) {
                     TextField("Add notes (optional)", text: $notes, axis: .vertical)
                         .lineLimit(Design.descriptionFieldLineLimit)
                         .frame(height:Design.descriptionFieldHeight, alignment: .top)
                 }
             }
-        }
-        .navigationTitle(item.displayName)
-        .scrollContentBackground(.hidden)
-        .background(Color.background)
-        .toolbar {
-            ToolbarItem(placement: .cancellationAction) {
-                Button("Cancel") {
-                    dismiss()
+            .navigationTitle(item.displayName)
+            .scrollContentBackground(.hidden)
+            .background(Color.background)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") {
+                        dismiss()
+                    }
+                }
+                ToolbarItem(placement: .principal) {
+                    Text("Edit Item Details")
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button {
+                        updateItem()
+                        dismiss()
+                    } label: {
+                        Label("Done", systemImage: "checkmark")
+                    }
                 }
             }
-            ToolbarItem(placement: .principal) {
-                Text("Edit Item Details")
+            .onAppear {
+                name = item.name ?? ""
+                notes = item.notes ?? ""
+                price = item.price
+                isEditing = true
             }
-            ToolbarItem(placement: .confirmationAction) {
-                Button {
-                    updateItem()
-                    dismiss()
-                } label: {
-                    Label("Done", systemImage: "checkmark")
+        }
+    }
+    
+    private func displayImage(reader: GeometryProxy) -> some View {
+        AsyncImage(url: item.imageURL) { image in
+            image
+                .resizable()
+                .clipShape(.rect(cornerRadius: Design.avatarDetailCornerRadius))
+        } placeholder: {
+            ProgressView()
+        }
+        .frame(width: reader.size.width/1.11,
+               height: reader.size.height/2)
+    }
+    
+    private func placeholderImage(reader: GeometryProxy) -> some View {
+        RoundedRectangle(cornerRadius: Design.avatarDetailCornerRadius)
+            .fill(item.itemColor)
+            .overlay {
+                if !name.isEmpty {
+                    Text(String(name.first!))
+                        .font(.system(size: Design.avatarDetailTextFontSize))
                 }
             }
-        }
-        .onAppear {
-            name = item.name ?? ""
-            notes = item.notes ?? ""
-            price = item.price
-        }
+            .frame(width: reader.size.width/1.11,
+                   height: reader.size.height/2)
     }
     
     private func updateItem() {

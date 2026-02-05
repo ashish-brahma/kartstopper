@@ -80,8 +80,8 @@ extension PersistenceController {
         item5.timestamp = Date.previewDate(year: 2024, month: 3, day: 7)
         item5.price = 100.00
         item5.quantity = 1
-        item5.name = "Beathable strap"
-        item5.notes = "Sweat abosorption material for wrist, knees and waist."
+        item5.name = "Breathable strap"
+        item5.notes = "Sweat absorption material for wrist, knees and waist."
         item5.cart = cart1
         
         let cart2 = CDCart(context: context)
@@ -97,7 +97,7 @@ extension PersistenceController {
         item6.price = 3520.52
         item6.quantity = 1
         item6.name = "JBL Earbuds"
-        item6.notes = "In-ear wireless with sweat protection, ANC and amibient noise control."
+        item6.notes = "In-ear wireless with sweat protection, ANC and ambient noise control."
         item6.cart = cart2
         
     }
