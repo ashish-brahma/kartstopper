@@ -80,7 +80,7 @@ struct ChecklistView: View {
                             isAdding = true
                         }
                     }
-                    .listRowBackground(Color.clear)
+                    .listRowBackground(Rectangle().fill(.ultraThickMaterial))
                 }
                 .overlay {
                     if totalItems != 0 && itemList.isEmpty {

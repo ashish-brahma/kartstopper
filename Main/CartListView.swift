@@ -38,7 +38,7 @@ struct CartListView: View {
                         AddCartView(name: $name,
                                     notes: $notes)
                     }
-                    .listRowBackground(Color.white.opacity(0.7))
+                    .listRowBackground(Rectangle().fill(.ultraThickMaterial))
                 }
             }
             .overlay {
