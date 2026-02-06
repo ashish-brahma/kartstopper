@@ -18,6 +18,8 @@ struct ChecklistView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.editMode) private var editMode
     
+    @Namespace var bottomID
+    
     @FetchRequest private var itemList: FetchedResults<CDItem>
     
     var cartPredicate: NSPredicate {
@@ -42,6 +44,7 @@ struct ChecklistView: View {
     
     @State private var name = ""
     @State private var price: Double = 0.00
+    @FocusState private var isAdding
     
     init(
         cart: CDCart,
@@ -57,48 +60,47 @@ struct ChecklistView: View {
     }
     
     var body: some View {
-        GeometryReader { reader in
-            List(selection: $selection) {
-                ForEach(itemList) { item in
-                    itemRowBuilder(item: item,
-                                   reader: reader)
-                }
-                .onDelete(perform: deleteItem(at:))
-                .onMove(perform: move)
-                
-                
-                Section {
-                    // FIXME: Scroll to this section automatically
-                    AddItemView(name: $name,
-                                price: $price)
-                    .onSubmit {
-                        if !name.isEmpty && price != 0.00 {
-                            addItem(to: cart)
+        GeometryReader { geometryProxy in
+            ScrollViewReader { scrollProxy in
+                List(selection: $selection) {
+                    ForEach(itemList) { item in
+                        itemRowBuilder(item: item,
+                                       reader: geometryProxy)
+                    }
+                    .onDelete(perform: deleteItem(at:))
+                    .onMove(perform: move)
+                    
+                    
+                    Section {
+                        AddItemView(name: $name,
+                                    price: $price)
+                        .id(bottomID)
+                        .focused($isAdding)
+                        .task {
+                            isAdding = true
                         }
                     }
+                    .listRowBackground(Color.clear)
                 }
-            }
-            .overlay {
-                if totalItems == 0 {
-                    ChecklistView.unavailableView(
-                        label: "No Items",
-                        symbolName: "note.text.badge.plus",
-                        description: "New items you add will appear here."
-                    )
-                } else if itemList.isEmpty {
-                    ChecklistView.searchUnavailableView
+                .overlay {
+                    if totalItems != 0 && itemList.isEmpty {
+                        ChecklistView.searchUnavailableView
+                    }
                 }
-            }
-            .searchable(text: $viewModel.itemQuery)
-            .onChange(of: viewModel.itemQuery) { newValue in
-                itemList.nsPredicate = newValue.isEmpty ? cartPredicate : searchPredicate
-            }
-            .textInputAutocapitalization(.never)
-            .navigationTitle(cart.displayName)
-            .scrollContentBackground(.hidden)
-            .background(Color.background)
-            .toolbar {
-                editorToolbar()
+                .searchable(text: $viewModel.itemQuery)
+                .task {
+                    scrollProxy.scrollTo(bottomID)
+                }
+                .onChange(of: viewModel.itemQuery) { newValue in
+                    itemList.nsPredicate = newValue.isEmpty ? cartPredicate : searchPredicate
+                }
+                .textInputAutocapitalization(.never)
+                .navigationTitle(cart.displayName)
+                .scrollContentBackground(.hidden)
+                .background(Color.background)
+                .toolbar {
+                    editorToolbar()
+                }
             }
         }
     }
@@ -230,6 +232,18 @@ struct ChecklistView: View {
         ToolbarItem(placement: .primaryAction) {
             EditButton()
                 .disabled(itemList.isEmpty)
+        }
+        if isAdding {
+            ToolbarItem(placement: .keyboard) {
+                Button("Done") {
+                    if !name.isEmpty && price != 0.00 {
+                        addItem(to: cart)
+                        name = ""
+                        price = 0.00
+                    }
+                    isAdding = false
+                }
+            }
         }
     }
     

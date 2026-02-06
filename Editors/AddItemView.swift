@@ -11,7 +11,6 @@ import SwiftUI
 struct AddItemView: View {
     @Binding var name: String
     @Binding var price: Double
-    @FocusState private var isEditing
     
     @Environment(\.locale) private var locale
     
@@ -25,7 +24,6 @@ struct AddItemView: View {
             
             VStack {
                 TextField("Item Name", text: $name)
-                    .focused($isEditing)
                 Divider()
                 TextField("Price",
                           value: $price,
@@ -37,7 +35,6 @@ struct AddItemView: View {
         .onAppear {
             name = ""
             price = 0.00
-            isEditing = true
         }
     }
 }

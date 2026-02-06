@@ -25,45 +25,52 @@ struct CartListView: View {
     @State private var notes = ""
     
     var body: some View {
-        List(selection: $selection) {
-            ForEach(carts) { cart in
-                CartNavLink(for: cart)
-            }
-            .onDelete(perform: deleteCart(at:))
-            .onMove(perform: move)
-            
-            if showAddCart {
-                Section {
-                    AddCartView(name: $name,
-                                notes: $notes)
+        VStack {
+            List(selection: $selection) {
+                ForEach(carts) { cart in
+                    CartNavLink(for: cart)
+                }
+                .onDelete(perform: deleteCart(at:))
+                .onMove(perform: move)
+                
+                if showAddCart {
+                    Section {
+                        AddCartView(name: $name,
+                                    notes: $notes)
+                    }
+                    .listRowBackground(Color.white.opacity(0.7))
                 }
             }
-        }
-        .overlay {
-            if viewModel.totalCarts == 0 {
-                ContentView.unavailableView(
-                    label: "No Carts",
-                    symbolName: "cart.badge.plus",
-                    description: "New carts you add will appear here."
-                )
-            } else if carts.isEmpty {
-                ContentView.searchUnavailableView
+            .overlay {
+                if !showAddCart {
+                    if viewModel.totalCarts == 0 {
+                        ContentView.unavailableView(
+                            label: "No Carts",
+                            symbolName: "cart.badge.plus",
+                            description: "New carts you add will appear here."
+                        )
+                    } else if carts.isEmpty {
+                        ContentView.searchUnavailableView
+                    }
+                }
             }
+            .searchable(text: $viewModel.cartQuery, placement: .navigationBarDrawer)
+            .onChange(of: viewModel.cartQuery) { newValue in
+                carts.nsPredicate = newValue.isEmpty ? nil : NSPredicate(format: "name CONTAINS[cd] %@", viewModel.cartQuery)
+            }
+            .navigationTitle("Carts")
+            .textInputAutocapitalization(.never)
+            .scrollContentBackground(.hidden)
+            .toolbar {
+                editorToolbar()
+            }
+            .task {
+                viewModel.update(context: viewContext)
+            }
+            
+            addButtonView()
         }
-        .searchable(text: $viewModel.cartQuery)
-        .onChange(of: viewModel.cartQuery) { newValue in
-            carts.nsPredicate = newValue.isEmpty ? nil : NSPredicate(format: "name CONTAINS[cd] %@", viewModel.cartQuery)
-        }
-        .navigationTitle("Carts")
-        .textInputAutocapitalization(.never)
-        .scrollContentBackground(.hidden)
         .background(Color.background)
-        .toolbar {
-            editorToolbar()
-        }
-        .task {
-            viewModel.update(context: viewContext)
-        }
     }
     
     // MARK: - View Builder Methods
@@ -105,26 +112,39 @@ struct CartListView: View {
         }
     }
     
-    @ToolbarContentBuilder
-    private func editorToolbar() -> some ToolbarContent {
-        ToolbarItem(placement: .bottomBar) {
+    @ViewBuilder
+    private func addButtonView() -> some View {
+        HStack {
+            Spacer()
             Button {
-                showAddCart.toggle()
+                showAddCart = true
             } label: {
                 Label("Add cart", systemImage: "plus")
-                    .labelStyle(.titleAndIcon)
+                    .labelStyle(.iconOnly)
+                    .imageScale(.large)
             }
+            .buttonStyle(.borderedProminent)
+            .clipShape(.circle)
+            .padding(Design.Padding.trailing)
         }
+    }
+    
+    @ToolbarContentBuilder
+    private func editorToolbar() -> some ToolbarContent {
         if showAddCart {
             ToolbarItem(placement: .cancellationAction) {
-                Button("Cancel") {
+                Button {
                     showAddCart = false
+                } label: {
+                    Label("Cancel", systemImage: "xmark")
                 }
             }
-            ToolbarItem(placement: .topBarTrailing) {
-                Button("Done") {
+            ToolbarItem(placement: .confirmationAction) {
+                Button {
                     addCart()
                     showAddCart = false
+                } label: {
+                    Label("Done", systemImage: "checkmark")
                 }
                 .disabled(name.isEmpty)
             }

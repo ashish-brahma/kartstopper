@@ -26,6 +26,8 @@ struct AddCartView: View {
             .frame(height: Design.descriptionFieldHeight, alignment: .top)
         }
         .onAppear {
+            name = ""
+            notes = ""
             isEditing = true
         }
     }

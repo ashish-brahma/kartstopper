@@ -38,8 +38,10 @@ struct EditCartView: View {
         .background(Color.background)
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
-                Button("Cancel") {
+                Button {
                     dismiss()
+                } label: {
+                    Label("Cancel", systemImage: "xmark")
                 }
             }
             ToolbarItem(placement: .principal) {
