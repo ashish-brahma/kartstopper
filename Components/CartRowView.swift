@@ -20,7 +20,8 @@ struct CartRowView: View {
     
     var body: some View {
         VStack(alignment: .leading) {
-            Text(cart.displayDate)
+            Text(cart.displayDate.formatted(date: .omitted,
+                                            time: .shortened))
                 .font(.subheadline)
             
             HStack {

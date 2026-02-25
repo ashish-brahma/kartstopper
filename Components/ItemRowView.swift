@@ -10,7 +10,6 @@ import SwiftUI
 
 struct ItemRowView: View {
     let imageURL: URL?
-    let date: String
     let name: String
     let price: Double
     var itemColor: Color
@@ -30,8 +29,6 @@ struct ItemRowView: View {
     
     private func itemDetails() -> some View {
         VStack(alignment: .leading) {
-            displayDate()
-            
             Text(name)
                 .foregroundStyle(Color.foreground)
                 .multilineTextAlignment(.leading)
@@ -71,14 +68,6 @@ struct ItemRowView: View {
             .padding(.trailing)
     }
     
-    private func displayDate() -> some View {
-        Text(date)
-            .font(.caption)
-            .foregroundStyle(.secondary)
-            .multilineTextAlignment(.leading)
-            .padding(.vertical, Design.Padding.vertical)
-    }
-    
     private func displayPrice() -> some View {
         Text(price.formatted(.currency(code: Locale.current.currency?.identifier ?? "USD")))
             .font(.title2)
@@ -89,12 +78,10 @@ struct ItemRowView: View {
     let item = CDItem.preview
     GeometryReader { reader in
         ItemRowView(imageURL: item.imageURL,
-                    date: item.displayDate,
                     name: item.displayName,
                     price: item.price,
                     itemColor: item.itemColor,
                     reader: reader)
-        .frame(height: reader.size.height/5)
         .position(x: reader.size.width/2, y: reader.size.height/2)
     }
 }

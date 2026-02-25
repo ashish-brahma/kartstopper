@@ -235,12 +235,10 @@ struct CategoryDetails : View {
                         .foregroundStyle(Color.foreground)
                 }
                 
-                Section {
-                    expenses(data: showAllData ? data : top5data)
+                expenses(data: showAllData ? data : top5data)
                     
-                    if data.count > 5 {
-                        ExpandButton(showAllData: $showAllData)
-                    }
+                if data.count > 5 {
+                    ExpandButton(showAllData: $showAllData)
                 }
             }
             .navigationTitle("Category")
@@ -253,28 +251,34 @@ struct CategoryDetails : View {
     @ViewBuilder
     private func expenses(data: [CartExpenseData]) -> some View {
         ForEach(data) { cart in
-            HStack(alignment: .center) {
-                VStack(alignment: .leading) {
-                    Text("\(cart.date.formatted(Date.customStyle))")
-                        .font(.caption)
+            Section {
+                HStack(alignment: .center) {
+                    VStack(alignment: .leading) {
+                        Text(cart.date.formatted(date: .omitted,
+                                                 time: .shortened))
+                        .font(.subheadline)
                         .foregroundStyle(.secondary)
-                    
-                    Text("\(cart.name)")
-                        .font(.title3)
-                        .foregroundStyle(.primary)
-                    
-                    Group {
-                        Text("\(percentage(expense: cart.expense), format: .percent.precision(.significantDigits(3)))")
-                        + Text(" (^[\(cart.itemCount) Item](inflect: true))")
+                        
+                        Text("\(cart.name)")
+                            .font(.title3)
+                            .foregroundStyle(.primary)
+                        
+                        Group {
+                            Text("\(percentage(expense: cart.expense), format: .percent.precision(.significantDigits(3)))")
+                            + Text(" (^[\(cart.itemCount) Item](inflect: true))")
+                        }
+                        .font(.caption.bold())
+                        .foregroundStyle(Color.foreground)
                     }
-                    .font(.caption.bold())
-                    .foregroundStyle(Color.foreground)
+                    
+                    Spacer()
+                    
+                    Text("\(cart.expense, format: .currency(code: locale.currency?.identifier ?? "USD"))")
+                        .foregroundStyle(.secondary)
                 }
-                
-                Spacer()
-                
-                Text("\(cart.expense, format: .currency(code: locale.currency?.identifier ?? "USD"))")
-                    .foregroundStyle(.secondary)
+            } header: {
+                Text(cart.date.formatted(date: .abbreviated,
+                                         time: .omitted))
             }
         }
     }

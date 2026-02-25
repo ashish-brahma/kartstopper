@@ -32,6 +32,13 @@ struct EditItemView: View {
                 }
                 .listRowBackground(Color.clear)
                 
+                Section(header: Text("Created On")) {
+                    Text(item.displayDate.formatted(date: .abbreviated,
+                                                    time: .shortened))
+                    .foregroundStyle(.secondary)
+                }
+                .listRowBackground(Color.gray.opacity(0.2))
+                
                 Section(header: Text("Item Name")) {
                     TextField("Enter a name for the item", text: $name)
                         .focused($isEditing)

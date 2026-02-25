@@ -163,7 +163,6 @@ struct ChecklistView: View {
                 
                 VStack(alignment: .leading) {
                     ItemRowView(imageURL: item.imageURL,
-                                date: item.displayDate,
                                 name: item.displayName,
                                 price: item.price,
                                 itemColor: item.itemColor,
@@ -174,6 +173,8 @@ struct ChecklistView: View {
                         .frame(width: reader.size.width/2)
                         .padding(.horizontal, Design.Padding.horizontal)
                 }
+                .frame(width: reader.size.width * 0.6,
+                       alignment: .leading)
                 
                 Spacer()
                 

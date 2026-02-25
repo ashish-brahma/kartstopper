@@ -21,10 +21,10 @@ extension CDCart {
         return notes
     }
     
-    var displayDate: String {
+    @objc var displayDate: Date {
         guard let timestamp, !timestamp.formatted().isEmpty
-        else { return "Undated" }
-        return timestamp.formatted(Date.customStyle)
+        else { return .now }
+        return timestamp
     }
     
     static func getTotalCarts(context: NSManagedObjectContext) -> Int {
@@ -74,16 +74,6 @@ extension CDCart {
 }
 
 extension Date {
-    // Date Formatting used for display.
-    static var customStyle: Date.FormatStyle {
-        Date.FormatStyle()
-            .year(.defaultDigits)
-            .month(.abbreviated)
-            .day(.twoDigits)
-            .hour(.twoDigits(amPM: .abbreviated))
-            .minute(.twoDigits)
-    }
-    
     // Extract start of the month from a given date
     static func startOfMonth(from date: Date) -> Date {
         var components = DateComponents()

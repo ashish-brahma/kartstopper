@@ -227,12 +227,10 @@ struct ExpenditureDetails: View {
                     .foregroundStyle(Color.foreground)
             }
             
-            Section {
-                expenses(data: showAllData ? interactiveData : top5Data)
-                
-                if interactiveData.count > 5 {
-                    ExpandButton(showAllData: $showAllData)
-                }
+            expenses(data: showAllData ? interactiveData : top5Data)
+            
+            if interactiveData.count > 5 {
+                ExpandButton(showAllData: $showAllData)
             }
         }
         .navigationTitle("Expenditure")
@@ -304,27 +302,32 @@ struct ExpenditureDetails: View {
     @ViewBuilder
     private func expenses(data: [ExpenditureData]) -> some View {
         ForEach(data) { item in
-            HStack(alignment: .center) {
-                VStack(alignment: .leading) {
-                    Text("\(item.date.formatted(Date.customStyle))")
-                        .font(.caption)
+            Section {
+                HStack(alignment: .center) {
+                    VStack(alignment: .leading) {
+                        Text("\(item.date.formatted(date: .omitted, time: .shortened))")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                        
+                        Text("\(item.name)")
+                            .font(.title3)
+                            .foregroundStyle(.primary)
+                            .padding(.bottom, -Design.Padding.bottom)
+                        
+                        Text("\(item.cartName)")
+                            .font(.caption.bold())
+                            .foregroundStyle(Color.foreground)
+                    }
+                    
+                    Spacer()
+                    
+                    Text("\(item.expense, format: .currency(code: locale.currency?.identifier ?? "USD"))")
                         .foregroundStyle(.secondary)
-                    
-                    Text("\(item.name)")
-                        .font(.title3)
-                        .foregroundStyle(.primary)
-                        .padding(.bottom, -Design.Padding.bottom)
-                    
-                    Text("\(item.cartName)")
-                        .font(.caption.bold())
-                        .foregroundStyle(Color.foreground)
+                        .padding(.bottom, Design.Padding.bottom)
                 }
-                
-                Spacer()
-                
-                Text("\(item.expense, format: .currency(code: locale.currency?.identifier ?? "USD"))")
-                    .foregroundStyle(.secondary)
-                    .padding(.bottom, Design.Padding.bottom)
+            } header: {
+                Text(item.date.formatted(date: .abbreviated,
+                                         time: .omitted))
             }
         }
     }

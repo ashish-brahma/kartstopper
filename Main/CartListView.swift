@@ -14,8 +14,11 @@ struct CartListView: View {
     @ObservedObject var viewModel: ViewModel
     @Environment(\.managedObjectContext) private var viewContext
 
-    @FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \CDCart.id, ascending: true)])
-    private var carts: FetchedResults<CDCart>
+    @SectionedFetchRequest<Date, CDCart>(
+        sectionIdentifier: \.displayDate,
+        sortDescriptors: [NSSortDescriptor(keyPath: \CDCart.id, ascending: true)]
+    )
+    private var carts: SectionedFetchResults<Date, CDCart>
     
     @State private var selection: CDCart?
     @State private var showAddCart = false
@@ -27,11 +30,20 @@ struct CartListView: View {
     var body: some View {
         VStack {
             List(selection: $selection) {
-                ForEach(carts) { cart in
-                    CartNavLink(for: cart)
+                ForEach(carts) { section in
+                    Section {
+                        ForEach(section) { cart in
+                            CartNavLink(for: cart)
+                        }
+                        .onDelete { indexSet in
+                            deleteCart(in: Array(section),
+                                       at: indexSet)
+                        }
+                    } header: {
+                        Text(section.id.formatted(date: .abbreviated,
+                                                  time: .omitted))
+                    }
                 }
-                .onDelete(perform: deleteCart(at:))
-                .onMove(perform: move)
                 
                 if showAddCart {
                     Section {
@@ -179,9 +191,11 @@ struct CartListView: View {
         }
     }
     
-    private func deleteCart(at offsets: IndexSet) {
+    private func deleteCart(
+        in section: [CDCart],
+        at offsets: IndexSet) {
         withAnimation {
-            offsets.map { carts[$0] }.forEach(deleteCart)
+            offsets.map { section[$0] }.forEach(deleteCart)
         }
     }
     
@@ -193,18 +207,6 @@ struct CartListView: View {
         viewContext.delete(cart)
         saveContext()
         viewModel.update(context: viewContext)
-    }
-    
-    private func move(from source: IndexSet, to destination: Int) {
-        withAnimation {
-            viewModel.objectWillChange.send()
-            var cartArray = Array(carts)
-            cartArray.move(fromOffsets: source, toOffset: destination)
-            for i in 0..<cartArray.count {
-                cartArray[i].id = Int32(i)
-            }
-            saveContext()
-        }
     }
 }
 

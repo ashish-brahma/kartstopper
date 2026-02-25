@@ -19,6 +19,12 @@ struct EditCartView: View {
     
     var body: some View {
         Form {
+            Section(header: Text("Created On")) {
+                Text(cart.displayDate.formatted(date: .abbreviated,
+                                                time: .shortened))
+                .foregroundStyle(.secondary)
+                .listRowBackground(Color.gray.opacity(0.2))
+            }
             Section(header: Text("Cart Name")) {
                 Group {
                     TextField("Enter a name for the cart", text: $name)

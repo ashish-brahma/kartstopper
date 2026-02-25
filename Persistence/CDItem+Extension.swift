@@ -22,10 +22,10 @@ extension CDItem {
         return notes
     }
     
-    var displayDate: String {
+    var displayDate: Date {
         guard let timestamp, !timestamp.formatted().isEmpty
-        else { return "Undated" }
-        return timestamp.formatted(Date.customStyle)
+        else { return .now }
+        return timestamp
     }
     
     var itemColor: Color {
