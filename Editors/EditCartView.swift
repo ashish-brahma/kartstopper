@@ -16,6 +16,7 @@ struct EditCartView: View {
     
     @State private var name = ""
     @State private var notes = ""
+    @FocusState private var isEditing
     
     var body: some View {
         Form {
@@ -28,6 +29,7 @@ struct EditCartView: View {
             Section(header: Text("Cart Name")) {
                 Group {
                     TextField("Enter a name for the cart", text: $name)
+                        .focused($isEditing)
                 }
             }
             
@@ -65,6 +67,7 @@ struct EditCartView: View {
         .onAppear {
             name = cart.name ?? ""
             notes = cart.notes ?? ""
+            isEditing = true
         }
     }
     
