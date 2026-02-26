@@ -135,6 +135,7 @@ struct CartListView: View {
             .buttonStyle(.borderedProminent)
             .clipShape(.circle)
             .padding(Design.Padding.trailing)
+            .disabled(showAddCart)
         }
     }
     
