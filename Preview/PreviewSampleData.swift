@@ -100,6 +100,18 @@ extension PersistenceController {
         item6.notes = "In-ear wireless with sweat protection, ANC and ambient noise control."
         item6.cart = cart2
         
+        let cart3 = CDCart(context: context)
+        cart3.id = Int32(2)
+        cart3.timestamp = Date.previewDate(
+            year:   2024,
+            month:  2,
+            day:    28,
+            hour:   10,
+            minute: 13,
+            second: 26
+        )
+        cart3.name = "Food & Beverages"
+        cart3.notes = "Fitness diet"
     }
 }
 
@@ -165,15 +177,18 @@ extension Date {
     static func previewDate(
         year: Int,
         month: Int,
-        day: Int
+        day: Int,
+        hour: Int = 09,
+        minute: Int = 41,
+        second: Int = 24
     ) -> Date {
         var components = DateComponents()
         components.day = day
         components.month = month
         components.year = year
-        components.hour = 09
-        components.minute = 41
-        components.second = 24
+        components.hour = hour
+        components.minute = minute
+        components.second = second
         
         let date = Calendar.current.date(from: components) ?? .now
         return date

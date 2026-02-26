@@ -21,10 +21,15 @@ extension CDCart {
         return notes
     }
     
-    @objc var displayDate: Date {
+    var displayDate: Date {
         guard let timestamp, !timestamp.formatted().isEmpty
         else { return .now }
         return timestamp
+    }
+    
+    @objc var sectionDate: String {
+        displayDate.formatted(date: .abbreviated,
+                              time: .omitted)
     }
     
     static func getTotalCarts(context: NSManagedObjectContext) -> Int {

@@ -14,11 +14,11 @@ struct CartListView: View {
     @ObservedObject var viewModel: ViewModel
     @Environment(\.managedObjectContext) private var viewContext
 
-    @SectionedFetchRequest<Date, CDCart>(
-        sectionIdentifier: \.displayDate,
+    @SectionedFetchRequest<String, CDCart>(
+        sectionIdentifier: \.sectionDate,
         sortDescriptors: [NSSortDescriptor(keyPath: \CDCart.id, ascending: true)]
     )
-    private var carts: SectionedFetchResults<Date, CDCart>
+    private var carts: SectionedFetchResults<String, CDCart>
     
     @State private var selection: CDCart?
     @State private var showAddCart = false
@@ -31,7 +31,7 @@ struct CartListView: View {
         VStack {
             List(selection: $selection) {
                 ForEach(carts) { section in
-                    Section {
+                    Section(header: Text(section.id)) {
                         ForEach(section) { cart in
                             CartNavLink(for: cart)
                         }
@@ -39,9 +39,6 @@ struct CartListView: View {
                             deleteCart(in: Array(section),
                                        at: indexSet)
                         }
-                    } header: {
-                        Text(section.id.formatted(date: .abbreviated,
-                                                  time: .omitted))
                     }
                 }
                 
