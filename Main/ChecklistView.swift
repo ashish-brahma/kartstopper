@@ -76,9 +76,6 @@ struct ChecklistView: View {
                                     price: $price)
                         .id(bottomID)
                         .focused($isAdding)
-                        .task {
-                            isAdding = true
-                        }
                     }
                     .listRowBackground(Rectangle().fill(.ultraThickMaterial))
                 }
