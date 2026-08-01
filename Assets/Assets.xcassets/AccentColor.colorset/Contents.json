@@ -20,8 +20,8 @@
         }
       ],
       "color" : {
-        "platform" : "universal",
-        "reference" : "systemMintColor"
+        "platform" : "ios",
+        "reference" : "systemGreenColor"
       },
       "idiom" : "universal"
     }

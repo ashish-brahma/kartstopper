@@ -4,6 +4,7 @@
 //
 //  Created by Ashish Brahma on 09/01/26.
 //
+//  A SwiftUI button view which is used to expand chart data.
 
 import SwiftUI
 
