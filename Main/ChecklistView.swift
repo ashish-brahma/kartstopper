@@ -93,6 +93,7 @@ struct ChecklistView: View {
                 }
                 .textInputAutocapitalization(.never)
                 .navigationTitle(cart.displayName)
+                .navigationTitleColor(Color.foreground)
                 .scrollContentBackground(.hidden)
                 .background(Color.background)
                 .toolbar {

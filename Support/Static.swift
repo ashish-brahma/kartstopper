@@ -10,7 +10,7 @@ import Foundation
 
 enum Constants {
     enum Manage {
-        static let monthlyBudgetFooter = "Budget limit is unlocked for modification on the first day of each month. Tap on the field to use keyboard."
+        static let monthlyBudgetFooter = "Budget amount is unlocked for modification on the first day of each month. Tap on the field to use keyboard."
         
         static let budgetModeFooter = "Budget mode sets the level of strictness with which expenses are monitored with respect to budget limit."
         

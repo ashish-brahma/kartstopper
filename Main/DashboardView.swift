@@ -13,86 +13,60 @@ struct DashboardView: View {
     @ObservedObject var viewModel: ViewModel
     
     @Binding var showPreferences: Bool
-    let reader: GeometryProxy
     
     @Environment(\.managedObjectContext) private var viewContext
-    @Environment(\.locale) private var locale
     
     var body: some View {
-        List {
-            if !viewModel.hasOnboarded {
+        GeometryReader { reader in
+            List {
+                if !viewModel.hasOnboarded {
+                    Section {
+                        SetupView(showPreferences: $showPreferences)
+                    }
+                    .listRowBackground(Rectangle().fill(.thickMaterial))
+                }
+                
                 Section {
-                    SetupView(showPreferences: $showPreferences)
-                }
-                .listRowBackground(Rectangle().fill(.thickMaterial))
-            }
-            
-            Section {
-                StatusCardView(reader: reader,
-                               viewModel: viewModel)
-            }
-            
-            Section {
-                NavigationLink {
-                    CartListView(viewModel: viewModel)
-                } label: {
-                    listsCard()
+                    TopFrequentCarts(reader: reader)
                 }
                 
-                TopFrequentCarts(reader: reader)
-            } header: {
-                Text(viewModel.totalCarts == 0 ? "Start Listing" : "Continue Listing")
-                    .font(.title2.bold())
-                    .foregroundStyle(Color.foreground)
-            }
-            
-            Section {
-                NavigationLink {
-                    ExpenditureDetails()
-                } label: {
-                    ExpenditureOverview(reader: reader)
+                Section {
+                    StatusCardView(viewModel: viewModel)
+                    
+                    NavigationLink {
+                        ExpenditureDetails()
+                    } label: {
+                        ExpenditureOverview(reader: reader)
+                    }
+                    
+                    NavigationLink {
+                        CategoryDetails()
+                    } label: {
+                        CategoriesOverview(reader: reader)
+                    }
+                } header: {
+                    Text(viewModel.dynamicTitle)
+                        .font(.title2.bold())
+                        .foregroundStyle(viewModel.fontColor)
                 }
-                
-                NavigationLink {
-                    CategoryDetails()
-                } label: {
-                    CategoriesOverview(reader: reader)
-                }
-            } header: {
-                Text("How You Spent")
-                    .font(.title2.bold())
-                    .foregroundStyle(Color.foreground)
             }
-        }
-        .listRowSpacing(Design.Spacing.listRow)
-        .scrollContentBackground(.hidden)
-        .task {
-            viewModel.update(context: viewContext)
-        }
-    }
-    
-    @ViewBuilder
-    private func listsCard() -> some View {
-        VStack(alignment: .leading) {
-            Text("Total Carts")
-                .font(.callout)
-                .foregroundStyle(.secondary)
-            
-            Text("^[\(viewModel.totalCarts) Carts](inflect: true)")
-                .font(.title2.bold())
-                .foregroundStyle(Color.foreground)
+            .listRowSpacing(Design.Spacing.listRow)
+            .navigationTitle("Track")
+            .navigationTitleColor(Color.foreground)
+            .scrollContentBackground(.hidden)
+            .background(Color.background)
+            .task {
+                viewModel.update(context: viewContext)
+            }
         }
     }
 }
 
 #Preview {
-    GeometryReader { reader in
-        NavigationStack {
-            DashboardView(viewModel: .preview,
-                          showPreferences: .constant(false),
-                          reader: reader)
-            .background(Color.background)
-        }
+    NavigationStack {
+        DashboardView(viewModel: .preview,
+                      showPreferences: .constant(false))
+        .background(Color.background)
     }
     .environment(\.managedObjectContext,
                   PersistenceController.preview.container.viewContext)

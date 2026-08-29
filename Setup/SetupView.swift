@@ -28,14 +28,7 @@ struct SetupView: View {
                             .font(.headline)
                             .foregroundStyle(Color.foreground)
                         Spacer()
-                        Button {
-                            dismiss = true
-                        } label: {
-                            Label("Close", systemImage: "xmark")
-                                .fontWeight(.medium)
-                                .labelStyle(.iconOnly)
-                                .foregroundStyle(.gray)
-                        }
+                        closeButton()
                     }
                     
                     HStack(alignment: .bottom) {
@@ -43,11 +36,35 @@ struct SetupView: View {
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                         Spacer()
-                        SettingsButton(showPreferences: $showPreferences,
-                                       configuration: .setup)
+                        ctaButton()
                     }
                 }
             }
+        }
+    }
+    
+    @ViewBuilder
+    private func closeButton() -> some View {
+        Button {
+            dismiss = true
+        } label: {
+            Label("Close", systemImage: "xmark")
+                .fontWeight(.medium)
+                .labelStyle(.iconOnly)
+                .foregroundStyle(.gray)
+        }
+    }
+    
+    @ViewBuilder
+    private func ctaButton() -> some View {
+        Button {
+            showPreferences = true
+        } label: {
+            Label("Setup", systemImage: "plus.circle.fill")
+                .bold()
+                .foregroundStyle(.gray700)
+                .labelStyle(.titleOnly)
+                .buttonStyle(.borderless)
         }
     }
 }

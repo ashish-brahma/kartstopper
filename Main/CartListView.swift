@@ -28,58 +28,55 @@ struct CartListView: View {
     @State private var notes = ""
     
     var body: some View {
-        VStack {
-            List(selection: $selection) {
-                ForEach(carts) { section in
-                    Section(header: Text(section.id)) {
-                        ForEach(section) { cart in
-                            CartNavLink(for: cart)
-                        }
-                        .onDelete { indexSet in
-                            deleteCart(in: Array(section),
-                                       at: indexSet)
-                        }
+        List(selection: $selection) {
+            ForEach(carts) { section in
+                Section(header: Text(section.id)) {
+                    ForEach(section) { cart in
+                        CartNavLink(for: cart)
+                    }
+                    .onDelete { indexSet in
+                        deleteCart(in: Array(section),
+                                   at: indexSet)
                     }
                 }
-                
-                if showAddCart {
-                    Section {
-                        AddCartView(name: $name,
-                                    notes: $notes)
-                    }
-                    .listRowBackground(Rectangle().fill(.ultraThickMaterial))
-                }
-            }
-            .overlay {
-                if !showAddCart {
-                    if viewModel.totalCarts == 0 {
-                        ContentView.unavailableView(
-                            label: "No Carts",
-                            symbolName: "cart.badge.plus",
-                            description: "New carts you add will appear here."
-                        )
-                    } else if carts.isEmpty {
-                        ContentView.searchUnavailableView
-                    }
-                }
-            }
-            .searchable(text: $viewModel.cartQuery, placement: .navigationBarDrawer)
-            .onChange(of: viewModel.cartQuery) { newValue in
-                carts.nsPredicate = newValue.isEmpty ? nil : NSPredicate(format: "name CONTAINS[cd] %@", viewModel.cartQuery)
-            }
-            .navigationTitle("Carts")
-            .textInputAutocapitalization(.never)
-            .scrollContentBackground(.hidden)
-            .toolbar {
-                editorToolbar()
-            }
-            .task {
-                viewModel.update(context: viewContext)
             }
             
-            addButtonView()
+            if showAddCart {
+                Section {
+                    AddCartView(name: $name,
+                                notes: $notes)
+                }
+                .listRowBackground(Rectangle().fill(.ultraThickMaterial))
+            }
         }
+        .overlay {
+            if !showAddCart {
+                if viewModel.totalCarts == 0 {
+                    ContentView.unavailableView(
+                        label: "No Carts",
+                        symbolName: "cart.badge.plus",
+                        description: "New carts you add will appear here."
+                    )
+                } else if carts.isEmpty {
+                    ContentView.searchUnavailableView
+                }
+            }
+        }
+        .searchable(text: $viewModel.cartQuery, placement: .navigationBarDrawer)
+        .onChange(of: viewModel.cartQuery) { newValue in
+            carts.nsPredicate = newValue.isEmpty ? nil : NSPredicate(format: "name CONTAINS[cd] %@", viewModel.cartQuery)
+        }
+        .navigationTitle("Carts")
+        .navigationTitleColor(Color.foreground)
+        .textInputAutocapitalization(.never)
+        .scrollContentBackground(.hidden)
         .background(Color.background)
+        .toolbar {
+            editorToolbar()
+        }
+        .task {
+            viewModel.update(context: viewContext)
+        }
     }
     
     // MARK: - View Builder Methods
@@ -123,20 +120,17 @@ struct CartListView: View {
     
     @ViewBuilder
     private func addButtonView() -> some View {
-        HStack {
-            Spacer()
-            Button {
-                showAddCart = true
-            } label: {
-                Label("Add cart", systemImage: "plus")
-                    .labelStyle(.iconOnly)
-                    .imageScale(.large)
-            }
-            .buttonStyle(.borderedProminent)
-            .clipShape(.circle)
-            .padding(Design.Padding.trailing)
-            .disabled(showAddCart)
+        Button {
+            showAddCart = true
+        } label: {
+            Label("Add cart", systemImage: "plus")
+                .labelStyle(.iconOnly)
+                .imageScale(.large)
         }
+        .buttonStyle(.borderedProminent)
+        .clipShape(.circle)
+        .padding(Design.Padding.trailing)
+        .disabled(showAddCart)
     }
     
     @ToolbarContentBuilder
@@ -159,9 +153,12 @@ struct CartListView: View {
                 .disabled(name.isEmpty)
             }
         } else {
-            ToolbarItem(placement: .primaryAction) {
+            ToolbarItem(placement: .topBarLeading) {
                 EditButton()
                     .disabled(carts.isEmpty)
+            }
+            ToolbarItem(placement: .primaryAction) {
+                addButtonView()
             }
         }
     }

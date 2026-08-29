@@ -14,32 +14,51 @@ struct ContentView: View {
     
     @Environment(\.managedObjectContext) private var viewContext
     
+    private enum Tabs: String {
+        case home
+        case track
+        case manage
+    }
+    
+    @SceneStorage("ContentView.selectedTab") private var selectedTab = Tabs.home
     @State private var showPreferences = false
     
     var body: some View {
-        GeometryReader { reader in
+        TabView(selection: $selectedTab) {
             NavigationStack {
-                VStack {
-                    NavigationBar(viewModel: viewModel,
-                                  showPreferences: $showPreferences,
-                                  reader: reader)
-                    
-                    DashboardView(viewModel: viewModel,
-                                  showPreferences: $showPreferences,
-                                  reader: reader)
-                }
-                .background(Color.background)
-                .navigationTitle("Home")
-                .navigationTitleColor(Color.foreground)
-                .toolbar(.hidden, for: .navigationBar)
+                CartListView(viewModel: viewModel)
             }
-            .sheet(isPresented: $showPreferences,
-                   onDismiss: {
-                viewModel.update(context: viewContext)
-            }) {
-                NavigationStack {
-                    ManageView(viewModel: viewModel)
-                }
+            .tabItem {
+                Label("Home", systemImage: "house")
+            }
+            .tag(Tabs.home)
+            
+            NavigationStack {
+                DashboardView(viewModel: viewModel,
+                              showPreferences: $showPreferences)
+            }
+            .tabItem {
+                Label("Track", systemImage: "chart.bar.xaxis.ascending.badge.clock")
+            }
+            .tag(Tabs.track)
+            
+            NavigationStack {
+                ManageView(viewModel: viewModel)
+            }
+            .tabItem {
+                Label("Manage", systemImage: "book.and.wrench")
+            }
+            .tag(Tabs.manage)
+        }
+        .task {
+            viewModel.update(context: viewContext)
+            if !viewModel.hasOnboarded {
+                selectedTab = .track
+            }
+        }
+        .onChange(of: showPreferences) { newValue in
+            if !viewModel.hasOnboarded && newValue {
+                selectedTab = .manage
             }
         }
     }

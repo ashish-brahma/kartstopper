@@ -8,8 +8,6 @@
 import SwiftUI
 
 struct StatusCardView: View {
-    let reader: GeometryProxy
-    
     @ObservedObject var viewModel: ViewModel
     @Environment(\.locale) private var locale
     
@@ -51,8 +49,6 @@ struct StatusCardView: View {
 }
 
 #Preview {
-    GeometryReader { reader in
-        StatusCardView(reader: reader,
-                       viewModel: .preview)
-    }
+    StatusCardView(viewModel: .preview)
+        .background(Color.background)
 }

@@ -13,12 +13,29 @@ struct ManageView: View {
     @ObservedObject var viewModel: ViewModel
     
     @Environment(\.openURL) private var openURL
-    @Environment(\.dismiss) private var dismiss
     @Environment(\.locale) private var locale
     
     @AppStorage("hasOnboarded") private var hasOnboarded = false
-    @AppStorage("budgetAmount") private var budgetLimit: Double = 0.00
+    @AppStorage("budgetAmount") private var budgetAmount: Double = 0.00
     @State private var difficulty: Mode = .medium
+    @State private var isEditing: Bool = false
+    @FocusState private var isEditingBudget: Bool
+    
+    private var message: String {
+        if !viewModel.hasOnboarded {
+            if budgetAmount == 0.00 {
+                return "Enter budget amount"
+            } else if budgetAmount > 0 {
+                return "Unsaved changes"
+            }
+        } else if isEditing {
+            if budgetAmount != viewModel.budget.budgetAmount
+               || difficulty != viewModel.budget.budgetMode {
+               return "Unsaved changes"
+            }
+        }
+        return ""
+    }
     
     var body: some View {
         Form {
@@ -61,23 +78,24 @@ struct ManageView: View {
             }
         }
         .navigationTitle("Preferences")
+        .navigationTitleColor(Color.foreground)
+        .scrollContentBackground(.hidden)
+        .background(Color.background)
         .task {
             if viewModel.hasOnboarded {
                 viewModel.budget.updateBudgetLock()
+            } else {
+                isEditing = true
+                isEditingBudget = true
             }
             if let mode = viewModel.budget.selectedModes.first {
                 difficulty = mode
             }
         }
         .toolbar {
-            ToolbarItem(placement: .cancellationAction) {
-                Button("Dismiss") {
-                    dismiss()
-                }
-            }
             ToolbarItem(placement: .confirmationAction) {
                 Button {
-                    if !viewModel.hasOnboarded && budgetLimit > 0 {
+                    if !viewModel.hasOnboarded && budgetAmount > 0 {
                         hasOnboarded = true
                         viewModel.updateOnboardingState()
                     }
@@ -85,11 +103,42 @@ struct ManageView: View {
                     UserDefaults.standard.set(difficulty.rawValue, forKey: "budgetMode")
                     viewModel.budget.updateBudgetSettings()
                     
-                    dismiss()
+                    isEditing = false
+                    isEditingBudget = false
                 } label: {
-                    Label("Done", systemImage: "checkmark")
+                    Label("Save", systemImage: "checkmark")
+                }
+                .disabled(!isEditing || budgetAmount == 0.00)
+            }
+            if isEditing {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button {
+                        budgetAmount = viewModel.hasOnboarded ? viewModel.budget.budgetAmount : 0.00
+                        difficulty = viewModel.hasOnboarded ? viewModel.budget.budgetMode : .medium
+                        isEditing = false
+                        isEditingBudget = false
+                    } label: {
+                        Label("Cancel", systemImage: "xmark")
+                    }
                 }
             }
+            ToolbarItem(placement: .principal) {
+                Text(message)
+                    .font(.caption.bold())
+                    .foregroundStyle(.accent)
+            }
+        }
+        .onChange(of: viewModel.hasOnboarded) { newValue in
+            if newValue {
+                viewModel.objectWillChange.send()
+                viewModel.budget.updateBudgetLock()
+            }
+        }
+        .onChange(of: budgetAmount) { newValue in
+            isEditing = (newValue != viewModel.budget.budgetAmount)
+        }
+        .onChange(of: difficulty) { newValue in
+            isEditing = (newValue != viewModel.budget.budgetMode)
         }
     }
     
@@ -99,12 +148,12 @@ struct ManageView: View {
             budgetField()
         } onIncrement: {
             viewModel.objectWillChange.send()
-            budgetLimit += 1
+            budgetAmount += 1
         } onDecrement: {
             viewModel.objectWillChange.send()
-            budgetLimit -= 1
-            if budgetLimit < 1 {
-                budgetLimit = 1
+            budgetAmount -= 1
+            if budgetAmount < 1 {
+                budgetAmount = 1
             }
         }
     }
@@ -118,9 +167,14 @@ struct ManageView: View {
             }
             
             TextField("Budget",
-                      value: $budgetLimit,
+                      value: $budgetAmount,
                       format: .currency(code: locale.currency?.identifier ?? "USD"))
-            .keyboardType(.decimalPad)
+            .keyboardType(.numbersAndPunctuation)
+            .submitLabel(.done)
+            .focused($isEditingBudget)
+            .onSubmit {
+                isEditingBudget = false
+            }
         }
     }
     
@@ -161,7 +215,6 @@ struct ManageView: View {
                 Spacer()
             }
             .padding()
-            .frame(maxHeight: .infinity)
             .navigationTitle(Constants.Manage.developerName.formatted())
         }
     }
@@ -182,7 +235,6 @@ struct ManageView: View {
                 Spacer()
             }
             .padding(Design.Padding.standard * 1.89)
-            .frame(maxHeight: .infinity)
             .navigationTitle("Legal")
         }
     }
