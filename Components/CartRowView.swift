@@ -4,7 +4,7 @@
 //
 //  Created by Ashish Brahma on 05/11/25.
 //
-//  A view that shows cart metadata.
+//  A SwiftUI view that shows cart metadata.
 
 import SwiftUI
 import CoreData

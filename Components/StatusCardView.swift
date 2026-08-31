@@ -4,6 +4,8 @@
 //
 //  Created by Ashish Brahma on 07/12/25.
 //
+//  A SwiftUI view that shows a gauge measuring the
+//  total amount spent out of the monthly budget.
 
 import SwiftUI
 
