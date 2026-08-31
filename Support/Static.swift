@@ -14,17 +14,11 @@ enum Constants {
         
         static let budgetModeFooter = "Budget mode sets the level of strictness with which expenses are monitored with respect to budget limit."
         
-        static let legalLine1 = "KartStopper is an open-source project hosted on "
-        
-        static let legalLine2 = " and distributed under a "
-        
         static let aboutDeveloperLine1 = "Ashish is currently working as an open-source mobile app developer for "
         
         static let aboutDeveloperLine2 = ". He has previously worked in Analytics and Data Science before embarking on his development journey. When not coding, he likes to look after his plants."
         
         static let appName = "KartStopper"
-        static let host = "GitHub"
-        static let license = "BSD 3-Clause License"
         
         static let developerName = PersonNameComponents(
             givenName: "Ashish",
