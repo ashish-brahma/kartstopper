@@ -8,28 +8,25 @@
 
 import SwiftUI
 import CoreData
+internal import Combine
 
 struct ContentView: View {
     @ObservedObject var viewModel: ViewModel
     
     @Environment(\.managedObjectContext) private var viewContext
     
-    private enum Tabs: String {
-        case home
-        case track
-        case manage
-    }
+    @StateObject var navModel = NavigationModel()
+    @SceneStorage("navigation") private var navData: Data?
     
-    @SceneStorage("ContentView.selectedTab") private var selectedTab = Tabs.home
     @State private var showPreferences = false
     
     var body: some View {
-        TabView(selection: $selectedTab) {
+        TabView(selection: $navModel.selectedTab) {
             NavigationStack {
                 CartListView(viewModel: viewModel)
             }
             .tabItem {
-                Label("Home", systemImage: "house")
+                Label(Tabs.home.localizedName, systemImage: Tabs.home.symbol)
             }
             .tag(Tabs.home)
             
@@ -38,7 +35,7 @@ struct ContentView: View {
                               showPreferences: $showPreferences)
             }
             .tabItem {
-                Label("Track", systemImage: "chart.bar.xaxis.ascending.badge.clock")
+                Label(Tabs.track.localizedName, systemImage: Tabs.track.symbol)
             }
             .tag(Tabs.track)
             
@@ -46,19 +43,31 @@ struct ContentView: View {
                 ManageView(viewModel: viewModel)
             }
             .tabItem {
-                Label("Manage", systemImage: "book.and.wrench")
+                Label(Tabs.manage.localizedName, systemImage: Tabs.manage.symbol)
             }
             .tag(Tabs.manage)
         }
         .task {
             viewModel.update(context: viewContext)
+            
+            // Onboard user if not already done.
             if !viewModel.hasOnboarded {
-                selectedTab = .track
+                navModel.selectedTab = .track
+            }
+            
+            // Restore navigation state.
+            if let data = navData {
+                navModel.jsonData = data
+            }
+            
+            // Listen for the latest navigation data and store it.
+            for await _ in navModel.objectWillChangeSequence {
+                navData = navModel.jsonData
             }
         }
         .onChange(of: showPreferences) { newValue in
             if !viewModel.hasOnboarded && newValue {
-                selectedTab = .manage
+                navModel.selectedTab = .manage
             }
         }
     }
