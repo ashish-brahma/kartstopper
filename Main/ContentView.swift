@@ -22,30 +22,24 @@ struct ContentView: View {
     
     var body: some View {
         TabView(selection: $navModel.selectedTab) {
-            NavigationStack {
-                CartListView(viewModel: viewModel)
-            }
-            .tabItem {
-                Label(Tabs.home.localizedName, systemImage: Tabs.home.symbol)
-            }
-            .tag(Tabs.home)
+            CartListView(viewModel: viewModel)
+                .tabItem {
+                    Label(Tabs.home.localizedName, systemImage: Tabs.home.symbol)
+                }
+                .tag(Tabs.home)
             
-            NavigationStack {
-                DashboardView(viewModel: viewModel,
-                              showPreferences: $showPreferences)
-            }
-            .tabItem {
-                Label(Tabs.track.localizedName, systemImage: Tabs.track.symbol)
-            }
-            .tag(Tabs.track)
             
-            NavigationStack {
-                ManageView(viewModel: viewModel)
-            }
-            .tabItem {
-                Label(Tabs.manage.localizedName, systemImage: Tabs.manage.symbol)
-            }
-            .tag(Tabs.manage)
+            DashboardView(viewModel: viewModel, showPreferences: $showPreferences)
+                .tabItem {
+                    Label(Tabs.track.localizedName, systemImage: Tabs.track.symbol)
+                }
+                .tag(Tabs.track)
+            
+            ManageView(viewModel: viewModel)
+                .tabItem {
+                    Label(Tabs.manage.localizedName, systemImage: Tabs.manage.symbol)
+                }
+                .tag(Tabs.manage)
         }
         .task {
             viewModel.update(context: viewContext)

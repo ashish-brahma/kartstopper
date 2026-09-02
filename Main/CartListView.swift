@@ -12,6 +12,7 @@ internal import Combine
 
 struct CartListView: View {
     @ObservedObject var viewModel: ViewModel
+
     @Environment(\.managedObjectContext) private var viewContext
 
     @SectionedFetchRequest<String, CDCart>(
@@ -20,6 +21,7 @@ struct CartListView: View {
     )
     private var carts: SectionedFetchResults<String, CDCart>
     
+    @State private var navigationPath: [CDCart] = []
     @State private var selection: CDCart?
     @State private var showAddCart = false
     @State private var showEditCart = false
@@ -28,54 +30,60 @@ struct CartListView: View {
     @State private var notes = ""
     
     var body: some View {
-        List(selection: $selection) {
-            ForEach(carts) { section in
-                Section(header: Text(section.id)) {
-                    ForEach(section) { cart in
-                        CartNavLink(for: cart)
+        NavigationStack(path: $navigationPath) {
+            List(selection: $selection) {
+                ForEach(carts) { section in
+                    Section(header: Text(section.id)) {
+                        ForEach(section) { cart in
+                            CartNavLink(for: cart)
+                        }
+                        .onDelete { indexSet in
+                            deleteCart(in: Array(section),
+                                       at: indexSet)
+                        }
                     }
-                    .onDelete { indexSet in
-                        deleteCart(in: Array(section),
-                                   at: indexSet)
+                }
+                
+                if showAddCart {
+                    Section {
+                        AddCartView(name: $name,
+                                    notes: $notes)
+                    }
+                    .listRowBackground(Rectangle().fill(.ultraThickMaterial))
+                }
+            }
+            .overlay {
+                if !showAddCart {
+                    if viewModel.totalCarts == 0 {
+                        ContentView.unavailableView(
+                            label: "No Carts",
+                            symbolName: "cart.badge.plus",
+                            description: "New carts you add will appear here."
+                        )
+                    } else if carts.isEmpty {
+                        ContentView.searchUnavailableView
                     }
                 }
             }
-            
-            if showAddCart {
-                Section {
-                    AddCartView(name: $name,
-                                notes: $notes)
-                }
-                .listRowBackground(Rectangle().fill(.ultraThickMaterial))
+            .searchable(text: $viewModel.cartQuery, placement: .navigationBarDrawer)
+            .onChange(of: viewModel.cartQuery) { newValue in
+                carts.nsPredicate = newValue.isEmpty ? nil : NSPredicate(format: "name CONTAINS[cd] %@", viewModel.cartQuery)
             }
-        }
-        .overlay {
-            if !showAddCart {
-                if viewModel.totalCarts == 0 {
-                    ContentView.unavailableView(
-                        label: "No Carts",
-                        symbolName: "cart.badge.plus",
-                        description: "New carts you add will appear here."
-                    )
-                } else if carts.isEmpty {
-                    ContentView.searchUnavailableView
-                }
+            .navigationTitle("Carts")
+            .navigationTitleColor(Color.foreground)
+            .navigationDestination(for: CDCart.self) { cart in
+                ChecklistView(cart: cart,
+                              viewModel: viewModel)
             }
-        }
-        .searchable(text: $viewModel.cartQuery, placement: .navigationBarDrawer)
-        .onChange(of: viewModel.cartQuery) { newValue in
-            carts.nsPredicate = newValue.isEmpty ? nil : NSPredicate(format: "name CONTAINS[cd] %@", viewModel.cartQuery)
-        }
-        .navigationTitle("Carts")
-        .navigationTitleColor(Color.foreground)
-        .textInputAutocapitalization(.never)
-        .scrollContentBackground(.hidden)
-        .background(Color.background)
-        .toolbar {
-            editorToolbar()
-        }
-        .task {
-            viewModel.update(context: viewContext)
+            .textInputAutocapitalization(.never)
+            .scrollContentBackground(.hidden)
+            .background(Color.background)
+            .toolbar {
+                editorToolbar()
+            }
+            .task {
+                viewModel.update(context: viewContext)
+            }
         }
     }
     
@@ -85,9 +93,9 @@ struct CartListView: View {
     private func CartNavLink(
         for cart: CDCart
     ) -> some View {
-        NavigationLink {
-            ChecklistView(cart: cart,
-                          viewModel: viewModel)
+        Button {
+            selection = cart
+            withAnimation(.easeIn) { navigationPath.append(cart) }
         } label: {
             CartRowView(cart: cart)
         }
@@ -104,7 +112,7 @@ struct CartListView: View {
                 selection = cart
                 showEditCart = true
             } label: {
-                Label("Edit Cart Details", systemImage: "pencil")
+                Label("Edit", systemImage: "pencil")
                     .tint(.edit)
                     .labelStyle(.iconOnly)
             }
@@ -116,21 +124,6 @@ struct CartListView: View {
                 }
             }
         }
-    }
-    
-    @ViewBuilder
-    private func addButtonView() -> some View {
-        Button {
-            showAddCart = true
-        } label: {
-            Label("Add cart", systemImage: "plus")
-                .labelStyle(.iconOnly)
-                .imageScale(.large)
-        }
-        .buttonStyle(.borderedProminent)
-        .clipShape(.circle)
-        .padding(Design.Padding.trailing)
-        .disabled(showAddCart)
     }
     
     @ToolbarContentBuilder
@@ -158,7 +151,15 @@ struct CartListView: View {
                     .disabled(carts.isEmpty)
             }
             ToolbarItem(placement: .primaryAction) {
-                addButtonView()
+                Button {
+                    showAddCart = true
+                } label: {
+                    Label("Add cart", systemImage: "plus")
+                        .labelStyle(.iconOnly)
+                        .imageScale(.large)
+                }
+                .buttonStyle(.borderedProminent)
+                .disabled(showAddCart)
             }
         }
     }
@@ -206,9 +207,7 @@ struct CartListView: View {
 }
 
 #Preview {
-    NavigationStack {
-        CartListView(viewModel: .preview)
-    }
-    .environment(\.managedObjectContext,
-                  PersistenceController.preview.container.viewContext)
+    CartListView(viewModel: .preview)
+        .environment(\.managedObjectContext,
+                      PersistenceController.preview.container.viewContext)
 }

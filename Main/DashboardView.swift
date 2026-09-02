@@ -16,58 +16,68 @@ struct DashboardView: View {
     
     @Environment(\.managedObjectContext) private var viewContext
     
+    private enum Card: String {
+        case expenses
+        case categories
+    }
+    
+    @State private var navigationPath: [Card] = []
+    
     var body: some View {
         GeometryReader { reader in
-            List {
-                if !viewModel.hasOnboarded {
+            NavigationStack(path: $navigationPath) {
+                List {
+                    if !viewModel.hasOnboarded {
+                        Section {
+                            SetupView(showPreferences: $showPreferences)
+                        }
+                        .listRowBackground(Rectangle().fill(.thickMaterial))
+                    }
+                    
                     Section {
-                        SetupView(showPreferences: $showPreferences)
+                        TopFrequentCarts(reader: reader)
                     }
-                    .listRowBackground(Rectangle().fill(.thickMaterial))
-                }
-                
-                Section {
-                    TopFrequentCarts(reader: reader)
-                }
-                
-                Section {
-                    StatusCardView(viewModel: viewModel)
                     
-                    NavigationLink {
+                    Section {
+                        StatusCardView(viewModel: viewModel)
+                        
+                        NavigationLink(value: Card.expenses) {
+                            ExpenditureOverview(reader: reader)
+                        }
+                        
+                        NavigationLink(value: Card.categories) {
+                            CategoriesOverview(reader: reader)
+                        }
+                    } header: {
+                        Text(viewModel.dynamicTitle)
+                            .font(.title2.bold())
+                            .foregroundStyle(viewModel.fontColor)
+                    }
+                }
+                .listRowSpacing(Design.Spacing.listRow)
+                .navigationTitle("Track")
+                .navigationTitleColor(Color.foreground)
+                .navigationDestination(for: Card.self) { card in
+                    switch card {
+                    case .expenses:
                         ExpenditureDetails()
-                    } label: {
-                        ExpenditureOverview(reader: reader)
-                    }
-                    
-                    NavigationLink {
+                    case .categories:
                         CategoryDetails()
-                    } label: {
-                        CategoriesOverview(reader: reader)
                     }
-                } header: {
-                    Text(viewModel.dynamicTitle)
-                        .font(.title2.bold())
-                        .foregroundStyle(viewModel.fontColor)
                 }
-            }
-            .listRowSpacing(Design.Spacing.listRow)
-            .navigationTitle("Track")
-            .navigationTitleColor(Color.foreground)
-            .scrollContentBackground(.hidden)
-            .background(Color.background)
-            .task {
-                viewModel.update(context: viewContext)
+                .scrollContentBackground(.hidden)
+                .background(Color.background)
+                .task {
+                    viewModel.update(context: viewContext)
+                }
             }
         }
     }
 }
 
 #Preview {
-    NavigationStack {
-        DashboardView(viewModel: .preview,
-                      showPreferences: .constant(false))
+    DashboardView(viewModel: .preview, showPreferences: .constant(false))
         .background(Color.background)
-    }
-    .environment(\.managedObjectContext,
-                  PersistenceController.preview.container.viewContext)
+        .environment(\.managedObjectContext,
+                      PersistenceController.preview.container.viewContext)
 }

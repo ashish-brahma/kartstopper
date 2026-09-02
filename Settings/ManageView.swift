@@ -14,10 +14,16 @@ struct ManageView: View {
     
     @Environment(\.locale) private var locale
     
+    private enum Info: String {
+        case legal
+        case developer
+    }
+    
     @AppStorage("hasOnboarded") private var hasOnboarded = false
     @AppStorage("budgetAmount") private var budgetAmount: Double = 0.00
     @State private var difficulty: Mode = .medium
     @State private var isEditing: Bool = false
+    @State private var navigationPath: [Info] = []
     @FocusState private var isEditingBudget: Bool
     
     private var message: String {
@@ -37,80 +43,86 @@ struct ManageView: View {
     }
     
     var body: some View {
-        Form {
-            Section {
-                budgetStepper()
-                    .disabled(viewModel.budget.isLocked)
-                    .foregroundStyle(viewModel.budget.isLocked ? .secondary : .primary)
-            } header: {
-                Text("Monthly Budget")
-            } footer: {
-                Text(Constants.Manage.monthlyBudgetFooter)
-            }
-            
-            Section {
-                difficultyPicker()
-            } header: {
-                Text("Budget Mode")
-            } footer: {
-                Text(Constants.Manage.budgetModeFooter)
-            }
-            
-            Section {
-                LinkButton(urlString: Constants.Manage.faqURL,
-                           title: "Frequently Asked Questions")
-                
-                LinkButton(urlString: Constants.Manage.privacyURL,
-                           title: "Privacy Policy")
-                
-                LinkButton(urlString: Constants.Manage.contactURL,
-                           title: "Write to us")
-            } header: {
-                Text("Help & Support")
-            }
-            
-            Section {
-                NavigationLink("Legal") {
-                    LegalView()
+        NavigationStack(path: $navigationPath) {
+            Form {
+                Section {
+                    budgetStepper()
+                        .disabled(viewModel.budget.isLocked)
+                        .foregroundStyle(viewModel.budget.isLocked ? .secondary : .primary)
+                } header: {
+                    Text("Monthly Budget")
+                } footer: {
+                    Text(Constants.Manage.monthlyBudgetFooter)
                 }
                 
-                NavigationLink("Developer") {
+                Section {
+                    difficultyPicker()
+                } header: {
+                    Text("Budget Mode")
+                } footer: {
+                    Text(Constants.Manage.budgetModeFooter)
+                }
+                
+                Section {
+                    LinkButton(urlString: Constants.Manage.faqURL,
+                               title: "Frequently Asked Questions")
+                    
+                    LinkButton(urlString: Constants.Manage.privacyURL,
+                               title: "Privacy Policy")
+                    
+                    LinkButton(urlString: Constants.Manage.contactURL,
+                               title: "Write to us")
+                } header: {
+                    Text("Help & Support")
+                }
+                
+                Section {
+                    NavigationLink("Legal", value: Info.legal)
+                    
+                    NavigationLink("Developer", value: Info.developer)
+                    
+                    LinkButton(urlString: Constants.Manage.repositoryURL,
+                               title: "Github Repository")
+                } header: {
+                    Text("About")
+                }
+            }
+            .navigationTitle("Preferences")
+            .navigationTitleColor(Color.foreground)
+            .navigationDestination(for: Info.self) { info in
+                switch info {
+                case .legal:
+                    LegalView()
+                case .developer:
                     DeveloperView()
                 }
-                
-                LinkButton(urlString: Constants.Manage.repositoryURL,
-                           title: "Github Repository")
-            } header: {
-                Text("About")
             }
-        }
-        .navigationTitle("Preferences")
-        .navigationTitleColor(Color.foreground)
-        .task {
-            if viewModel.hasOnboarded {
-                viewModel.budget.updateBudgetLock()
-            } else {
-                isEditing = true
-                isEditingBudget = true
+            .task {
+                if viewModel.hasOnboarded {
+                    viewModel.budget.updateBudgetLock()
+                } else {
+                    isEditing = true
+                    isEditingBudget = true
+                }
+                if let mode = viewModel.budget.selectedModes.first {
+                    difficulty = mode
+                }
             }
-            if let mode = viewModel.budget.selectedModes.first {
-                difficulty = mode
+            .toolbar {
+                editorToolbar()
             }
-        }
-        .toolbar {
-            editorToolbar()
-        }
-        .onChange(of: viewModel.hasOnboarded) { newValue in
-            if newValue {
-                viewModel.objectWillChange.send()
-                viewModel.budget.updateBudgetLock()
+            .onChange(of: viewModel.hasOnboarded) { newValue in
+                if newValue {
+                    viewModel.objectWillChange.send()
+                    viewModel.budget.updateBudgetLock()
+                }
             }
-        }
-        .onChange(of: budgetAmount) { newValue in
-            isEditing = (newValue != viewModel.budget.budgetAmount)
-        }
-        .onChange(of: difficulty) { newValue in
-            isEditing = (newValue != viewModel.budget.budgetMode)
+            .onChange(of: budgetAmount) { newValue in
+                isEditing = (newValue != viewModel.budget.budgetAmount)
+            }
+            .onChange(of: difficulty) { newValue in
+                isEditing = (newValue != viewModel.budget.budgetMode)
+            }
         }
     }
     
@@ -199,7 +211,5 @@ struct ManageView: View {
 }
 
 #Preview {
-    NavigationStack {
-        ManageView(viewModel: .preview)
-    }
+    ManageView(viewModel: .preview)
 }

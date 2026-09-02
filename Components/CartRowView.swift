@@ -32,14 +32,17 @@ struct CartRowView: View {
                 Text("\(totalItems)")
                     .font(.system(size: Design.itemCountFontSize, weight: .semibold))
                     .padding(.trailing, Design.Padding.trailing)
+                
+                Image(systemName: "chevron.right")
             }
             
             Text(cart.displayNotes)
                 .font(.footnote)
                 .minimumScaleFactor(Design.notesMinScaleFactor)
                 .frame(alignment: .leading)
+            
         }
-        .foregroundStyle(.secondary)
+        .foregroundStyle(.black.opacity(0.5))
     }
 }
 
