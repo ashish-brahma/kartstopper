@@ -16,13 +16,13 @@ struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
     
     @StateObject var navModel = NavigationModel()
-    @SceneStorage("navigation") private var navData: Data?
+    @SceneStorage("ContentView.navigation") private var navData: Data?
     
     @State private var showPreferences = false
     
     var body: some View {
         TabView(selection: $navModel.selectedTab) {
-            CartListView(viewModel: viewModel)
+            CartListView(viewModel: viewModel, navModel: navModel)
                 .tabItem {
                     Label(Tabs.home.localizedName, systemImage: Tabs.home.symbol)
                 }

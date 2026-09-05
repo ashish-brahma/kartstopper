@@ -32,6 +32,17 @@ extension CDCart {
                               time: .omitted)
     }
     
+    static func getCarts(
+        by ids: [Int32],
+        context: NSManagedObjectContext = PersistenceController.shared.container.viewContext
+    ) -> [CDCart] {
+        let request = CDCart.fetchRequest()
+        request.predicate = NSPredicate(format: "id IN %@", ids)
+        guard let carts = try? context.fetch(request), !carts.isEmpty
+        else { return [] }
+        return carts
+    }
+    
     static func getTotalCarts(context: NSManagedObjectContext) -> Int {
         guard let count = try? context.count(for: CDCart.fetchRequest()), count != 0
         else { return 0 }

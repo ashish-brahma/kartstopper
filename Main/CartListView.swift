@@ -12,6 +12,7 @@ internal import Combine
 
 struct CartListView: View {
     @ObservedObject var viewModel: ViewModel
+    @ObservedObject var navModel: NavigationModel
 
     @Environment(\.managedObjectContext) private var viewContext
 
@@ -21,8 +22,6 @@ struct CartListView: View {
     )
     private var carts: SectionedFetchResults<String, CDCart>
     
-    @State private var navigationPath: [CDCart] = []
-    @State private var selection: CDCart?
     @State private var showAddCart = false
     @State private var showEditCart = false
     
@@ -30,8 +29,8 @@ struct CartListView: View {
     @State private var notes = ""
     
     var body: some View {
-        NavigationStack(path: $navigationPath) {
-            List(selection: $selection) {
+        NavigationStack(path: $navModel.presentedCarts) {
+            List(selection: $navModel.selectedCart) {
                 ForEach(carts) { section in
                     Section(header: Text(section.id)) {
                         ForEach(section) { cart in
@@ -94,8 +93,10 @@ struct CartListView: View {
         for cart: CDCart
     ) -> some View {
         Button {
-            selection = cart
-            withAnimation(.easeIn) { navigationPath.append(cart) }
+            navModel.selectedCart = cart
+            withAnimation {
+                navModel.presentedCarts.append(cart)
+            }
         } label: {
             CartRowView(cart: cart)
         }
@@ -109,7 +110,7 @@ struct CartListView: View {
         }
         .swipeActions(edge: .trailing) {
             Button {
-                selection = cart
+                navModel.selectedCart = cart
                 showEditCart = true
             } label: {
                 Label("Edit", systemImage: "pencil")
@@ -118,7 +119,7 @@ struct CartListView: View {
             }
         }
         .sheet(isPresented: $showEditCart) {
-            if let selection = selection {
+            if let selection = navModel.selectedCart {
                 NavigationStack {
                     EditCartView(cart: selection)
                 }
@@ -197,8 +198,8 @@ struct CartListView: View {
     
     private func deleteCart(_ cart: CDCart) {
         viewModel.objectWillChange.send()
-        if cart.objectID == selection?.objectID {
-            selection = nil
+        if cart.objectID == navModel.selectedCart?.objectID {
+            navModel.selectedCart = nil
         }
         viewContext.delete(cart)
         saveContext()
@@ -207,7 +208,7 @@ struct CartListView: View {
 }
 
 #Preview {
-    CartListView(viewModel: .preview)
+    CartListView(viewModel: .preview, navModel: NavigationModel())
         .environment(\.managedObjectContext,
                       PersistenceController.preview.container.viewContext)
 }

@@ -10,18 +10,27 @@ import SwiftUI
 internal import Combine
 
 class NavigationModel: ObservableObject, Codable {
-    /// Currently selected tab in TabView
+    /// Currently selected tab in TabView.
     @Published var selectedTab: Tabs?
+    
+    /// Currently selected cart in CartListView.
+    @Published var selectedCart: CDCart?
+    
+    /// Array of carts pushed on carts navigation stack.
+    @Published var presentedCarts: [CDCart] = []
     
     /// Type that enumerates keys used for encoding and decoding.
     enum CodingKeys: String, CodingKey {
         case selectedTab
+        case selectedCart
+        case cartPathIds
     }
     
     /// Encode all values using coding keys and store them.
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encodeIfPresent(selectedTab, forKey: .selectedTab)
+        try container.encode(presentedCarts.map(\.id), forKey: .cartPathIds)
     }
     
     init() {}
@@ -30,6 +39,9 @@ class NavigationModel: ObservableObject, Codable {
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.selectedTab = try container.decodeIfPresent(Tabs.self, forKey: .selectedTab)
+        
+        let cartPathIds = try container.decode([CDCart.ID].self, forKey: .cartPathIds)
+        self.presentedCarts = CDCart.getCarts(by: cartPathIds)
     }
     
     /// Persisted navigation data in JSON format.
@@ -42,6 +54,7 @@ class NavigationModel: ObservableObject, Codable {
                   let model = try? JSONDecoder().decode(NavigationModel.self, from: data)
             else { return }
             self.selectedTab = model.selectedTab
+            self.presentedCarts = model.presentedCarts
         }
     }
     
