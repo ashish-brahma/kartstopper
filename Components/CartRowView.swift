@@ -42,7 +42,7 @@ struct CartRowView: View {
                 .frame(alignment: .leading)
             
         }
-        .foregroundStyle(.black.opacity(0.5))
+        .foregroundStyle(.gray.opacity(0.8))
     }
 }
 
