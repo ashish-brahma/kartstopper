@@ -22,22 +22,27 @@ struct ContentView: View {
     
     var body: some View {
         TabView(selection: $navModel.selectedTab) {
-            CartListView(viewModel: viewModel, navModel: navModel)
-                .tabItem {
-                    Label(Tabs.home.localizedName, systemImage: Tabs.home.symbol)
-                }
-                .tag(Tabs.home)
+            CartListView(viewModel: viewModel,
+                         navModel: navModel)
+            .tabItem {
+                Label(Tabs.home.localizedName,
+                      systemImage: Tabs.home.symbol)
+            }
+            .tag(Tabs.home)
             
-            
-            DashboardView(viewModel: viewModel, showPreferences: $showPreferences)
-                .tabItem {
-                    Label(Tabs.track.localizedName, systemImage: Tabs.track.symbol)
-                }
-                .tag(Tabs.track)
+            DashboardView(viewModel: viewModel,
+                          navModel: navModel,
+                          showPreferences: $showPreferences)
+            .tabItem {
+                Label(Tabs.track.localizedName,
+                      systemImage: Tabs.track.symbol)
+            }
+            .tag(Tabs.track)
             
             ManageView(viewModel: viewModel)
                 .tabItem {
-                    Label(Tabs.manage.localizedName, systemImage: Tabs.manage.symbol)
+                    Label(Tabs.manage.localizedName,
+                          systemImage: Tabs.manage.symbol)
                 }
                 .tag(Tabs.manage)
         }

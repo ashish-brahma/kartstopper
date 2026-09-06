@@ -10,20 +10,31 @@ import SwiftUI
 internal import Combine
 
 class NavigationModel: ObservableObject, Codable {
-    /// Currently selected tab in TabView.
+    /// Currently selected tab in Tab View.
     @Published var selectedTab: Tabs?
     
-    /// Currently selected cart in CartListView.
+    /// Currently selected cart in carts list.
     @Published var selectedCart: CDCart?
     
-    /// Array of carts pushed on carts navigation stack.
+    /// Array of carts pushed on carts' navigation stack.
     @Published var presentedCarts: [CDCart] = []
+    
+    /// Array of cards pushed on dashboard's navigation stack.
+    @Published var presentedCards: [Card] = []
+    
+    /// Currently selected time range for Category Details chart.
+    @Published var selectedTimeRangeForCategories: TimeRange = .last30days
+    
+    /// Currently selected time range for Expenditure Details chart.
+    @Published var selectedTimeRangeForExpenses: TimeRange = .last7days
     
     /// Type that enumerates keys used for encoding and decoding.
     enum CodingKeys: String, CodingKey {
         case selectedTab
-        case selectedCart
         case cartPathIds
+        case cardPathIds
+        case timeRangeCategories
+        case timeRangeExpenses
     }
     
     /// Encode all values using coding keys and store them.
@@ -31,6 +42,9 @@ class NavigationModel: ObservableObject, Codable {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encodeIfPresent(selectedTab, forKey: .selectedTab)
         try container.encode(presentedCarts.map(\.id), forKey: .cartPathIds)
+        try container.encode(presentedCards.map(\.id), forKey: .cardPathIds)
+        try container.encode(selectedTimeRangeForCategories.rawValue, forKey: .timeRangeCategories)
+        try container.encode(selectedTimeRangeForExpenses.rawValue, forKey: .timeRangeExpenses)
     }
     
     init() {}
@@ -38,10 +52,24 @@ class NavigationModel: ObservableObject, Codable {
     /// Decode all values using coding keys and load them.
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        
         self.selectedTab = try container.decodeIfPresent(Tabs.self, forKey: .selectedTab)
         
         let cartPathIds = try container.decode([CDCart.ID].self, forKey: .cartPathIds)
         self.presentedCarts = CDCart.getCarts(by: cartPathIds)
+        
+        let cardPathIds = try container.decode([Card.ID].self, forKey: .cardPathIds)
+        self.presentedCards = cardPathIds.compactMap { Card.allCases[$0] }
+        
+        let timeRangeCategories = try container.decode(TimeInterval.self, forKey: .timeRangeCategories)
+        self.selectedTimeRangeForCategories = TimeRange.allCases.first {
+            $0.rawValue == timeRangeCategories
+        } ?? .last30days
+        
+        let timeRangeExpenses = try container.decode(TimeInterval.self, forKey: .timeRangeExpenses)
+        self.selectedTimeRangeForExpenses = TimeRange.allCases.first {
+            $0.rawValue == timeRangeExpenses
+        } ?? .last7days
     }
     
     /// Persisted navigation data in JSON format.
@@ -55,6 +83,9 @@ class NavigationModel: ObservableObject, Codable {
             else { return }
             self.selectedTab = model.selectedTab
             self.presentedCarts = model.presentedCarts
+            self.presentedCards = model.presentedCards
+            self.selectedTimeRangeForCategories = model.selectedTimeRangeForCategories
+            self.selectedTimeRangeForExpenses = model.selectedTimeRangeForExpenses
         }
     }
     
@@ -66,7 +97,7 @@ class NavigationModel: ObservableObject, Codable {
     }
 }
 
-/// Type that manages tab data in the root TabView.
+/// Type that manages tab data in the root Tab View.
 enum Tabs: Int, Hashable, CaseIterable, Identifiable, Codable {
     case home
     case track
@@ -95,4 +126,19 @@ enum Tabs: Int, Hashable, CaseIterable, Identifiable, Codable {
             return "book.and.wrench"
         }
     }
+}
+
+/// Type that manages card data in dashboard.
+enum Card: Int, Hashable, CaseIterable, Identifiable, Codable {
+    case expenses
+    case categories
+    
+    var id: Int { rawValue }
+}
+
+/// Type that manages time range data for time range picker in charts.
+enum TimeRange: TimeInterval, Hashable, CaseIterable, Codable  {
+    case last7days = 7
+    case last30days = 30
+    case last365days = 365
 }

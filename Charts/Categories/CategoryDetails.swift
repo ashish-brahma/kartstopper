@@ -172,7 +172,7 @@ struct CategoryDetailsChart: View {
 // MARK: - Details view
 
 struct CategoryDetails : View {
-    @State private var timeRange: TimeRange = .last30days
+    @Binding var selectedTimeRange: TimeRange
     @State private var sortParameter: SortParameter = .expense
     @State private var showAllData: Bool = false
     
@@ -184,7 +184,7 @@ struct CategoryDetails : View {
     
     var filterDateRange: ClosedRange<Date> {
         let dateRange = CDItem.dateRange(context: viewContext)
-        let start = dateRange.upperBound.addingTimeInterval(-1 * 3600 * 24 * timeRange.rawValue)
+        let start = dateRange.upperBound.addingTimeInterval(-1 * 3600 * 24 * selectedTimeRange.rawValue)
         let end = dateRange.upperBound
         return start...end
     }
@@ -220,7 +220,7 @@ struct CategoryDetails : View {
                     CategoryDetailsChart(data: data)
                         .frame(height: reader.size.height/2)
                 } header: {
-                    TimeRangePicker(value: $timeRange)
+                    TimeRangePicker(value: $selectedTimeRange)
                 } footer: {
                     Text("\(timeRangeStart) - \(timeRangeEnd)")
                         .font(.callout)
@@ -290,7 +290,7 @@ struct CategoryDetails : View {
 }
 
 #Preview {
-    CategoryDetails()
+    CategoryDetails(selectedTimeRange: .constant(.last30days))
         .environment(\.managedObjectContext,
                       PersistenceController.preview.container.viewContext)
 }

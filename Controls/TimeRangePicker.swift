@@ -23,12 +23,6 @@ struct TimeRangePicker: View {
     }
 }
 
-enum TimeRange: TimeInterval {
-    case last7days = 7
-    case last30days = 30
-    case last365days = 365
-}
-
 #Preview {
     TimeRangePicker(value: .constant(TimeRange.last7days))
     TimeRangePicker(value: .constant(TimeRange.last30days))

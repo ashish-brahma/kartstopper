@@ -11,21 +11,15 @@ import CoreData
 
 struct DashboardView: View {
     @ObservedObject var viewModel: ViewModel
+    @ObservedObject var navModel: NavigationModel
     
     @Binding var showPreferences: Bool
     
     @Environment(\.managedObjectContext) private var viewContext
     
-    private enum Card: String {
-        case expenses
-        case categories
-    }
-    
-    @State private var navigationPath: [Card] = []
-    
     var body: some View {
         GeometryReader { reader in
-            NavigationStack(path: $navigationPath) {
+            NavigationStack(path: $navModel.presentedCards) {
                 List {
                     if !viewModel.hasOnboarded {
                         Section {
@@ -60,9 +54,9 @@ struct DashboardView: View {
                 .navigationDestination(for: Card.self) { card in
                     switch card {
                     case .expenses:
-                        ExpenditureDetails()
+                        ExpenditureDetails(selectedTimeRange: $navModel.selectedTimeRangeForExpenses)
                     case .categories:
-                        CategoryDetails()
+                        CategoryDetails(selectedTimeRange: $navModel.selectedTimeRangeForCategories)
                     }
                 }
                 .scrollContentBackground(.hidden)
@@ -76,8 +70,10 @@ struct DashboardView: View {
 }
 
 #Preview {
-    DashboardView(viewModel: .preview, showPreferences: .constant(false))
-        .background(Color.background)
-        .environment(\.managedObjectContext,
-                      PersistenceController.preview.container.viewContext)
+    DashboardView(viewModel: .preview,
+                  navModel: NavigationModel(),
+                  showPreferences: .constant(false))
+    .background(Color.background)
+    .environment(\.managedObjectContext,
+                  PersistenceController.preview.container.viewContext)
 }

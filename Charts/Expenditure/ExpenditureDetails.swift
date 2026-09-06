@@ -134,7 +134,7 @@ struct MonthlyExpenditureChart: View {
 // MARK: - Details view
 
 struct ExpenditureDetails: View {
-    @State private var selectedTimeRange: TimeRange = .last7days
+    @Binding var selectedTimeRange: TimeRange
     @State private var sortParameter: SortParameter = .expense
     @State private var showAllData: Bool = false
     @State private var scrollPositionStart: Date = .distantPast
@@ -334,7 +334,7 @@ struct ExpenditureDetails: View {
 }
 
 #Preview {
-    ExpenditureDetails()
+    ExpenditureDetails(selectedTimeRange: .constant(.last7days))
         .environment(\.managedObjectContext,
                       PersistenceController.preview.container.viewContext)
 }
