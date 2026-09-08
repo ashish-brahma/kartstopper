@@ -11,19 +11,14 @@ internal import Combine
 
 struct ManageView: View {
     @ObservedObject var viewModel: ViewModel
+    @ObservedObject var navModel: NavigationModel
     
     @Environment(\.locale) private var locale
-    
-    private enum Info: String {
-        case legal
-        case developer
-    }
     
     @AppStorage("hasOnboarded") private var hasOnboarded = false
     @AppStorage("budgetAmount") private var budgetAmount: Double = 0.00
     @State private var difficulty: Mode = .medium
     @State private var isEditing: Bool = false
-    @State private var navigationPath: [Info] = []
     @FocusState private var isEditingBudget: Bool
     
     private var message: String {
@@ -43,7 +38,7 @@ struct ManageView: View {
     }
     
     var body: some View {
-        NavigationStack(path: $navigationPath) {
+        NavigationStack(path: $navModel.presentedCredits) {
             Form {
                 Section {
                     budgetStepper()
@@ -77,9 +72,9 @@ struct ManageView: View {
                 }
                 
                 Section {
-                    NavigationLink("Legal", value: Info.legal)
+                    NavigationLink("Legal", value: Credits.legal)
                     
-                    NavigationLink("Developer", value: Info.developer)
+                    NavigationLink("Developer", value: Credits.developer)
                     
                     LinkButton(urlString: Constants.Manage.repositoryURL,
                                title: "Github Repository")
@@ -89,8 +84,8 @@ struct ManageView: View {
             }
             .navigationTitle("Preferences")
             .navigationTitleColor(Color.foreground)
-            .navigationDestination(for: Info.self) { info in
-                switch info {
+            .navigationDestination(for: Credits.self) { document in
+                switch document {
                 case .legal:
                     LegalView()
                 case .developer:
@@ -211,5 +206,6 @@ struct ManageView: View {
 }
 
 #Preview {
-    ManageView(viewModel: .preview)
+    ManageView(viewModel: .preview,
+               navModel: NavigationModel())
 }

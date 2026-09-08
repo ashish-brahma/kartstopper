@@ -39,12 +39,13 @@ struct ContentView: View {
             }
             .tag(Tabs.track)
             
-            ManageView(viewModel: viewModel)
-                .tabItem {
-                    Label(Tabs.manage.localizedName,
-                          systemImage: Tabs.manage.symbol)
-                }
-                .tag(Tabs.manage)
+            ManageView(viewModel: viewModel,
+                       navModel: navModel)
+            .tabItem {
+                Label(Tabs.manage.localizedName,
+                      systemImage: Tabs.manage.symbol)
+            }
+            .tag(Tabs.manage)
         }
         .task {
             viewModel.update(context: viewContext)
