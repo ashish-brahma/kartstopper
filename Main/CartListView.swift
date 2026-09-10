@@ -156,10 +156,9 @@ struct CartListView: View {
                     showAddCart = true
                 } label: {
                     Label("Add cart", systemImage: "plus")
-                        .labelStyle(.iconOnly)
-                        .imageScale(.large)
                 }
                 .buttonStyle(.borderedProminent)
+                .buttonBorderShape(.capsule)
                 .disabled(showAddCart)
             }
         }
