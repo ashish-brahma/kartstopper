@@ -101,21 +101,12 @@ struct CartListView: View {
             CartRowView(cart: cart)
         }
         .swipeActions(edge: .trailing) {
-            Button(role: .destructive) {
-                deleteCart(cart)
-            } label: {
-                Label("Delete", systemImage: "trash")
-                    .labelStyle(.iconOnly)
-            }
+            DeleteSwipeButton { deleteCart(cart) }
         }
         .swipeActions(edge: .trailing) {
-            Button {
+            EditSwipeButton {
                 navModel.selectedCart = cart
                 showEditCart = true
-            } label: {
-                Label("Edit", systemImage: "pencil")
-                    .tint(.edit)
-                    .labelStyle(.iconOnly)
             }
         }
         .sheet(isPresented: $showEditCart) {

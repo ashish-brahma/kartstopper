@@ -113,28 +113,12 @@ struct ChecklistView: View {
         itemNavLabel(for: item, reader: reader)
             .opacity(editMode?.wrappedValue.isEditing ?? true ? 0.5 : 1)
             .swipeActions(edge: .trailing) {
-                Button(role: .destructive) {
-                    deleteItem(item)
-                } label: {
-                    Label("Delete", systemImage: "trash")
-                        .labelStyle(.iconOnly)
-                }
+                DeleteSwipeButton { deleteItem(item) }
             }
             .swipeActions(edge: .trailing) {
-                Button {
+                EditSwipeButton {
                     selection = item
-                    showEditItem = true
-                } label: {
-                    Label("Edit", systemImage: "pencil")
-                        .tint(.edit)
-                        .labelStyle(.iconOnly)
-                }
-            }
-            .sheet(isPresented: $showEditItem) {
-                if let selection = selection {
-                    NavigationStack {
-                        EditItemView(item: selection)
-                    }
+                    showItemInfo = true
                 }
             }
             .sheet(isPresented: $showItemInfo) {
