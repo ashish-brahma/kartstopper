@@ -130,9 +130,9 @@ enum Tabs: Int, Hashable, CaseIterable, Identifiable, Codable {
         case .home:
             return "house"
         case .track:
-            return "chart.bar.xaxis.ascending.badge.clock"
+            return "chart.line.uptrend.xyaxis"
         case .manage:
-            return "book.and.wrench"
+            return "wrench.and.screwdriver"
         }
     }
 }
