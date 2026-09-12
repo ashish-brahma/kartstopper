@@ -12,23 +12,33 @@ import CoreData
 struct AddCartView: View {
     @Binding var name: String
     @Binding var notes: String
-    @FocusState private var isEditing
+    @FocusState private var isAddingName
+    @FocusState private var isAddingNotes
     
     var body: some View {
         VStack {
             TextField("Cart Name", text: $name)
-                .focused($isEditing)
+                .focused($isAddingName)
+                .autocorrectionDisabled()
+                .textInputAutocapitalization(.words)
+                .submitLabel(.next)
+                .onSubmit {
+                    isAddingNotes = true
+                }
             Divider()
             TextField("Add notes (optional)",
                       text: $notes,
                       axis: .vertical)
+            .textInputAutocapitalization(.sentences)
+            .frame(height: Design.descriptionFieldHeight,
+                   alignment: .top)
             .lineLimit(Design.descriptionFieldLineLimit)
-            .frame(height: Design.descriptionFieldHeight, alignment: .top)
+            .focused($isAddingNotes)
         }
         .onAppear {
             name = ""
             notes = ""
-            isEditing = true
+            isAddingName = true
         }
     }
 }

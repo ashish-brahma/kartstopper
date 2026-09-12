@@ -43,7 +43,7 @@ struct ChecklistView: View {
     @State private var showItemInfo = false
     
     @State private var name = ""
-    @State private var price: Double = 0.00
+    @State private var price: Double? = 0.00
     @FocusState private var isAdding
     
     init(
@@ -69,11 +69,17 @@ struct ChecklistView: View {
                     }
                     .onDelete(perform: deleteItem(at:))
                     .onMove(perform: move)
-                    
+                    .onAppear {
+                        withAnimation {
+                            scrollProxy.scrollTo(bottomID)
+                        }
+                    }
                     
                     Section {
                         AddItemView(name: $name,
-                                    price: $price)
+                                    price: $price,
+                                    addAction: { addItem(to: cart) },
+                                    onDismiss: { isAdding = false })
                         .id(bottomID)
                         .focused($isAdding)
                     }
@@ -86,7 +92,7 @@ struct ChecklistView: View {
                 }
                 .searchable(text: $viewModel.itemQuery)
                 .task {
-                    scrollProxy.scrollTo(bottomID)
+                    isAdding = true
                 }
                 .onChange(of: viewModel.itemQuery) { newValue in
                     itemList.nsPredicate = newValue.isEmpty ? cartPredicate : searchPredicate
@@ -216,18 +222,6 @@ struct ChecklistView: View {
             EditButton()
                 .disabled(itemList.isEmpty)
         }
-        if isAdding {
-            ToolbarItem(placement: .keyboard) {
-                Button("Done") {
-                    if !name.isEmpty && price != 0.00 {
-                        addItem(to: cart)
-                        name = ""
-                        price = 0.00
-                    }
-                    isAdding = false
-                }
-            }
-        }
     }
     
     // MARK: - Core Data Methods
@@ -247,7 +241,7 @@ struct ChecklistView: View {
             newItem.id = Int32(totalItems + 1)
             newItem.name = name
             newItem.timestamp = Date()
-            newItem.price = price
+            newItem.price = price ?? 0.00
             newItem.cart = cart
             saveContext()
         }

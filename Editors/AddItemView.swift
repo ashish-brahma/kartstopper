@@ -10,9 +10,12 @@ import SwiftUI
 
 struct AddItemView: View {
     @Binding var name: String
-    @Binding var price: Double
+    @Binding var price: Double?
+    let addAction: () -> Void
+    let onDismiss: () -> Void
     
     @Environment(\.locale) private var locale
+    @FocusState private var isAddingPrice
     
     var body: some View {
         HStack {
@@ -23,24 +26,42 @@ struct AddItemView: View {
                 .padding(.trailing, Design.Padding.trailing)
             
             VStack {
-                TextField("Item Name", text: $name)
+                TextField("Item Name",
+                          text: $name)
+                    .autocorrectionDisabled()
+                    .textInputAutocapitalization(.words)
+                    .submitLabel(.next)
+                    .onSubmit {
+                        isAddingPrice = true
+                    }
                 Divider()
                 TextField("Price",
                           value: $price,
-                          format: .currency(code: locale.currency?.identifier ?? "USD"),
-                          prompt: Text("Price"))
-                .keyboardType(.decimalPad)
+                          format: .currency(code: locale.currency?.identifier ?? "USD"))
+                .focused($isAddingPrice)
+                .keyboardType(.numbersAndPunctuation)
+                .submitLabel(.done)
+                .onSubmit {
+                    if !name.isEmpty && price != nil {
+                        addAction()
+                        name = ""
+                        price = nil
+                    }
+                    onDismiss()
+                }
             }
         }
         .onAppear {
             name = ""
-            price = 0.00
+            price = nil
         }
     }
 }
 
 #Preview {
     AddItemView(name: .constant(CDItem.preview.displayName),
-                price: .constant(CDItem.preview.price))
+                price: .constant(CDItem.preview.price),
+                addAction: { },
+                onDismiss: { })
         .environment(\.locale, Locale(identifier: "en-IN"))
 }
