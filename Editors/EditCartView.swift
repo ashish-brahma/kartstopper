@@ -4,6 +4,7 @@
 //
 //  Created by Ashish Brahma on 05/11/25.
 //
+//  A SwiftUI view that edits an existing cart's data.
 
 import SwiftUI
 import CoreData
@@ -16,58 +17,73 @@ struct EditCartView: View {
     
     @State private var name = ""
     @State private var notes = ""
-    @FocusState private var isEditing
+    
+    private enum Field: Hashable {
+        case name
+        case notes
+    }
+    @FocusState private var focusedField: Field?
     
     var body: some View {
-        Form {
-            Section(header: Text("Created On")) {
-                Text(cart.displayDate.formatted(date: .abbreviated,
-                                                time: .shortened))
-                .foregroundStyle(.secondary)
-                .listRowBackground(Color.gray.opacity(0.2))
-            }
-            Section(header: Text("Cart Name")) {
-                Group {
-                    TextField("Enter a name for the cart", text: $name)
-                        .focused($isEditing)
+        NavigationStack {
+            Form {
+                Section(header: Text("Created On")) {
+                    Text(cart.displayDate.formatted(date: .abbreviated,
+                                                    time: .shortened))
+                    .foregroundStyle(.secondary)
+                    .listRowBackground(Color.gray.opacity(0.2))
+                }
+                Section(header: Text("Cart Name")) {
+                    Group {
+                        TextField("Enter a name for the cart", text: $name)
+                            .autocorrectionDisabled()
+                            .textInputAutocapitalization(.words)
+                            .focused($focusedField, equals: .name)
+                            .submitLabel(.next)
+                            .onSubmit {
+                                focusedField = .notes
+                            }
+                    }
+                }
+                
+                Section(header: Text("Cart Description")) {
+                    Group {
+                        TextField("Add notes (optional)", text: $notes, axis: .vertical)
+                            .textInputAutocapitalization(.sentences)
+                            .lineLimit(Design.descriptionFieldLineLimit)
+                            .frame(height: Design.descriptionFieldHeight, alignment: .top)
+                            .focused($focusedField, equals: .notes)
+                    }
                 }
             }
-            
-            Section(header: Text("Cart Description")) {
-                Group {
-                    TextField("Add notes (optional)", text: $notes, axis: .vertical)
-                        .lineLimit(Design.descriptionFieldLineLimit)
-                        .frame(height: Design.descriptionFieldHeight, alignment: .top)
+            .navigationTitle(cart.displayName)
+            .scrollContentBackground(.hidden)
+            .background(Color.background)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button {
+                        dismiss()
+                    } label: {
+                        Label("Cancel", systemImage: "xmark")
+                    }
                 }
-            }
-        }
-        .navigationTitle(cart.displayName)
-        .scrollContentBackground(.hidden)
-        .background(Color.background)
-        .toolbar {
-            ToolbarItem(placement: .cancellationAction) {
-                Button {
-                    dismiss()
-                } label: {
-                    Label("Cancel", systemImage: "xmark")
+                ToolbarItem(placement: .principal) {
+                    Text("Edit Cart Details")
                 }
-            }
-            ToolbarItem(placement: .principal) {
-                Text("Edit Cart Details")
-            }
-            ToolbarItem(placement: .confirmationAction) {
-                Button {
-                    updateCart()
-                    dismiss()
-                } label: {
-                    Label("Done", systemImage: "checkmark")
+                ToolbarItem(placement: .confirmationAction) {
+                    Button {
+                        updateCart()
+                        dismiss()
+                    } label: {
+                        Label("Done", systemImage: "checkmark")
+                    }
                 }
             }
         }
         .onAppear {
             name = cart.name ?? ""
             notes = cart.notes ?? ""
-            isEditing = true
+            focusedField = .name
         }
     }
     
@@ -95,7 +111,5 @@ struct EditCartView: View {
 }
 
 #Preview {
-    NavigationStack {
-        EditCartView(cart: .preview)
-    }
+    EditCartView(cart: .preview)
 }

@@ -4,6 +4,7 @@
 //
 //  Created by Ashish Brahma on 05/11/25.
 //
+//  A SwiftUI view that edits an existing item's data.
 
 import SwiftUI
 import CoreData
@@ -18,65 +19,85 @@ struct EditItemView: View {
     @State private var name = ""
     @State private var notes = ""
     @State private var price: Double = 0.00
-    @FocusState private var isEditing
+    
+    private enum Field: Hashable {
+        case name
+        case price
+        case notes
+    }
+    @FocusState private var focusedField: Field?
     
     var body: some View {
         GeometryReader { reader in
-            Form {
-                Section {
-                    if item.imageURL != nil {
-                        displayImage(reader: reader)
-                    } else {
-                        placeholderImage(reader: reader)
+            NavigationStack {
+                Form {
+                    Section {
+                        if item.imageURL != nil {
+                            displayImage(reader: reader)
+                        } else {
+                            placeholderImage(reader: reader)
+                        }
+                    }
+                    .listRowBackground(Color.clear)
+                    
+                    Section(header: Text("Created On")) {
+                        Text(item.displayDate.formatted(date: .abbreviated,
+                                                        time: .shortened))
+                        .foregroundStyle(.secondary)
+                    }
+                    .listRowBackground(Color.gray.opacity(0.2))
+                    
+                    Section(header: Text("Item Name")) {
+                        TextField("Enter a name for the item", text: $name)
+                            .autocorrectionDisabled()
+                            .textInputAutocapitalization(.words)
+                            .focused($focusedField, equals: .name)
+                            .submitLabel(.next)
+                            .onSubmit {
+                                focusedField = .price
+                            }
+                    }
+                    
+                    Section(header: Text("Price")) {
+                        TextField("Price",
+                                  value: $price,
+                                  format: .currency(code: locale.currency?.identifier ?? "USD"))
+                        .keyboardType(.numbersAndPunctuation)
+                        .focused($focusedField, equals: .price)
+                        .submitLabel(.next)
+                        .onSubmit {
+                            focusedField = .notes
+                        }
+                    }
+                    
+                    Section(header: Text("Item Description")) {
+                        TextField("Add notes (optional)", text: $notes, axis: .vertical)
+                            .lineLimit(Design.descriptionFieldLineLimit)
+                            .frame(height:Design.descriptionFieldHeight, alignment: .top)
+                            .focused($focusedField, equals: .notes)
                     }
                 }
-                .listRowBackground(Color.clear)
-                
-                Section(header: Text("Created On")) {
-                    Text(item.displayDate.formatted(date: .abbreviated,
-                                                    time: .shortened))
-                    .foregroundStyle(.secondary)
-                }
-                .listRowBackground(Color.gray.opacity(0.2))
-                
-                Section(header: Text("Item Name")) {
-                    TextField("Enter a name for the item", text: $name)
-                        .focused($isEditing)
-                }
-                
-                Section(header: Text("Price")) {
-                    TextField("Price",
-                              value: $price,
-                              format: .currency(code: locale.currency?.identifier ?? "USD"))
-                    .keyboardType(.decimalPad)
-                }
-                
-                Section(header: Text("Item Description")) {
-                    TextField("Add notes (optional)", text: $notes, axis: .vertical)
-                        .lineLimit(Design.descriptionFieldLineLimit)
-                        .frame(height:Design.descriptionFieldHeight, alignment: .top)
-                }
-            }
-            .navigationTitle(item.displayName)
-            .scrollContentBackground(.hidden)
-            .background(Color.background)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button {
-                        dismiss()
-                    } label: {
-                        Label("Cancel", systemImage: "xmark")
+                .navigationTitle(item.displayName)
+                .scrollContentBackground(.hidden)
+                .background(Color.background)
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button {
+                            dismiss()
+                        } label: {
+                            Label("Cancel", systemImage: "xmark")
+                        }
                     }
-                }
-                ToolbarItem(placement: .principal) {
-                    Text("Edit Item Details")
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button {
-                        updateItem()
-                        dismiss()
-                    } label: {
-                        Label("Done", systemImage: "checkmark")
+                    ToolbarItem(placement: .principal) {
+                        Text("Edit Item Details")
+                    }
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button {
+                            updateItem()
+                            dismiss()
+                        } label: {
+                            Label("Done", systemImage: "checkmark")
+                        }
                     }
                 }
             }
@@ -84,7 +105,7 @@ struct EditItemView: View {
                 name = item.name ?? ""
                 notes = item.notes ?? ""
                 price = item.price
-                isEditing = true
+                focusedField = .name
             }
         }
     }
@@ -142,7 +163,5 @@ struct EditItemView: View {
 }
 
 #Preview {
-    NavigationStack {
-        EditItemView(item: .preview)
-    }
+    EditItemView(item: .preview)
 }

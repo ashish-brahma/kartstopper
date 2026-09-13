@@ -129,9 +129,7 @@ struct ChecklistView: View {
             }
             .sheet(isPresented: $showItemInfo) {
                 if let selection = selection {
-                    NavigationStack {
-                        EditItemView(item: selection)
-                    }
+                    EditItemView(item: selection)
                 }
             }
     }

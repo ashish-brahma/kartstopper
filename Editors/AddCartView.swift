@@ -12,18 +12,22 @@ import CoreData
 struct AddCartView: View {
     @Binding var name: String
     @Binding var notes: String
-    @FocusState private var isAddingName
-    @FocusState private var isAddingNotes
+    
+    private enum Field: Hashable {
+        case name
+        case notes
+    }
+    @FocusState private var focusedField: Field?
     
     var body: some View {
         VStack {
             TextField("Cart Name", text: $name)
-                .focused($isAddingName)
                 .autocorrectionDisabled()
                 .textInputAutocapitalization(.words)
+                .focused($focusedField, equals: .name)
                 .submitLabel(.next)
                 .onSubmit {
-                    isAddingNotes = true
+                    focusedField = .notes
                 }
             Divider()
             TextField("Add notes (optional)",
@@ -33,12 +37,12 @@ struct AddCartView: View {
             .frame(height: Design.descriptionFieldHeight,
                    alignment: .top)
             .lineLimit(Design.descriptionFieldLineLimit)
-            .focused($isAddingNotes)
+            .focused($focusedField, equals: .notes)
         }
         .onAppear {
             name = ""
             notes = ""
-            isAddingName = true
+            focusedField = .name
         }
     }
 }

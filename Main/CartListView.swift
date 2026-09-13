@@ -13,9 +13,9 @@ internal import Combine
 struct CartListView: View {
     @ObservedObject var viewModel: ViewModel
     @ObservedObject var navModel: NavigationModel
-
+    
     @Environment(\.managedObjectContext) private var viewContext
-
+    
     @SectionedFetchRequest<String, CDCart>(
         sectionIdentifier: \.sectionDate,
         sortDescriptors: [NSSortDescriptor(keyPath: \CDCart.id, ascending: true)]
@@ -111,9 +111,7 @@ struct CartListView: View {
         }
         .sheet(isPresented: $showEditCart) {
             if let selection = navModel.selectedCart {
-                NavigationStack {
-                    EditCartView(cart: selection)
-                }
+                EditCartView(cart: selection)
             }
         }
     }
@@ -181,10 +179,10 @@ struct CartListView: View {
     private func deleteCart(
         in section: [CDCart],
         at offsets: IndexSet) {
-        withAnimation {
-            offsets.map { section[$0] }.forEach(deleteCart)
+            withAnimation {
+                offsets.map { section[$0] }.forEach(deleteCart)
+            }
         }
-    }
     
     private func deleteCart(_ cart: CDCart) {
         viewModel.objectWillChange.send()

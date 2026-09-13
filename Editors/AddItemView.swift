@@ -15,7 +15,12 @@ struct AddItemView: View {
     let onDismiss: () -> Void
     
     @Environment(\.locale) private var locale
-    @FocusState private var isAddingPrice
+    
+    private enum Field: Hashable {
+        case name
+        case price
+    }
+    @FocusState private var focusedField: Field?
     
     var body: some View {
         HStack {
@@ -26,20 +31,20 @@ struct AddItemView: View {
                 .padding(.trailing, Design.Padding.trailing)
             
             VStack {
-                TextField("Item Name",
-                          text: $name)
+                TextField("Item Name", text: $name)
                     .autocorrectionDisabled()
                     .textInputAutocapitalization(.words)
+                    .focused($focusedField, equals: .name)
                     .submitLabel(.next)
                     .onSubmit {
-                        isAddingPrice = true
+                        focusedField = .price
                     }
                 Divider()
                 TextField("Price",
                           value: $price,
                           format: .currency(code: locale.currency?.identifier ?? "USD"))
-                .focused($isAddingPrice)
                 .keyboardType(.numbersAndPunctuation)
+                .focused($focusedField, equals: .price)
                 .submitLabel(.done)
                 .onSubmit {
                     if !name.isEmpty && price != nil {
@@ -63,5 +68,5 @@ struct AddItemView: View {
                 price: .constant(CDItem.preview.price),
                 addAction: { },
                 onDismiss: { })
-        .environment(\.locale, Locale(identifier: "en-IN"))
+    .environment(\.locale, Locale(identifier: "en-IN"))
 }
