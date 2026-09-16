@@ -80,9 +80,6 @@ struct CartListView: View {
             .toolbar {
                 editorToolbar()
             }
-            .task {
-                viewModel.update(context: viewContext)
-            }
         }
     }
     
@@ -93,7 +90,6 @@ struct CartListView: View {
         for cart: CDCart
     ) -> some View {
         Button {
-            navModel.selectedCart = cart
             withAnimation {
                 navModel.presentedCarts.append(cart)
             }
