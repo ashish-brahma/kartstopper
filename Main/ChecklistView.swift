@@ -97,7 +97,10 @@ struct ChecklistView: View {
                 .scrollContentBackground(.hidden)
                 .background(Color.background)
                 .toolbar {
-                    editorToolbar()
+                    ToolbarItem(placement: .primaryAction) {
+                        EditButton()
+                            .disabled(itemList.isEmpty)
+                    }
                 }
             }
         }
@@ -205,14 +208,6 @@ struct ChecklistView: View {
                     .tint(.info)
                     .labelStyle(.iconOnly)
             }
-        }
-    }
-    
-    @ToolbarContentBuilder
-    private func editorToolbar() -> some ToolbarContent {
-        ToolbarItem(placement: .primaryAction) {
-            EditButton()
-                .disabled(itemList.isEmpty)
         }
     }
     

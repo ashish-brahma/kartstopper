@@ -61,21 +61,15 @@ struct EditCartView: View {
             .background(Color.background)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button {
-                        dismiss()
-                    } label: {
-                        Label("Cancel", systemImage: "xmark")
-                    }
+                    CancelToolbarButton { dismiss() }
                 }
                 ToolbarItem(placement: .principal) {
                     Text("Edit Cart Details")
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button {
+                    ConfirmToolbarButton {
                         updateCart()
                         dismiss()
-                    } label: {
-                        Label("Done", systemImage: "checkmark")
                     }
                 }
             }

@@ -116,18 +116,12 @@ struct CartListView: View {
     private func editorToolbar() -> some ToolbarContent {
         if showAddCart {
             ToolbarItem(placement: .cancellationAction) {
-                Button {
-                    showAddCart = false
-                } label: {
-                    Label("Cancel", systemImage: "xmark")
-                }
+                CancelToolbarButton { showAddCart = false }
             }
             ToolbarItem(placement: .confirmationAction) {
-                Button {
+                ConfirmToolbarButton {
                     addCart()
                     showAddCart = false
-                } label: {
-                    Label("Done", systemImage: "checkmark")
                 }
                 .disabled(name.isEmpty)
             }
@@ -137,13 +131,9 @@ struct CartListView: View {
                     .disabled(carts.isEmpty)
             }
             ToolbarItem(placement: .primaryAction) {
-                Button {
+                AddToolbarButton(entityName: "cart") {
                     showAddCart = true
-                } label: {
-                    Label("Add cart", systemImage: "plus")
                 }
-                .buttonStyle(.borderedProminent)
-                .buttonBorderShape(.capsule)
                 .disabled(showAddCart)
             }
         }

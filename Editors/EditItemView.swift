@@ -82,21 +82,15 @@ struct EditItemView: View {
                 .background(Color.background)
                 .toolbar {
                     ToolbarItem(placement: .cancellationAction) {
-                        Button {
-                            dismiss()
-                        } label: {
-                            Label("Cancel", systemImage: "xmark")
-                        }
+                        CancelToolbarButton { dismiss() }
                     }
                     ToolbarItem(placement: .principal) {
                         Text("Edit Item Details")
                     }
                     ToolbarItem(placement: .confirmationAction) {
-                        Button {
+                        ConfirmToolbarButton {
                             updateItem()
                             dismiss()
-                        } label: {
-                            Label("Done", systemImage: "checkmark")
                         }
                     }
                 }
