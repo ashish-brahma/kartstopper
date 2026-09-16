@@ -44,7 +44,6 @@ struct ChecklistView: View {
     
     @State private var name = ""
     @State private var price: Double? = 0.00
-    @FocusState private var isAdding
     
     init(
         cart: CDCart,
@@ -78,10 +77,8 @@ struct ChecklistView: View {
                     Section {
                         AddItemView(name: $name,
                                     price: $price,
-                                    addAction: { addItem(to: cart) },
-                                    onDismiss: { isAdding = false })
+                                    addAction: { addItem(to: cart) })
                         .id(bottomID)
-                        .focused($isAdding)
                     }
                     .listRowBackground(Rectangle().fill(.ultraThickMaterial))
                 }
@@ -91,9 +88,6 @@ struct ChecklistView: View {
                     }
                 }
                 .searchable(text: $viewModel.itemQuery)
-                .task {
-                    isAdding = true
-                }
                 .onChange(of: viewModel.itemQuery) { newValue in
                     itemList.nsPredicate = newValue.isEmpty ? cartPredicate : searchPredicate
                 }

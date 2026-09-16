@@ -12,7 +12,6 @@ struct AddItemView: View {
     @Binding var name: String
     @Binding var price: Double?
     let addAction: () -> Void
-    let onDismiss: () -> Void
     
     @Environment(\.locale) private var locale
     
@@ -52,13 +51,14 @@ struct AddItemView: View {
                         name = ""
                         price = nil
                     }
-                    onDismiss()
+                    focusedField = nil
                 }
             }
         }
         .onAppear {
             name = ""
             price = nil
+            focusedField = .name
         }
     }
 }
@@ -66,7 +66,6 @@ struct AddItemView: View {
 #Preview {
     AddItemView(name: .constant(CDItem.preview.displayName),
                 price: .constant(CDItem.preview.price),
-                addAction: { },
-                onDismiss: { })
+                addAction: { })
     .environment(\.locale, Locale(identifier: "en-IN"))
 }
