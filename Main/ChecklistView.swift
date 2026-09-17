@@ -102,6 +102,11 @@ struct ChecklistView: View {
                             .disabled(itemList.isEmpty)
                     }
                 }
+                .sheet(isPresented: $showItemInfo) {
+                    if let selection = selection {
+                        EditItemView(item: selection)
+                    }
+                }
             }
         }
     }
@@ -122,11 +127,6 @@ struct ChecklistView: View {
                 EditSwipeButton {
                     selection = item
                     showItemInfo = true
-                }
-            }
-            .sheet(isPresented: $showItemInfo) {
-                if let selection = selection {
-                    EditItemView(item: selection)
                 }
             }
     }

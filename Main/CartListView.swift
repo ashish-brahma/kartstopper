@@ -80,6 +80,11 @@ struct CartListView: View {
             .toolbar {
                 editorToolbar()
             }
+            .sheet(isPresented: $showEditCart) {
+                if let selection = navModel.selectedCart {
+                    EditCartView(cart: selection)
+                }
+            }
         }
     }
     
@@ -103,11 +108,6 @@ struct CartListView: View {
             EditSwipeButton {
                 navModel.selectedCart = cart
                 showEditCart = true
-            }
-        }
-        .sheet(isPresented: $showEditCart) {
-            if let selection = navModel.selectedCart {
-                EditCartView(cart: selection)
             }
         }
     }
