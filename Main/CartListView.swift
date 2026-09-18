@@ -34,7 +34,14 @@ struct CartListView: View {
                 ForEach(carts) { section in
                     Section(header: Text(section.id)) {
                         ForEach(section) { cart in
-                            CartNavLink(for: cart)
+                            CartNavigationButton(
+                                navModel: navModel,
+                                cart: cart,
+                                deleteAction: { deleteCart(cart) },
+                                editAction: {
+                                    navModel.selectedCart = cart
+                                    showEditCart = true
+                                })
                         }
                         .onDelete { indexSet in
                             deleteCart(in: Array(section),
@@ -78,63 +85,15 @@ struct CartListView: View {
             .scrollContentBackground(.hidden)
             .background(Color.background)
             .toolbar {
-                editorToolbar()
+                CartsToolbar(showAddCart: $showAddCart,
+                             disableConfirm: .constant(name.isEmpty),
+                             disableEdit: .constant(carts.isEmpty),
+                             addAction: addCart)
             }
             .sheet(isPresented: $showEditCart) {
                 if let selection = navModel.selectedCart {
                     EditCartView(cart: selection)
                 }
-            }
-        }
-    }
-    
-    // MARK: - View Builder Methods
-    
-    @ViewBuilder
-    private func CartNavLink(
-        for cart: CDCart
-    ) -> some View {
-        Button {
-            withAnimation {
-                navModel.presentedCarts.append(cart)
-            }
-        } label: {
-            CartRowView(cart: cart)
-        }
-        .swipeActions(edge: .trailing) {
-            DeleteSwipeButton { deleteCart(cart) }
-        }
-        .swipeActions(edge: .trailing) {
-            EditSwipeButton {
-                navModel.selectedCart = cart
-                showEditCart = true
-            }
-        }
-    }
-    
-    @ToolbarContentBuilder
-    private func editorToolbar() -> some ToolbarContent {
-        if showAddCart {
-            ToolbarItem(placement: .cancellationAction) {
-                CancelToolbarButton { showAddCart = false }
-            }
-            ToolbarItem(placement: .confirmationAction) {
-                ConfirmToolbarButton {
-                    addCart()
-                    showAddCart = false
-                }
-                .disabled(name.isEmpty)
-            }
-        } else {
-            ToolbarItem(placement: .topBarLeading) {
-                EditButton()
-                    .disabled(carts.isEmpty)
-            }
-            ToolbarItem(placement: .primaryAction) {
-                AddToolbarButton(entityName: "cart") {
-                    showAddCart = true
-                }
-                .disabled(showAddCart)
             }
         }
     }
@@ -164,11 +123,12 @@ struct CartListView: View {
     
     private func deleteCart(
         in section: [CDCart],
-        at offsets: IndexSet) {
-            withAnimation {
-                offsets.map { section[$0] }.forEach(deleteCart)
-            }
+        at offsets: IndexSet
+    ) {
+        withAnimation {
+            offsets.map { section[$0] }.forEach(deleteCart)
         }
+    }
     
     private func deleteCart(_ cart: CDCart) {
         viewModel.objectWillChange.send()
@@ -182,7 +142,14 @@ struct CartListView: View {
 }
 
 #Preview {
-    CartListView(viewModel: .preview, navModel: NavigationModel())
-        .environment(\.managedObjectContext,
-                      PersistenceController.preview.container.viewContext)
+    let result = PersistenceController.preview
+    let viewContext = result.container.viewContext
+    let model: ViewModel = .preview
+    
+    CartListView(viewModel: model,
+                 navModel: NavigationModel())
+    .task {
+        model.update(context: viewContext)
+    }
+    .environment(\.managedObjectContext, viewContext)
 }
