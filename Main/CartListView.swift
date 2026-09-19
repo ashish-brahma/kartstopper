@@ -37,11 +37,9 @@ struct CartListView: View {
                             CartNavigationButton(
                                 navModel: navModel,
                                 cart: cart,
-                                deleteAction: { deleteCart(cart) },
-                                editAction: {
-                                    navModel.selectedCart = cart
-                                    showEditCart = true
-                                })
+                                showEditCart: $showEditCart,
+                                onDelete: { deleteCart(cart) }
+                            )
                         }
                         .onDelete { indexSet in
                             deleteCart(in: Array(section),
@@ -85,10 +83,11 @@ struct CartListView: View {
             .scrollContentBackground(.hidden)
             .background(Color.background)
             .toolbar {
-                CartsToolbar(showAddCart: $showAddCart,
-                             disableConfirm: .constant(name.isEmpty),
-                             disableEdit: .constant(carts.isEmpty),
-                             addAction: addCart)
+                CartsToolbar(viewModel: viewModel,
+                             showAddCart: $showAddCart,
+                             cartsEmpty: .constant(carts.isEmpty),
+                             name: $name,
+                             notes: $notes)
             }
             .sheet(isPresented: $showEditCart) {
                 if let selection = navModel.selectedCart {
@@ -98,26 +97,12 @@ struct CartListView: View {
         }
     }
     
-    // MARK: - Core Data Methods
-    
     private func saveContext() {
         do {
             try viewContext.save()
         } catch {
             let nsError = error as NSError
             fatalError("Unresolved error \(nsError)")
-        }
-    }
-    
-    private func addCart() {
-        withAnimation {
-            let newCart = CDCart(context: viewContext)
-            newCart.id = Int32(viewModel.totalCarts + 1)
-            newCart.name = name
-            newCart.timestamp = Date()
-            newCart.notes = notes
-            saveContext()
-            viewModel.update(context: viewContext)
         }
     }
     

@@ -8,13 +8,14 @@
 
 import SwiftUI
 import CoreData
+internal import Combine
 
 struct CartNavigationButton: View {
     @ObservedObject var navModel: NavigationModel
     
     let cart: CDCart
-    let deleteAction: () -> Void
-    let editAction: () -> Void
+    @Binding var showEditCart: Bool
+    let onDelete: () -> Void
     
     var body: some View {
         Button {
@@ -25,19 +26,24 @@ struct CartNavigationButton: View {
             CartRowView(cart: cart)
         }
         .swipeActions(edge: .trailing) {
-            DeleteSwipeButton(action: deleteAction)
+            DeleteSwipeButton(action: onDelete)
         }
         .swipeActions(edge: .trailing) {
-            EditSwipeButton(action: editAction)
+            EditSwipeButton {
+                navModel.selectedCart = cart
+                showEditCart = true
+            }
         }
     }
 }
 
 #Preview {
-    CartNavigationButton(navModel: NavigationModel(),
-                         cart: .preview,
-                         deleteAction: { },
-                         editAction: { })
+    CartNavigationButton(
+        navModel: NavigationModel(),
+        cart: .preview,
+        showEditCart: .constant(false),
+        onDelete: { }
+    )
     .environment(\.managedObjectContext,
                   PersistenceController.preview.container.viewContext)
 }

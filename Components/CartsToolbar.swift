@@ -10,11 +10,14 @@ import SwiftUI
 import CoreData
 
 struct CartsToolbar: ToolbarContent {
-    @Binding var showAddCart: Bool
-    @Binding var disableConfirm: Bool
-    @Binding var disableEdit: Bool
+    @ObservedObject var viewModel: ViewModel
     
-    let addAction: () -> Void
+    @Environment(\.managedObjectContext) private var viewContext
+    
+    @Binding var showAddCart: Bool
+    @Binding var cartsEmpty: Bool
+    @Binding var name: String
+    @Binding var notes: String
     
     var body: some ToolbarContent {
         if showAddCart {
@@ -23,15 +26,15 @@ struct CartsToolbar: ToolbarContent {
             }
             ToolbarItem(placement: .confirmationAction) {
                 ConfirmToolbarButton {
-                    addAction()
+                    addCart()
                     showAddCart = false
                 }
-                .disabled(disableConfirm)
+                .disabled(name.isEmpty)
             }
         } else {
             ToolbarItem(placement: .topBarLeading) {
                 EditButton()
-                    .disabled(disableEdit)
+                    .disabled(cartsEmpty)
             }
             ToolbarItem(placement: .primaryAction) {
                 AddToolbarButton(entityName: "cart") {
@@ -41,22 +44,43 @@ struct CartsToolbar: ToolbarContent {
             }
         }
     }
+    
+    private func saveContext() {
+        do {
+            try viewContext.save()
+        } catch {
+            let nsError = error as NSError
+            fatalError("Unresolved error \(nsError)")
+        }
+    }
+    
+    private func addCart() {
+        withAnimation {
+            let newCart = CDCart(context: viewContext)
+            newCart.id = Int32(viewModel.totalCarts + 1)
+            newCart.name = name
+            newCart.timestamp = Date()
+            newCart.notes = notes
+            saveContext()
+            viewModel.update(context: viewContext)
+        }
+    }
 }
 
 #Preview {
     NavigationStack {
         List {
-            CartNavigationButton(navModel: NavigationModel(),
-                                 cart: .preview,
-                                 deleteAction: { },
-                                 editAction: { })
+            CartRowView(cart: .preview)
         }
         .navigationTitle("Carts")
         .toolbar {
-            CartsToolbar(showAddCart: .constant(false),
-                         disableConfirm: .constant(false),
-                         disableEdit: .constant(false),
-                         addAction: { })
+            CartsToolbar(
+                viewModel: .preview,
+                showAddCart: .constant(false),
+                cartsEmpty: .constant(false),
+                name: .constant(CDCart.preview.displayName),
+                notes: .constant(CDCart.preview.notes ?? "")
+            )
         }
     }
     .environment(\.managedObjectContext,
