@@ -13,7 +13,7 @@ struct MockBudget: BudgetProtocol {
     
     var budgetAmount: Double
     
-    var budgetMode: Mode
+    var budgetMode: BudgetMode
     
     var isLocked: Bool
     

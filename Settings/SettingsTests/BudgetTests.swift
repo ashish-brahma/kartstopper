@@ -44,9 +44,9 @@ struct BudgetTests {
     }
     
     @Test("Mode calibrates status",
-          arguments: zip(Mode.allCases, [false, true, true]))
+          arguments: zip(BudgetMode.allCases, [false, true, true]))
     mutating func budgetModeUpdatesRatioCutOffs(
-        mode: Mode,
+        mode: BudgetMode,
         isTrue: Bool
     ) throws {
         budget.budgetAmount = MockBudget.negative.budgetAmount

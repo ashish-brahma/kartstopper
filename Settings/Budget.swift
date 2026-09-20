@@ -18,7 +18,7 @@ struct Budget: BudgetProtocol {
     var budgetAmount: Double = 0.00
     
     /// Difficulty mode used for budget monitoring.
-    var budgetMode: Mode = .medium
+    var budgetMode: BudgetMode = .medium
     
     /// Flag to lock budget for editing.
     var isLocked: Bool = false
@@ -27,8 +27,8 @@ struct Budget: BudgetProtocol {
     var status: Status = .unassigned
     
     /// An array containing buget mode selected and saved by user
-    var selectedModes: [Mode] {
-        Mode.allCases.filter {
+    var selectedModes: [BudgetMode] {
+        BudgetMode.allCases.filter {
             $0.rawValue == UserDefaults.standard.string(forKey: "budgetMode")
         }
     }

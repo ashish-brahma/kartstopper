@@ -16,7 +16,7 @@ protocol BudgetProtocol {
     var budgetAmount: Double { get set }
     
     /// Difficulty mode used for budget monitoring.
-    var budgetMode: Mode { get set }
+    var budgetMode: BudgetMode { get set }
     
     /// Flag to lock budget for editing.
     var isLocked: Bool { get set }
@@ -35,7 +35,7 @@ protocol BudgetProtocol {
 }
 
 /// Difficulty levels to determine strictness of monitoring.
-enum Mode: String, CaseIterable, Identifiable {
+enum BudgetMode: String, CaseIterable, Identifiable {
     case easy = "Easy"
     case medium = "Medium"
     case hard = "Hard"
