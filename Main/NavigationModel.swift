@@ -19,6 +19,9 @@ class NavigationModel: ObservableObject, Codable {
     /// Array of carts pushed on carts' navigation stack.
     @Published var presentedCarts: [CDCart] = []
     
+    /// Currently selected item in checklist.
+    @Published var selectedItem: CDItem?
+    
     /// Array of cards pushed on dashboard's navigation stack.
     @Published var presentedCards: [Card] = []
     

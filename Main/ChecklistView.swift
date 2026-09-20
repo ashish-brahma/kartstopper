@@ -14,9 +14,9 @@ struct ChecklistView: View {
     var cart: CDCart
     
     @ObservedObject var viewModel: ViewModel
+    @ObservedObject var navModel: NavigationModel
     
     @Environment(\.managedObjectContext) private var viewContext
-    @Environment(\.editMode) private var editMode
     
     @Namespace var bottomID
     
@@ -38,7 +38,6 @@ struct ChecklistView: View {
         CDCart.getTotalItems(for: cart, context: viewContext)
     }
     
-    @State private var selection: CDItem?
     @State private var showEditItem = false
     @State private var showItemInfo = false
     
@@ -47,10 +46,12 @@ struct ChecklistView: View {
     
     init(
         cart: CDCart,
-        viewModel: ViewModel
+        viewModel: ViewModel,
+        navModel: NavigationModel
     ) {
         self.cart = cart
         self.viewModel = viewModel
+        self.navModel = navModel
         
         self._itemList = FetchRequest<CDItem>(
             sortDescriptors: [NSSortDescriptor(keyPath: \CDItem.id, ascending: true)],
@@ -61,14 +62,20 @@ struct ChecklistView: View {
     var body: some View {
         GeometryReader { geometryProxy in
             ScrollViewReader { scrollProxy in
-                List(selection: $selection) {
+                List(selection: $navModel.selectedItem) {
                     ForEach(itemList) { item in
-                        itemRowBuilder(item: item,
-                                       reader: geometryProxy)
+                        ItemRowView(
+                            viewModel: viewModel,
+                            navModel: navModel,
+                            item: item,
+                            showItemInfo: $showItemInfo,
+                            reader: geometryProxy,
+                            deleteAction: { deleteItem(item) }
+                        )
                     }
                     .onDelete(perform: deleteItem(at:))
                     .onMove(perform: move)
-                    .onAppear {
+                    .task {
                         withAnimation {
                             scrollProxy.scrollTo(bottomID)
                         }
@@ -77,7 +84,7 @@ struct ChecklistView: View {
                     Section {
                         AddItemView(name: $name,
                                     price: $price,
-                                    addAction: { addItem(to: cart) })
+                                    cart: cart)
                         .id(bottomID)
                     }
                     .listRowBackground(Rectangle().fill(.ultraThickMaterial))
@@ -103,7 +110,7 @@ struct ChecklistView: View {
                     }
                 }
                 .sheet(isPresented: $showItemInfo) {
-                    if let selection = selection {
+                    if let selection = navModel.selectedItem {
                         EditItemView(item: selection)
                     }
                 }
@@ -111,126 +118,12 @@ struct ChecklistView: View {
         }
     }
     
-    // MARK: - View Builder Methods
-    
-    @ViewBuilder
-    private func itemRowBuilder(
-        item: CDItem,
-        reader: GeometryProxy
-    ) -> some View {
-        itemNavLabel(for: item, reader: reader)
-            .opacity(editMode?.wrappedValue.isEditing ?? true ? 0.5 : 1)
-            .swipeActions(edge: .trailing) {
-                DeleteSwipeButton { deleteItem(item) }
-            }
-            .swipeActions(edge: .trailing) {
-                EditSwipeButton {
-                    selection = item
-                    showItemInfo = true
-                }
-            }
-    }
-    
-    @ViewBuilder
-    private func itemNavLabel(
-        for item: CDItem,
-        reader: GeometryProxy
-    ) -> some View {
-        VStack(alignment: .leading) {
-            HStack {
-                checkLabel(for: item)
-                    .padding(.trailing, Design.Padding.trailing)
-                    .onTapGesture {
-                        toggleStatus(for: item)
-                    }
-                
-                VStack(alignment: .leading) {
-                    ItemRowView(imageURL: item.imageURL,
-                                name: item.displayName,
-                                price: item.price,
-                                itemColor: item.itemColor,
-                                reader: reader)
-                    .frame(height: reader.size.height/6)
-                    
-                    quantityStepper(for: item)
-                        .frame(width: reader.size.width/2)
-                        .padding(.horizontal, Design.Padding.horizontal)
-                }
-                .frame(width: reader.size.width * 0.6,
-                       alignment: .leading)
-                
-                Spacer()
-                
-                infoButton(for: item)
-            }
-        }
-    }
-    
-    @ViewBuilder
-    private func checkLabel(for item: CDItem) -> some View {
-        if editMode?.wrappedValue.isEditing == false {
-            Label("Checkcircle",
-                  systemImage: item.isComplete ? "checkmark.circle.fill" : "circle")
-            .imageScale(.large)
-            .labelStyle(.iconOnly)
-            .foregroundStyle(Color.accentColor)
-        }
-    }
-    
-    @ViewBuilder
-    private func quantityStepper(for item: CDItem) -> some View {
-        Stepper {
-            Text("Quantity: \(item.quantity)")
-                .foregroundStyle(.secondary)
-        } onIncrement: {
-            viewModel.objectWillChange.send()
-            item.quantity += 1
-            saveContext()
-        } onDecrement: {
-            viewModel.objectWillChange.send()
-            item.quantity -= 1
-            if item.quantity < 1 {
-                item.quantity = 1
-            }
-            saveContext()
-        }
-    }
-    
-    @ViewBuilder
-    private func infoButton(for item: CDItem) -> some View {
-        if editMode?.wrappedValue.isEditing == false {
-            Button {
-                selection = item
-                showItemInfo = true
-            } label: {
-                Label("Info", systemImage: "info.circle")
-                    .imageScale(.large)
-                    .tint(.info)
-                    .labelStyle(.iconOnly)
-            }
-        }
-    }
-    
-    // MARK: - Core Data Methods
-    
     private func saveContext() {
         do {
             try viewContext.save()
         } catch {
             let nsError = error as NSError
             fatalError("Unresolved error \(nsError)")
-        }
-    }
-    
-    private func addItem(to cart: CDCart) {
-        withAnimation {
-            let newItem = CDItem(context: viewContext)
-            newItem.id = Int32(totalItems + 1)
-            newItem.name = name
-            newItem.timestamp = Date()
-            newItem.price = price ?? 0.00
-            newItem.cart = cart
-            saveContext()
         }
     }
     
@@ -243,29 +136,29 @@ struct ChecklistView: View {
     
     private func deleteItem(_ item: CDItem) {
         viewModel.objectWillChange.send()
-        if item.objectID == selection?.objectID {
-            selection = nil
+        if item.objectID == navModel.selectedItem?.objectID {
+            navModel.selectedItem = nil
         }
         viewContext.delete(item)
         saveContext()
     }
     
-    private func move(from source: IndexSet, to destination: Int) {
+    private func move(
+        from source: IndexSet,
+        to destination: Int
+    ) {
         withAnimation {
             viewModel.objectWillChange.send()
             var itemArray = Array(itemList)
-            itemArray.move(fromOffsets: source, toOffset: destination)
+            
+            itemArray.move(fromOffsets: source,
+                           toOffset: destination)
+            
             for i in 0..<itemArray.count {
                 itemArray[i].id = Int32(i)
             }
             saveContext()
         }
-    }
-    
-    private func toggleStatus(for item: CDItem) {
-        viewModel.objectWillChange.send()
-        item.isComplete.toggle()
-        saveContext()
     }
 }
 
@@ -277,7 +170,9 @@ struct ChecklistView: View {
     let cart = try! viewContext.fetch(request).first { $0.id == 0 }
     
     NavigationStack {
-        ChecklistView(cart: cart!, viewModel: .preview)
+        ChecklistView(cart: cart!,
+                      viewModel: .preview,
+                      navModel: NavigationModel())
     }
     .environment(\.managedObjectContext, viewContext)
 }

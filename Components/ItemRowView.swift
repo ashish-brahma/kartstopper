@@ -7,81 +7,90 @@
 //  A SwiftUI view that shows metadata of an item in a cart.
 
 import SwiftUI
+import CoreData
+internal import Combine
 
 struct ItemRowView: View {
-    let imageURL: URL?
-    let name: String
-    let price: Double
-    var itemColor: Color
+    @ObservedObject var viewModel: ViewModel
+    @ObservedObject var navModel: NavigationModel
+    
+    @Environment(\.managedObjectContext) private var viewContext
+    @Environment(\.editMode) private var editMode
+    
+    let item: CDItem
+    @Binding var showItemInfo: Bool
     let reader: GeometryProxy
+    let deleteAction: () -> Void
     
     var body: some View {
-        HStack(alignment: .top) {
-            if imageURL != nil {
-                displayImage()
-            } else {
-                placeholderImage()
-            }
-            
-            itemDetails()
-        }
-    }
-    
-    private func itemDetails() -> some View {
         VStack(alignment: .leading) {
-            Text(name)
-                .foregroundStyle(Color.foreground)
-                .multilineTextAlignment(.leading)
-                .font(.system(size: Design.itemNameFontSize, weight: .medium))
-            
-            displayPrice()
+            rowLabel(isEditing: editMode?.wrappedValue.isEditing ?? true)
         }
-        .foregroundStyle(.secondary)
-    }
-    
-    private func displayImage() -> some View {
-        AsyncImage(url: imageURL) { image in
-            image
-                .resizable()
-                .scaledToFit()
-        } placeholder: {
-            ProgressView()
+        .opacity(editMode?.wrappedValue.isEditing ?? true ? 0.5 : 1)
+        .swipeActions(edge: .trailing) {
+            DeleteSwipeButton(action: deleteAction)
         }
-        .frame(
-            maxWidth: reader.size.width/6,
-            maxHeight: reader.size.width/6,
-        )
-        .padding(.trailing)
-    }
-    
-    private func placeholderImage() -> some View {
-        RoundedRectangle(cornerRadius: Design.avatarCornerRadius)
-            .fill(itemColor)
-            .overlay {
-                Text(String(name.first!))
-                    .font(.system(size: Design.avatarTextFontSize))
+        .swipeActions(edge: .trailing) {
+            EditSwipeButton {
+                navModel.selectedItem = item
+                showItemInfo = true
             }
-            .frame(
-                maxWidth: reader.size.width/6,
-                maxHeight: reader.size.width/6
-            )
-            .padding(.trailing)
+        }
     }
     
-    private func displayPrice() -> some View {
-        Text(price.formatted(.currency(code: Locale.current.currency?.identifier ?? "USD")))
-            .font(.title2)
+    @ViewBuilder
+    private func rowLabel(isEditing: Bool) -> some View {
+        HStack {
+            if !isEditing {
+                Checkcircle(viewModel: viewModel,
+                            item: item)
+            }
+            
+            columnLabel()
+            Spacer()
+            
+            if !isEditing {
+                InformationButton(navModel: navModel,
+                                  item: item,
+                                  showItemInfo: $showItemInfo)
+            }
+        }
+    }
+    
+    private func columnLabel() -> some View {
+        VStack(alignment: .leading) {
+            ItemOverviewLabel(
+                imageURL: item.imageURL,
+                name: item.displayName,
+                price: item.price,
+                itemColor: item.itemColor,
+                reader: reader
+            )
+            .frame(height: reader.size.height/6)
+            
+            QuantityStepper(viewModel: viewModel,
+                            item: item)
+            .frame(width: reader.size.width/2)
+            .padding(.horizontal, Design.Padding.horizontal)
+        }
+        .frame(width: reader.size.width * 0.6,
+               alignment: .leading)
     }
 }
 
 #Preview() {
-    let item = CDItem.preview
     GeometryReader { reader in
-        ItemRowView(imageURL: item.imageURL,
-                    name: item.displayName,
-                    price: item.price,
-                    itemColor: item.itemColor,
-                    reader: reader)
-        .position(x: reader.size.width/2, y: reader.size.height/2)
+        ItemRowView(viewModel: .preview,
+                    navModel: NavigationModel(),
+                    item: .preview,
+                    showItemInfo: .constant(false),
+                    reader: reader,
+                    deleteAction: { })
+        
+        .position(x: reader.size.width/2,
+                  y: reader.size.height/2)
+        
+        .environment(\.managedObjectContext,
+                      PersistenceController.preview.container.viewContext)
     }
 }

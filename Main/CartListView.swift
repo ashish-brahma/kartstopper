@@ -77,7 +77,8 @@ struct CartListView: View {
             .navigationTitleColor(Color.foreground)
             .navigationDestination(for: CDCart.self) { cart in
                 ChecklistView(cart: cart,
-                              viewModel: viewModel)
+                              viewModel: viewModel,
+                              navModel: navModel)
             }
             .textInputAutocapitalization(.never)
             .scrollContentBackground(.hidden)

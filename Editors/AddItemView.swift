@@ -7,12 +7,14 @@
 //  A SwiftUI view that adds a new item.
 
 import SwiftUI
+import CoreData
 
 struct AddItemView: View {
     @Binding var name: String
     @Binding var price: Double?
-    let addAction: () -> Void
+    let cart: CDCart
     
+    @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.locale) private var locale
     
     private enum Field: Hashable {
@@ -20,6 +22,10 @@ struct AddItemView: View {
         case price
     }
     @FocusState private var focusedField: Field?
+    
+    private var totalItems: Int {
+        CDCart.getTotalItems(for: cart, context: viewContext)
+    }
     
     var body: some View {
         HStack {
@@ -47,18 +53,43 @@ struct AddItemView: View {
                 .submitLabel(.done)
                 .onSubmit {
                     if !name.isEmpty && price != nil {
-                        addAction()
+                        addItem(to: cart)
                         name = ""
                         price = nil
+                        focusedField = .name
+                    } else {
+                        focusedField = nil
                     }
-                    focusedField = nil
                 }
             }
         }
         .onAppear {
             name = ""
             price = nil
-            focusedField = .name
+            if totalItems == 0 {
+                focusedField = .name
+            }
+        }
+    }
+    
+    private func saveContext() {
+        do {
+            try viewContext.save()
+        } catch {
+            let nsError = error as NSError
+            fatalError("Unresolved error \(nsError)")
+        }
+    }
+    
+    private func addItem(to cart: CDCart) {
+        withAnimation {
+            let newItem = CDItem(context: viewContext)
+            newItem.id = Int32(totalItems + 1)
+            newItem.name = name
+            newItem.timestamp = Date()
+            newItem.price = price ?? 0.00
+            newItem.cart = cart
+            saveContext()
         }
     }
 }
@@ -66,6 +97,8 @@ struct AddItemView: View {
 #Preview {
     AddItemView(name: .constant(CDItem.preview.displayName),
                 price: .constant(CDItem.preview.price),
-                addAction: { })
+                cart: .preview)
     .environment(\.locale, Locale(identifier: "en-IN"))
+    .environment(\.managedObjectContext,
+                  PersistenceController.preview.container.viewContext)
 }

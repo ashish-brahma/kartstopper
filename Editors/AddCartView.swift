@@ -7,7 +7,6 @@
 //  A SwiftUI view that adds a new cart.
 
 import SwiftUI
-import CoreData
 
 struct AddCartView: View {
     @Binding var name: String
