@@ -15,7 +15,7 @@ struct SetupView: View {
     var body: some View {
         if !dismiss {
             HStack(alignment: .top) {
-                Image(systemName: "chart.line.uptrend.xyaxis.circle.fill")
+                Image(systemName: "plus.circle")
                     .imageScale(.large)
                     .font(.system(size: Design.setupImageFontSize,
                                   weight: .medium))

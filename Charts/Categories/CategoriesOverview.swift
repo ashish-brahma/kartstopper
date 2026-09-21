@@ -89,7 +89,7 @@ struct CategoriesOverview : View {
                     .foregroundStyle(.secondary)
                 
                 if data.isEmpty {
-                    Image(systemName: "checkmark.circle.trianglebadge.exclamationmark")
+                    Image(systemName: "exclamationmark.circle.fill")
                         .foregroundStyle(.sanskrit)
                 }
             }
