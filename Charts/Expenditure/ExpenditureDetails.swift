@@ -202,7 +202,9 @@ struct ExpenditureDetails: View {
         List {
             if !data.isEmpty {
                 Section {
-                    chartContent()
+                    if !interactiveData.isEmpty {
+                        chartContent()
+                    }
                 } header: {
                     TimeRangePicker(value: $selectedTimeRange)
                 }
@@ -239,6 +241,11 @@ struct ExpenditureDetails: View {
         }
         .onChange(of: selectedTimeRange) { _ in
             updateScrollPosition()
+        }
+        .onChange(of: scrollPositionStart) { _ in
+            if interactiveData.isEmpty {
+                updateScrollPosition()
+            }
         }
     }
     
@@ -285,13 +292,13 @@ struct ExpenditureDetails: View {
                     scrollPosition: $scrollPositionStart,
                     averageExpenditure: averageExpenditure
                 )
-                    .frame(height: 240)
+                .frame(height: 240)
             case .last365days:
                 MonthlyExpenditureChart(
                     data: data,
                     averageExpenditure: averageExpenditure
                 )
-                    .frame(height: 240)
+                .frame(height: 240)
             }
         }
     }
@@ -331,7 +338,7 @@ struct ExpenditureDetails: View {
 }
 
 #Preview {
-    ExpenditureDetails(selectedTimeRange: .constant(.last7days))
+    ExpenditureDetails(selectedTimeRange: .constant(.last30days))
         .environment(\.managedObjectContext,
                       PersistenceController.preview.container.viewContext)
 }
