@@ -34,6 +34,12 @@ extension CDItem {
         return .random(using: &generator)
     }
     
+    static func getTotalItems(context: NSManagedObjectContext) -> Int {
+        guard let count = try? context.count(for: CDItem.fetchRequest()), count != 0
+                else { return 0 }
+        return count
+    }
+    
     static func getExpenditure(
         in range: ClosedRange<Date>,
         context: NSManagedObjectContext

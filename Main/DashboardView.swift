@@ -13,9 +13,9 @@ struct DashboardView: View {
     @ObservedObject var viewModel: ViewModel
     @ObservedObject var navModel: NavigationModel
     
-    @Binding var showPreferences: Bool
-    
     @Environment(\.managedObjectContext) private var viewContext
+    
+    @Binding var showPreferences: Bool
     
     var body: some View {
         GeometryReader { reader in

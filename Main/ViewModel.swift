@@ -14,8 +14,14 @@ class ViewModel: ObservableObject {
     /// Query term used to conduct cart search.
     @Published var cartQuery = ""
     
+    /// Query term used to conduct item search.
+    @Published var itemQuery = ""
+    
     /// Total number of carts.
     @Published var totalCarts: Int = 0
+    
+    /// Total number of items.
+    @Published var totalItems: Int = 0
     
     /// Instance of budget
     @Published var budget: Budget
@@ -28,9 +34,6 @@ class ViewModel: ObservableObject {
     
     /// Color code used for gauge on status card in home view.
     @Published var gaugeColor: Color = .gray700
-    
-    /// Query term used to conduct item search.
-    @Published var itemQuery = ""
     
     /// Flag to check if user has onboarded.
     @Published var hasOnboarded: Bool = false
@@ -55,6 +58,7 @@ class ViewModel: ObservableObject {
         }
         
         totalCarts = CDCart.getTotalCarts(context: context)
+        totalItems = CDItem.getTotalItems(context: context)
         
         dynamicTitle = setTitle()
         fontColor = setFontColor()

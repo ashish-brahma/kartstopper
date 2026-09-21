@@ -78,8 +78,11 @@ struct TopFrequentCarts: View {
                         .frame(height: 60)
                 }
             } else {
-                Label("No expenses", systemImage: "checkmark.circle.trianglebadge.exclamationmark")
-                    .foregroundStyle(.secondary)
+                ContentView.unavailableView(
+                    label: "No Items",
+                    symbolName: "checklist",
+                    description: "Cart with the most number of items is analyzed here."
+                )
             }
         }
     }

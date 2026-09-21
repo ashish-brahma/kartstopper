@@ -49,9 +49,17 @@ struct ExpenditureOverview: View {
     
     var body: some View {
         VStack(alignment: .leading) {
+            HStack {
                 Text("Total Expenditure")
                     .font(.callout)
                     .foregroundStyle(.secondary)
+                
+                if data.isEmpty {
+                    Image(systemName: "checkmark.circle.trianglebadge.exclamationmark")
+                        .foregroundStyle(.sanskrit)
+                }
+            }
+            
             if !data.isEmpty {
                 Text(totalExpenditure, format: .currency(code: locale.currency?.identifier ?? "USD"))
                     .font(.title2.bold())
@@ -67,9 +75,6 @@ struct ExpenditureOverview: View {
                         .frame(height: 60)
                 }
                 .padding(.top, -1.5 * Design.Padding.top)
-            } else {
-                Label("No expenses", systemImage: "checkmark.circle.trianglebadge.exclamationmark")
-                    .foregroundStyle(.secondary)
             }
         }
     }

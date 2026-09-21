@@ -26,8 +26,10 @@ extension CartCountData {
             let count = CDCart.getTotalItems(for: cart,
                                              context: context)
             
-            data.append(.init(name: cart.displayName,
-                              itemCount: count))
+            if count > 0 {
+                data.append(.init(name: cart.displayName,
+                                  itemCount: count))
+            }
         }
         
         data = data.sorted { $0.itemCount > $1.itemCount }

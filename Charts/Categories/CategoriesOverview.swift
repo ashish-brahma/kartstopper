@@ -83,12 +83,19 @@ struct CategoriesOverview : View {
     
     var body: some View {
         VStack(alignment: .leading) {
+            HStack {
                 Text("Most Expensive Cart")
                     .font(.callout)
                     .foregroundStyle(.secondary)
                 
+                if data.isEmpty {
+                    Image(systemName: "checkmark.circle.trianglebadge.exclamationmark")
+                        .foregroundStyle(.sanskrit)
+                }
+            }
+                
             if !data.isEmpty {
-                Text(data.isEmpty ? "-" : "\(topCartName)")
+                Text("\(topCartName)")
                     .font(.title2.bold())
                     .foregroundStyle(Color.foreground)
                 
@@ -102,9 +109,6 @@ struct CategoriesOverview : View {
                     CategoriesOverviewChart(data: data)
                         .frame(height: 80)
                 }
-            } else {
-                Label("No expenses", systemImage: "checkmark.circle.trianglebadge.exclamationmark")
-                    .foregroundStyle(.secondary)
             }
         }
     }
