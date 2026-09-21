@@ -47,7 +47,8 @@ struct DailyExpenditureChart: View {
                     .valueAligned(
                         matching: .init(hour: 0),
                         majorAlignment: .matching(.init(day: 1))
-                    ))
+                    )
+                )
                 .chartScrollPosition(x: $scrollPosition)
         } else {
             chartView()
@@ -78,13 +79,6 @@ struct DailyExpenditureChart: View {
                     AxisGridLine()
                     AxisValueLabel(format: axisValueLabelFormat)
                 }
-            }
-        }
-        .overlay {
-            if data.isEmpty {
-                Text("No data")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
             }
         }
     }
@@ -119,13 +113,6 @@ struct MonthlyExpenditureChart: View {
                 AxisTick()
                 AxisGridLine()
                 AxisValueLabel(format: .dateTime.month(.narrow))
-            }
-        }
-        .overlay {
-            if data.isEmpty {
-                Text("No data")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
             }
         }
     }
@@ -213,24 +200,34 @@ struct ExpenditureDetails: View {
     
     var body: some View {
         List {
-            Section {
-                chartContent()
-            } header: {
-                TimeRangePicker(value: $selectedTimeRange)
+            if !data.isEmpty {
+                Section {
+                    chartContent()
+                } header: {
+                    TimeRangePicker(value: $selectedTimeRange)
+                }
+                
+                Section {
+                    SortButton(value: $sortParameter)
+                } header: {
+                    Text("Expenses")
+                        .font(.title2.bold())
+                        .foregroundStyle(Color.foreground)
+                }
+                
+                expenses(data: showAllData ? interactiveData : top5Data)
+                
+                if interactiveData.count > 5 {
+                    ExpandButton(showAllData: $showAllData)
+                }
             }
-            
-            Section {
-                SortButton(value: $sortParameter)
-            } header: {
-                Text("Expenses")
-                    .font(.title2.bold())
-                    .foregroundStyle(Color.foreground)
-            }
-            
-            expenses(data: showAllData ? interactiveData : top5Data)
-            
-            if interactiveData.count > 5 {
-                ExpandButton(showAllData: $showAllData)
+        }
+        .overlay {
+            if data.isEmpty {
+                CategoryDetails.unavailableView(
+                    label: "No Expenses",
+                    symbolName: "checkmark.circle.trianglebadge.exclamationmark",
+                    description: "Items marked as complete are analyzed here.")
             }
         }
         .navigationTitle("Expenditure")

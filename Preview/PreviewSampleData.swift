@@ -46,7 +46,7 @@ extension PersistenceController {
         
         let item2 = CDItem(context: context)
         item2.id = Int32(1)
-        item2.isComplete = true
+        item2.isComplete = false
         item2.timestamp = Date.previewDate(year: 2024, month: 2, day: 29)
         item2.price = 200.00
         item2.quantity = 5
@@ -66,7 +66,7 @@ extension PersistenceController {
         
         let item4 = CDItem(context: context)
         item4.id = Int32(3)
-        item4.isComplete = true
+        item4.isComplete = false
         item4.timestamp = Date.previewDate(year: 2024, month: 3, day: 6)
         item4.price = 1000.00
         item4.quantity = 1

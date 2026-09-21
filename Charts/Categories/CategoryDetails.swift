@@ -68,13 +68,6 @@ struct CategoryDetailsChart: View {
                     chartView()
                 }
             }
-            .overlay {
-                if data.isEmpty {
-                    Text("No data")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                }
-            }
         }
     }
     
@@ -216,29 +209,40 @@ struct CategoryDetails : View {
     var body: some View {
         GeometryReader { reader in
             List {
-                Section {
-                    CategoryDetailsChart(data: data)
-                        .frame(height: reader.size.height/2)
-                } header: {
-                    TimeRangePicker(value: $selectedTimeRange)
-                } footer: {
-                    Text("\(timeRangeStart) - \(timeRangeEnd)")
-                        .font(.callout)
-                        .foregroundStyle(.secondary)
-                }
-                
-                Section {
-                    SortButton(value: $sortParameter)
-                } header: {
-                    Text("Cart Value")
-                        .font(.title2.bold())
-                        .foregroundStyle(Color.foreground)
-                }
-                
-                expenses(data: showAllData ? data : top5data)
+                if !data.isEmpty {
+                    Section {
+                        CategoryDetailsChart(data: data)
+                            .frame(height: reader.size.height/2)
+                    } header: {
+                        TimeRangePicker(value: $selectedTimeRange)
+                    } footer: {
+                        Text("\(timeRangeStart) - \(timeRangeEnd)")
+                            .font(.callout)
+                            .foregroundStyle(.secondary)
+                    }
                     
-                if data.count > 5 {
-                    ExpandButton(showAllData: $showAllData)
+                    Section {
+                        SortButton(value: $sortParameter)
+                    } header: {
+                        Text("Cart Value")
+                            .font(.title2.bold())
+                            .foregroundStyle(Color.foreground)
+                    }
+                    
+                    expenses(data: showAllData ? data : top5data)
+                    
+                    if data.count > 5 {
+                        ExpandButton(showAllData: $showAllData)
+                    }
+                }
+            }
+            .overlay {
+                if data.isEmpty {
+                    ContentView.unavailableView(
+                        label: "No Expenses",
+                        symbolName: "checkmark.circle.trianglebadge.exclamationmark",
+                        description: "Carts containing completed items are analyzed here."
+                    )
                 }
             }
             .navigationTitle("Category")

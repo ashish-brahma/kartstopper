@@ -21,13 +21,6 @@ struct ExpenditureOverviewChart: View {
         .chartXAxis(.hidden)
         .chartYAxis(.hidden)
         .foregroundStyle(.sanskrit)
-        .overlay {
-            if data.isEmpty {
-                Text("No data")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            }
-        }
     }
 }
 
@@ -56,24 +49,28 @@ struct ExpenditureOverview: View {
     
     var body: some View {
         VStack(alignment: .leading) {
-            Text("Total Expenditure")
-                .font(.callout)
-                .foregroundStyle(.secondary)
-            
-            Text(totalExpenditure, format: .currency(code: locale.currency?.identifier ?? "USD"))
-                .font(.title2.bold())
-                .foregroundStyle(Color.foreground)
-            
-            Text("Latest \(timeRange.rawValue, format: .number) Day Streak")
-                .font(.headline)
-                .foregroundStyle(.accent)
-            
-            HStack {
-                Spacer(minLength: reader.size.width / 2.8)
-                ExpenditureOverviewChart(data: data)
-                    .frame(height: 60)
+                Text("Total Expenditure")
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+            if !data.isEmpty {
+                Text(totalExpenditure, format: .currency(code: locale.currency?.identifier ?? "USD"))
+                    .font(.title2.bold())
+                    .foregroundStyle(Color.foreground)
+                
+                Text("Latest \(timeRange.rawValue, format: .number) Day Streak")
+                    .font(.headline)
+                    .foregroundStyle(.accent)
+                
+                HStack {
+                    Spacer(minLength: reader.size.width / 2.8)
+                    ExpenditureOverviewChart(data: data)
+                        .frame(height: 60)
+                }
+                .padding(.top, -1.5 * Design.Padding.top)
+            } else {
+                Label("No expenses", systemImage: "checkmark.circle.trianglebadge.exclamationmark")
+                    .foregroundStyle(.secondary)
             }
-            .padding(.top, -1.5 * Design.Padding.top)
         }
     }
 }

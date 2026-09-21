@@ -83,28 +83,27 @@ struct CategoriesOverview : View {
     
     var body: some View {
         VStack(alignment: .leading) {
-            Text("Most Expensive Cart")
-                .font(.callout)
-                .foregroundStyle(.secondary)
-            
-            Text(data.isEmpty ? "-" : "\(topCartName)")
-                .font(.title2.bold())
-                .foregroundStyle(Color.foreground)
-            
-            Text("Latest \(timeRange.rawValue, format: .number) Day Streak")
-                .font(.headline)
-                .foregroundStyle(.accent)
-            
-            HStack {
-                Spacer(minLength: reader.size.width / 2.8)
-                CategoriesOverviewChart(data: data)
-                    .frame(height: 80)
-            }
-        }
-        .overlay {
-            if data.isEmpty {
-                Text("No data")
-                    .font(.subheadline)
+                Text("Most Expensive Cart")
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+                
+            if !data.isEmpty {
+                Text(data.isEmpty ? "-" : "\(topCartName)")
+                    .font(.title2.bold())
+                    .foregroundStyle(Color.foreground)
+                
+                
+                Text("Latest \(timeRange.rawValue, format: .number) Day Streak")
+                    .font(.headline)
+                    .foregroundStyle(.accent)
+                
+                HStack {
+                    Spacer(minLength: reader.size.width / 2.8)
+                    CategoriesOverviewChart(data: data)
+                        .frame(height: 80)
+                }
+            } else {
+                Label("No expenses", systemImage: "checkmark.circle.trianglebadge.exclamationmark")
                     .foregroundStyle(.secondary)
             }
         }

@@ -51,10 +51,16 @@ extension CDCart {
     
     static func getTotalItems(
         for cart: CDCart,
+        isComplete: Bool = false,
         context: NSManagedObjectContext
     ) -> Int {
         let request = CDItem.fetchRequest()
-        request.predicate = NSPredicate(format: "cart.name = %@", cart.name ?? "")
+        let countPredicate = NSPredicate(format: "cart.name = %@", cart.name ?? "")
+        let expensePredicate = NSPredicate(format: "isComplete == true")
+        let compoundPredicate = NSCompoundPredicate(
+            andPredicateWithSubpredicates: [countPredicate, expensePredicate]
+        )
+        request.predicate = isComplete ? compoundPredicate : countPredicate
         guard let count = try? context.count(for: request), count != 0
         else { return 0 }
         return count

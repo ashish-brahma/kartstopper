@@ -66,15 +66,20 @@ struct TopFrequentCarts: View {
                 .font(.callout)
                 .foregroundStyle(.secondary)
             
-            Text(data.isEmpty ? "-" : "\(topCartName)")
-                .font(.title2.bold())
-                .foregroundStyle(Color.foreground)
-            
-            HStack {
-                Spacer(minLength: reader.size.width / 3)
-                CartsFrequencyChart(data: data)
-                    .padding(.top, -1.5 * Design.Padding.top)
-                    .frame(height: 60)
+            if !data.isEmpty {
+                Text("\(topCartName)")
+                    .font(.title2.bold())
+                    .foregroundStyle(Color.foreground)
+                
+                HStack {
+                    Spacer(minLength: reader.size.width / 3)
+                    CartsFrequencyChart(data: data)
+                        .padding(.top, -1.5 * Design.Padding.top)
+                        .frame(height: 60)
+                }
+            } else {
+                Label("No expenses", systemImage: "checkmark.circle.trianglebadge.exclamationmark")
+                    .foregroundStyle(.secondary)
             }
         }
     }

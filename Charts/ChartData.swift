@@ -57,9 +57,9 @@ extension ExpenditureData {
                                           context: context)
         
         var data = items.map {
-            ExpenditureData(name: $0.name ?? "",
-                            cartName: $0.cart?.name ?? "",
-                            date: $0.timestamp ?? .now,
+            ExpenditureData(name: $0.displayName,
+                            cartName: $0.cart?.displayName ?? "",
+                            date: $0.displayDate,
                             expense: $0.price * Double($0.quantity))
         }
         
@@ -98,12 +98,15 @@ extension CartExpenseData {
                                                   context: context)
             
             let count = CDCart.getTotalItems(for: cart,
+                                             isComplete: true,
                                              context: context)
             
-            data.append(.init(name: cart.name ?? "",
-                              date: cart.timestamp ?? .now,
-                              expense: expense,
-                              itemCount: count))
+            if count > 0 {
+                data.append(.init(name: cart.displayName,
+                                  date: cart.displayDate,
+                                  expense: expense,
+                                  itemCount: count))
+            }
         }
         
         return data
