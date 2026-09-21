@@ -45,7 +45,7 @@ struct EditItemView: View {
                                                         time: .shortened))
                         .foregroundStyle(.secondary)
                     }
-                    .listRowBackground(Color.gray.opacity(0.2))
+                    .listRowBackground(Color(.tertiarySystemFill))
                     
                     Section(header: Text("Item Name")) {
                         TextField("Enter a name for the item", text: $name)

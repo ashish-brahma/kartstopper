@@ -19,18 +19,18 @@ struct BudgetAmountField: View {
     
     var body: some View {
         HStack {
-            if viewModel.budget.isLocked {
-                Label("Budget Lock", systemImage: "lock.fill")
-                    .labelStyle(.iconOnly)
-            }
-            
             TextField("Budget",
                       value: $budgetAmount,
                       format: .currency(code: locale.currency?.identifier ?? "USD"))
             .keyboardType(.numbersAndPunctuation)
             .submitLabel(.done)
+            .disabled(viewModel.budget.isLocked)
+            
+            if viewModel.budget.isLocked {
+                Label("Budget Lock", systemImage: "lock.fill")
+                    .labelStyle(.iconOnly)
+            }
         }
-        .disabled(viewModel.budget.isLocked)
         .foregroundStyle(viewModel.budget.isLocked ? .secondary : .primary)
     }
 }

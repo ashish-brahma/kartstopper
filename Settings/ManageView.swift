@@ -35,6 +35,7 @@ struct ManageView: View {
                 } footer: {
                     Text(Constants.Manage.monthlyBudgetFooter)
                 }
+                .listRowBackground(viewModel.budget.isLocked ? Color(.tertiarySystemFill) : Color(.secondarySystemGroupedBackground))
                 
                 Section {
                     BudgetModePicker(difficulty: $difficulty)
