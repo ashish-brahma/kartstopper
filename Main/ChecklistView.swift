@@ -87,7 +87,7 @@ struct ChecklistView: View {
                                     cart: cart)
                         .id(bottomID)
                     }
-                    .listRowBackground(Rectangle().fill(.ultraThickMaterial))
+                    .listRowBackground(Rectangle().fill(Color(.secondarySystemGroupedBackground)))
                 }
                 .overlay {
                     if totalItems != 0 && itemList.isEmpty {
