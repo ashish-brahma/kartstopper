@@ -162,9 +162,3 @@ enum Credits: Int, Hashable, CaseIterable, Identifiable, Codable {
     
     var id: Int { rawValue }
 }
-
-/// Type that manages focus state in preferences.
-enum ManageField: Hashable {
-    case budgetAmount
-    case budgetMode
-}

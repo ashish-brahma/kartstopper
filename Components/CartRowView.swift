@@ -19,30 +19,30 @@ struct CartRowView: View {
     }
     
     var body: some View {
-        VStack(alignment: .leading) {
-            Text(cart.displayDate.formatted(date: .omitted,
-                                            time: .shortened))
+        NavigationLink(value: cart) {
+            VStack(alignment: .leading) {
+                Text(cart.displayDate.formatted(date: .omitted,
+                                                time: .shortened))
                 .font(.subheadline)
-            
-            HStack {
-                Text(cart.displayName)
-                    .font(.largeTitle)
-                    .foregroundStyle(Color.foreground)
-                Spacer()
-                Text("\(totalItems)")
-                    .font(.system(size: Design.itemCountFontSize, weight: .semibold))
-                    .padding(.trailing, Design.Padding.trailing)
                 
-                Image(systemName: "chevron.right")
+                HStack {
+                    Text(cart.displayName)
+                        .font(.largeTitle)
+                        .foregroundStyle(Color.foreground)
+                    Spacer()
+                    Text("\(totalItems)")
+                        .font(.system(size: Design.itemCountFontSize, weight: .semibold))
+                        .padding(.trailing, Design.Padding.trailing)
+                }
+                
+                Text(cart.displayNotes)
+                    .font(.footnote)
+                    .minimumScaleFactor(Design.notesMinScaleFactor)
+                    .frame(alignment: .leading)
+                
             }
-            
-            Text(cart.displayNotes)
-                .font(.footnote)
-                .minimumScaleFactor(Design.notesMinScaleFactor)
-                .frame(alignment: .leading)
-            
+            .foregroundStyle(.gray.opacity(0.8))
         }
-        .foregroundStyle(.gray.opacity(0.8))
     }
 }
 

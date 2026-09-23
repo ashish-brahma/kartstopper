@@ -17,7 +17,7 @@ struct ItemRowView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.editMode) private var editMode
     
-    let item: CDItem
+    @ObservedObject var item: CDItem
     @Binding var showItemInfo: Bool
     let reader: GeometryProxy
     let deleteAction: () -> Void

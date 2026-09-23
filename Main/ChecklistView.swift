@@ -148,7 +148,6 @@ struct ChecklistView: View {
         to destination: Int
     ) {
         withAnimation {
-            viewModel.objectWillChange.send()
             var itemArray = Array(itemList)
             
             itemArray.move(fromOffsets: source,

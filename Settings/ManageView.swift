@@ -120,6 +120,12 @@ struct ManageView: View {
     }
 }
 
+/// Type that manages focus state in preferences.
+enum ManageField: Hashable {
+    case budgetAmount
+    case budgetMode
+}
+
 #Preview {
     ManageView(viewModel: .preview,
                navModel: NavigationModel())
