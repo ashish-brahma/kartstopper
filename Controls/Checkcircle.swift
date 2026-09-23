@@ -9,9 +9,12 @@
 import SwiftUI
 import CoreData
 internal import Combine
+internal import OSLog
 
 struct Checkcircle: View {
     @ObservedObject var viewModel: ViewModel
+    
+    let logger = PersistenceController.shared.logger
     
     @Environment(\.managedObjectContext) private var viewContext
     
@@ -24,7 +27,7 @@ struct Checkcircle: View {
             .foregroundStyle(Color.accentColor)
             .padding(.trailing, Design.Padding.trailing)
             .onTapGesture {
-                toggleStatus(for: item)
+                toggleStatus()
             }
     }
     
@@ -32,12 +35,13 @@ struct Checkcircle: View {
         do {
             try viewContext.save()
         } catch {
-            let nsError = error as NSError
-            fatalError("Unresolved error \(nsError)")
+            if !item.isUpdated {
+                logger.error("Failed to toggle item's completion status. \(error.localizedDescription)")
+            }
         }
     }
     
-    private func toggleStatus(for item: CDItem) {
+    private func toggleStatus() {
         viewModel.objectWillChange.send()
         item.isComplete.toggle()
         saveContext()

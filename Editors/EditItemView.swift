@@ -8,9 +8,12 @@
 
 import SwiftUI
 import CoreData
+internal import OSLog
 
 struct EditItemView: View {
     var item: CDItem
+    
+    let logger = PersistenceController.shared.logger
     
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.dismiss) private var dismiss
@@ -150,8 +153,9 @@ struct EditItemView: View {
         do {
             try viewContext.save()
         } catch {
-            let nsError = error as NSError
-            fatalError("Unresolved error \(nsError)")
+            if !item.isUpdated {
+                logger.error("Failed to update item. \(error.localizedDescription)")
+            }
         }
     }
 }

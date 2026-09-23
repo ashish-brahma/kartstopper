@@ -9,8 +9,11 @@
 import SwiftUI
 import CoreData
 internal import Combine
+internal import OSLog
 
 struct CartListView: View {
+    let logger = PersistenceController.shared.logger
+    
     @ObservedObject var viewModel: ViewModel
     @ObservedObject var navModel: NavigationModel
     
@@ -98,12 +101,13 @@ struct CartListView: View {
         }
     }
     
-    private func saveContext() {
+    private func saveContext(cart: CDCart) {
         do {
             try viewContext.save()
         } catch {
-            let nsError = error as NSError
-            fatalError("Unresolved error \(nsError)")
+            if !cart.isDeleted {
+                logger.error("Failed to delete cart. \(error.localizedDescription)")
+            }
         }
     }
     
@@ -122,7 +126,7 @@ struct CartListView: View {
             navModel.selectedCart = nil
         }
         viewContext.delete(cart)
-        saveContext()
+        saveContext(cart: cart)
         viewModel.update(context: viewContext)
     }
 }

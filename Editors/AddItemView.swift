@@ -8,11 +8,15 @@
 
 import SwiftUI
 import CoreData
+internal import OSLog
 
 struct AddItemView: View {
+    @ObservedObject var viewModel: ViewModel
     @Binding var name: String
     @Binding var price: Double?
     let cart: CDCart
+    
+    let logger = PersistenceController.shared.logger
     
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.locale) private var locale
@@ -53,7 +57,7 @@ struct AddItemView: View {
                 .submitLabel(.done)
                 .onSubmit {
                     if !name.isEmpty && price != nil {
-                        addItem(to: cart)
+                        addItem()
                         name = ""
                         price = nil
                         focusedField = .name
@@ -72,16 +76,17 @@ struct AddItemView: View {
         }
     }
     
-    private func saveContext() {
+    private func saveContext(item: CDItem) {
         do {
             try viewContext.save()
         } catch {
-            let nsError = error as NSError
-            fatalError("Unresolved error \(nsError)")
+            if !item.isInserted {
+                logger.error("Failed to insert new item.\(error.localizedDescription)")
+            }
         }
     }
     
-    private func addItem(to cart: CDCart) {
+    private func addItem() {
         withAnimation {
             let newItem = CDItem(context: viewContext)
             newItem.id = Int32(totalItems + 1)
@@ -89,13 +94,15 @@ struct AddItemView: View {
             newItem.timestamp = Date()
             newItem.price = price ?? 0.00
             newItem.cart = cart
-            saveContext()
+            saveContext(item: newItem)
+            viewModel.update(context: viewContext)
         }
     }
 }
 
 #Preview {
-    AddItemView(name: .constant(CDItem.preview.displayName),
+    AddItemView(viewModel: .preview,
+                name: .constant(CDItem.preview.displayName),
                 price: .constant(CDItem.preview.price),
                 cart: .preview)
     .environment(\.locale, Locale(identifier: "en-IN"))

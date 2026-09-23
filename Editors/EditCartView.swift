@@ -8,9 +8,12 @@
 
 import SwiftUI
 import CoreData
+internal import OSLog
 
 struct EditCartView: View {
     var cart: CDCart
+    
+    let logger = PersistenceController.shared.logger
     
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.dismiss) private var dismiss
@@ -99,8 +102,9 @@ struct EditCartView: View {
         do {
             try viewContext.save()
         } catch {
-            let nsError = error as NSError
-            fatalError("Unresolved error \(nsError)")
+            if !cart.isUpdated {
+                logger.error("Failed to update cart. \(error.localizedDescription)")
+            }
         }
     }
 }

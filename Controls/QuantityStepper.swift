@@ -9,9 +9,12 @@
 import SwiftUI
 import CoreData
 internal import Combine
+internal import OSLog
 
 struct QuantityStepper: View {
     @ObservedObject var viewModel: ViewModel
+    
+    let logger = PersistenceController.shared.logger
     
     @Environment(\.managedObjectContext) private var viewContext
     
@@ -39,8 +42,9 @@ struct QuantityStepper: View {
         do {
             try viewContext.save()
         } catch {
-            let nsError = error as NSError
-            fatalError("Unresolved error \(nsError)")
+            if !item.isUpdated {
+                logger.error("Failed to update item's quantity. \(error.localizedDescription)")
+            }
         }
     }
 }

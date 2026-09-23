@@ -8,9 +8,12 @@
 
 import SwiftUI
 import CoreData
+internal import OSLog
 
 struct CartsToolbar: ToolbarContent {
     @ObservedObject var viewModel: ViewModel
+    
+    let logger = PersistenceController.shared.logger
     
     @Environment(\.managedObjectContext) private var viewContext
     
@@ -45,12 +48,13 @@ struct CartsToolbar: ToolbarContent {
         }
     }
     
-    private func saveContext() {
+    private func saveContext(cart: CDCart) {
         do {
             try viewContext.save()
         } catch {
-            let nsError = error as NSError
-            fatalError("Unresolved error \(nsError)")
+            if !cart.isInserted {
+                logger.error("Failed to insert new cart. \(error.localizedDescription)")
+            }
         }
     }
     
@@ -61,7 +65,7 @@ struct CartsToolbar: ToolbarContent {
             newCart.name = name
             newCart.timestamp = Date()
             newCart.notes = notes
-            saveContext()
+            saveContext(cart: newCart)
             viewModel.update(context: viewContext)
         }
     }

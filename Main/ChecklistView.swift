@@ -9,9 +9,12 @@
 import SwiftUI
 import CoreData
 internal import Combine
+internal import OSLog
 
 struct ChecklistView: View {
     var cart: CDCart
+    
+    let logger = PersistenceController.shared.logger
     
     @ObservedObject var viewModel: ViewModel
     @ObservedObject var navModel: NavigationModel
@@ -82,7 +85,8 @@ struct ChecklistView: View {
                     }
                     
                     Section {
-                        AddItemView(name: $name,
+                        AddItemView(viewModel: viewModel,
+                                    name: $name,
                                     price: $price,
                                     cart: cart)
                         .id(bottomID)
@@ -118,19 +122,9 @@ struct ChecklistView: View {
         }
     }
     
-    private func saveContext() {
-        do {
-            try viewContext.save()
-        } catch {
-            let nsError = error as NSError
-            fatalError("Unresolved error \(nsError)")
-        }
-    }
-    
     private func deleteItem(at offsets: IndexSet) {
         withAnimation {
             offsets.map { itemList[$0] }.forEach(deleteItem)
-            saveContext()
         }
     }
     
@@ -140,7 +134,14 @@ struct ChecklistView: View {
             navModel.selectedItem = nil
         }
         viewContext.delete(item)
-        saveContext()
+        
+        do {
+            try viewContext.save()
+        } catch {
+            if !item.isDeleted {
+                logger.error("Failed to delete item. \(error.localizedDescription)")
+            }
+        }
     }
     
     private func move(
@@ -156,7 +157,12 @@ struct ChecklistView: View {
             for i in 0..<itemArray.count {
                 itemArray[i].id = Int32(i)
             }
-            saveContext()
+            
+            do {
+                try viewContext.save()
+            } catch {
+                logger.error("Failed to move(rearrange) items. \(error.localizedDescription)")
+            }
         }
     }
 }
