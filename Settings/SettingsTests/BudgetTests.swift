@@ -21,7 +21,12 @@ struct BudgetTests {
     
     @Test("Status correctness", arguments: 0...2)
     mutating func monthlySpendUpdatesBudgetStatus(_ index: Int) throws {
-        budget.totalMonthlySpend = (budget.neutralCutOff + 1) * cases[index].budgetAmount
+        guard let amount = cases[index].budgetAmount else { return }
+        guard let mode = cases[index].budgetMode else { return }
+        
+        budget.budgetAmount = amount
+        budget.budgetMode = mode
+        budget.totalMonthlySpend = (budget.neutralCutOff + 1) * amount
         budget.updateBudgetStatus()
         
         #expect(budget.status == .negative, "When total monthly amount spent out of the allocated budget exceeds neutral cut-off ratio, a negative status is expected.")

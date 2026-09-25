@@ -15,23 +15,16 @@ struct Budget: BudgetProtocol {
     var totalMonthlySpend: Double = 0.00
     
     /// Amount allocated for monthly budget.
-    var budgetAmount: Double = 0.00
+    var budgetAmount: Double? = nil
     
     /// Difficulty mode used for budget monitoring.
-    var budgetMode: BudgetMode = .medium
+    var budgetMode: BudgetMode? = nil
     
     /// Flag to lock budget for editing.
     var isLocked: Bool = false
     
     /// Status indicator of budget.
     var status: Status = .unassigned
-    
-    /// An array containing buget mode selected and saved by user
-    var selectedModes: [BudgetMode] {
-        BudgetMode.allCases.filter {
-            $0.rawValue == UserDefaults.standard.string(forKey: "budgetMode")
-        }
-    }
     
     /// Cutoff ratio used to check positive status.
     var positiveCutOff: Double {
@@ -42,6 +35,8 @@ struct Budget: BudgetProtocol {
             0.5
         case .hard:
             0.35
+        case .none:
+            0.0
         }
     }
     
@@ -54,6 +49,8 @@ struct Budget: BudgetProtocol {
             0.8
         case .hard:
             0.65
+        case .none:
+            0.0
         }
     }
     
@@ -62,21 +59,21 @@ struct Budget: BudgetProtocol {
         isLocked = day == 1 ? false : true
     }
     
-    /// Read preferences saved by user.
-    mutating func updateBudgetSettings() {
-        budgetAmount = UserDefaults.standard.double(forKey: "budgetAmount")
-        budgetMode = selectedModes[0]
-    }
-    
     /// Determine status by fraction of amount spend from the allocated budget amount.
     mutating func updateBudgetStatus() {
-        switch(totalMonthlySpend/budgetAmount) {
+        guard let amount = budgetAmount else { return }
+        guard let _ = budgetMode else { return }
+        
+        switch(totalMonthlySpend/amount) {
         case 0.0..<positiveCutOff:
             status = .positive
+        
         case positiveCutOff..<neutralCutOff:
             status = .neutral
+        
         case neutralCutOff...:
             status = .negative
+        
         default:
             status = .unassigned
         }

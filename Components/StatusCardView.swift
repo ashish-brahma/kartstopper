@@ -41,7 +41,7 @@ struct StatusCardView: View {
         .foregroundStyle(viewModel.budget.status == .negative ? .cowpeas : .richBlack)
         .task {
             current = viewModel.budget.totalMonthlySpend
-            maxValue = viewModel.budget.budgetAmount
+            maxValue = viewModel.budget.budgetAmount ?? 0.0
         }
     }
     

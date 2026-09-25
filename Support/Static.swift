@@ -10,7 +10,7 @@ import Foundation
 
 enum Constants {
     enum Manage {
-        static let monthlyBudgetFooter = "Budget amount is unlocked for modification on the first day of each month."
+        static let monthlyBudgetFooter = "Budget amount is unlocked for modification on the first day of each month. Review your input before hitting return key."
         
         static let budgetModeFooter = "Budget mode sets the level of strictness with which expenses are monitored with respect to budget limit."
         
@@ -30,5 +30,17 @@ enum Constants {
         static let contactURL = "mailto:kartstopper@outlook.com"
         static let developerURL = "https://ashish-brahma.github.io/portfolio/"
         static let repositoryURL = "https://github.com/ashish-brahma/kartstopper"
+        
+        static let preferencesFilePath = FileManager.documentsDirectory.appending(path: "Preferences")
+    }
+}
+
+extension FileManager {
+    static var documentsDirectory: URL {
+        let paths = FileManager.default.urls(
+            for: .documentDirectory,
+            in: .userDomainMask
+        )
+        return paths[0]
     }
 }

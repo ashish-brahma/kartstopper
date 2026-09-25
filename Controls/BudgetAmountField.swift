@@ -15,11 +15,11 @@ struct BudgetAmountField: View {
     
     @Environment(\.locale) private var locale
     
-    @Binding var budgetAmount: Double
+    @Binding var budgetAmount: Double?
     
     var body: some View {
         HStack {
-            TextField("Budget",
+            TextField("Budget amount in \(locale.currency?.identifier ?? "USD")",
                       value: $budgetAmount,
                       format: .currency(code: locale.currency?.identifier ?? "USD"))
             .keyboardType(.numbersAndPunctuation)
@@ -33,6 +33,8 @@ struct BudgetAmountField: View {
         }
         .foregroundStyle(viewModel.budget.isLocked ? .secondary : .primary)
     }
+    
+    
 }
 
 #Preview {

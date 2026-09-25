@@ -13,10 +13,10 @@ protocol BudgetProtocol {
     var totalMonthlySpend: Double { get set }
     
     /// Amount allocated for monthly budget.
-    var budgetAmount: Double { get set }
+    var budgetAmount: Double? { get set }
     
     /// Difficulty mode used for budget monitoring.
-    var budgetMode: BudgetMode { get set }
+    var budgetMode: BudgetMode? { get set }
     
     /// Flag to lock budget for editing.
     var isLocked: Bool { get set }
@@ -27,22 +27,17 @@ protocol BudgetProtocol {
     /// Allow budget edits on the beginning of each month.
     mutating func updateBudgetLock(day: Int)
     
-    /// Read preferences saved by user.
-    mutating func updateBudgetSettings()
-    
     /// Determine status by fraction of amount spend from the allocated budget amount.
     mutating func updateBudgetStatus()
 }
 
 /// Difficulty levels to determine strictness of monitoring.
-enum BudgetMode: String, CaseIterable, Identifiable {
+enum BudgetMode: String, CaseIterable, Identifiable, Codable {
     case easy = "Easy"
     case medium = "Medium"
     case hard = "Hard"
     
-    var id : String {
-        UUID().uuidString
-    }
+    var id : String { self.rawValue }
 }
 
 /// Categories to grade expenditure.
@@ -52,7 +47,5 @@ enum Status: String, CaseIterable, Identifiable {
     case negative = "NegativeStatus"
     case unassigned = "UnassignedStatus"
     
-    var id : String {
-        UUID().uuidString
-    }
+    var id : String { self.rawValue }
 }

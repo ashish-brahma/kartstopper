@@ -52,7 +52,6 @@ class ViewModel: ObservableObject {
         
         updateOnboardingState()
         if hasOnboarded {
-            budget.updateBudgetSettings()
             budget.totalMonthlySpend = CDCart.getTotalMonthlySpend(context: context)
             budget.updateBudgetStatus()
         }

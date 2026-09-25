@@ -10,7 +10,7 @@
 import SwiftUI
 
 struct BudgetModePicker: View {
-    @Binding var difficulty: BudgetMode
+    @Binding var difficulty: BudgetMode?
     
     var body: some View {
         Picker("Difficulty", selection: $difficulty) {

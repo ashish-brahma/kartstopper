@@ -11,9 +11,9 @@ import Foundation
 struct MockBudget: BudgetProtocol {
     var totalMonthlySpend: Double
     
-    var budgetAmount: Double
+    var budgetAmount: Double?
     
-    var budgetMode: BudgetMode
+    var budgetMode: BudgetMode?
     
     var isLocked: Bool
     
