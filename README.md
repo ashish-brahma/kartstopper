@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="Assets/Assets.xcassets/AppIcon.appiconset/KS_light.png" width="108px" height="108px">
+  <img src="Resources/Assets.xcassets/AppIcon.appiconset/KS_light.png" width="108px" height="108px">
 </div>
 
 # KartStopper
