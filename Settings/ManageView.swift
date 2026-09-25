@@ -49,7 +49,7 @@ struct ManageView: View {
                 } header: {
                     Text("Monthly Budget")
                 } footer: {
-                    Text(Constants.Manage.monthlyBudgetFooter)
+                    budgetAmountFooter()
                 }
                 .listRowBackground(viewModel.budget.isLocked ? Color(.tertiarySystemFill) : Color(.secondarySystemGroupedBackground))
                 
@@ -120,6 +120,24 @@ struct ManageView: View {
                     viewModel.objectWillChange.send()
                     viewModel.budget.updateBudgetLock()
                 }
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private func budgetAmountFooter() -> some View {
+        VStack(alignment: .leading) {
+            Text(Constants.Manage.monthlyBudgetFooter)
+                .padding(Design.Padding.bottom)
+            
+            if focusedField == .budgetAmount {
+                HStack(alignment: .firstTextBaseline) {
+                    Label("Info", systemImage: "info.circle")
+                        .labelStyle(.iconOnly)
+                    Text("Review the amount before submission. This field remains disabled for editing for the rest of the month.")
+                }
+                .font(.caption)
+                .foregroundStyle(.sanskrit)
             }
         }
     }

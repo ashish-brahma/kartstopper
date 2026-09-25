@@ -19,9 +19,11 @@ struct BudgetAmountField: View {
     
     var body: some View {
         HStack {
-            TextField("Budget amount in \(locale.currency?.identifier ?? "USD")",
-                      value: $budgetAmount,
-                      format: .currency(code: locale.currency?.identifier ?? "USD"))
+            TextField(
+                "Budget amount in \(locale.currency?.identifier ?? "USD")",
+                value: $budgetAmount,
+                format: .currency(code: locale.currency?.identifier ?? "USD")
+            )
             .keyboardType(.numbersAndPunctuation)
             .submitLabel(.done)
             .disabled(viewModel.budget.isLocked)
