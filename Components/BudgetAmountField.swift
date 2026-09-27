@@ -17,12 +17,16 @@ struct BudgetAmountField: View {
     
     @Binding var budgetAmount: Double?
     
+    var currencyCode: String {
+        locale.currency?.identifier ?? "USD"
+    }
+    
     var body: some View {
         HStack {
             TextField(
-                "Budget amount in \(locale.currency?.identifier ?? "USD")",
+                "Budget amount in \(currencyCode)",
                 value: $budgetAmount,
-                format: .currency(code: locale.currency?.identifier ?? "USD")
+                format: .currency(code: currencyCode)
             )
             .keyboardType(.numbersAndPunctuation)
             .submitLabel(.done)

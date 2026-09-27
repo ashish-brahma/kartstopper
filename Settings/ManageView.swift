@@ -128,14 +128,14 @@ struct ManageView: View {
     private func budgetAmountFooter() -> some View {
         VStack(alignment: .leading) {
             Text(Constants.Manage.monthlyBudgetFooter)
-                .padding(Design.Padding.bottom)
             
             if focusedField == .budgetAmount {
                 HStack(alignment: .firstTextBaseline) {
-                    Label("Info", systemImage: "info.circle")
-                        .labelStyle(.iconOnly)
-                    Text("Review the amount before submission. This field remains disabled for editing for the rest of the month.")
+                    Image(systemName: "info.circle")
+                        .padding(.trailing, -Design.Padding.trailing/4)
+                    Text(Constants.Manage.monthlyBudgetWarning)
                 }
+                .padding(.vertical, -Design.Padding.vertical)
                 .font(.caption)
                 .foregroundStyle(.sanskrit)
             }
