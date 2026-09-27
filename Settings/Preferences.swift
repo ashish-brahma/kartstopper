@@ -41,7 +41,7 @@ class PreferencesModel: ObservableObject, Codable {
         self.selectedMode = try container.decodeIfPresent(BudgetMode.self, forKey: .budgetMode)
     }
     
-    /// Persisted navigation data in .plist format.
+    /// Persisted preferences data in .plist format.
     var data: Data? {
         get {
             try? PropertyListEncoder().encode(self)
