@@ -134,13 +134,13 @@ struct ManageView: View {
             
             if focusedField == .budgetAmount {
                 HStack(alignment: .firstTextBaseline) {
-                    Image(systemName: "info.circle")
+                    Image(systemName: "exclamationmark.circle")
                         .padding(.trailing, -Design.Padding.trailing/4)
                     Text(Constants.Manage.monthlyBudgetWarning)
                 }
                 .padding(.vertical, -Design.Padding.vertical)
                 .font(.caption)
-                .foregroundStyle(.sanskrit)
+                .foregroundStyle(Color.warning)
             }
         }
     }

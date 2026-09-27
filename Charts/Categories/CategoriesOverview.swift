@@ -89,8 +89,8 @@ struct CategoriesOverview : View {
                     .foregroundStyle(.secondary)
                 
                 if data.isEmpty {
-                    Image(systemName: "exclamationmark.circle.fill")
-                        .foregroundStyle(.sanskrit)
+                    Image(systemName: "exclamationmark.circle")
+                        .foregroundStyle(Color.warning)
                 }
             }
                 
