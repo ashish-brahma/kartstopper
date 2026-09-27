@@ -28,6 +28,7 @@ struct QuantityStepper: View {
             viewModel.objectWillChange.send()
             item.quantity += 1
             saveContext()
+            viewModel.update(context: viewContext)
         } onDecrement: {
             viewModel.objectWillChange.send()
             item.quantity -= 1
@@ -35,6 +36,7 @@ struct QuantityStepper: View {
                 item.quantity = 1
             }
             saveContext()
+            viewModel.update(context: viewContext)
         }
     }
     

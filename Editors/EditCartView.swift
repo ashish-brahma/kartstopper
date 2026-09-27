@@ -11,6 +11,7 @@ import CoreData
 internal import OSLog
 
 struct EditCartView: View {
+    @ObservedObject var viewModel: ViewModel
     var cart: CDCart
     
     let logger = PersistenceController.shared.logger
@@ -95,6 +96,7 @@ struct EditCartView: View {
                 cart.notes = notes
             }
             saveContext()
+            viewModel.update(context: viewContext)
         }
     }
     
@@ -110,5 +112,6 @@ struct EditCartView: View {
 }
 
 #Preview {
-    EditCartView(cart: .preview)
+    EditCartView(viewModel: .preview,
+                 cart: .preview)
 }

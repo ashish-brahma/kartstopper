@@ -7,11 +7,14 @@
 //  A SwiftUI view that shows user preferences.
 
 import SwiftUI
+import CoreData
 internal import Combine
 
 struct ManageView: View {
     @ObservedObject var viewModel: ViewModel
     @ObservedObject var navModel: NavigationModel
+    
+    @Environment(\.managedObjectContext) private var viewContext
     
     @AppStorage("hasOnboarded") private var hasOnboarded = false
     
@@ -149,9 +152,11 @@ struct ManageView: View {
         let displayAmount = viewModel.budget.budgetAmount
         
         if savedAmount != displayAmount {
-            preferencesModel.saveData()
             preferencesModel.objectWillChange.send()
+            preferencesModel.saveData()
+            viewModel.objectWillChange.send()
             viewModel.budget.budgetAmount = savedAmount
+            viewModel.update(context: viewContext)
         }
     }
     
@@ -162,9 +167,11 @@ struct ManageView: View {
         let displayMode = viewModel.budget.budgetMode
         
         if savedMode != displayMode {
-            preferencesModel.saveData()
             preferencesModel.objectWillChange.send()
+            preferencesModel.saveData()
+            viewModel.objectWillChange.send()
             viewModel.budget.budgetMode = savedMode
+            viewModel.update(context: viewContext)
         }
     }
     

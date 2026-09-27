@@ -95,7 +95,8 @@ struct CartListView: View {
             }
             .sheet(isPresented: $showEditCart) {
                 if let selection = navModel.selectedCart {
-                    EditCartView(cart: selection)
+                    EditCartView(viewModel: viewModel,
+                                 cart: selection)
                 }
             }
         }

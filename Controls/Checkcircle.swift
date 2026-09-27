@@ -45,6 +45,7 @@ struct Checkcircle: View {
         viewModel.objectWillChange.send()
         item.isComplete.toggle()
         saveContext()
+        viewModel.update(context: viewContext)
     }
 }
 

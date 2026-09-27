@@ -115,7 +115,8 @@ struct ChecklistView: View {
                 }
                 .sheet(isPresented: $showItemInfo) {
                     if let selection = navModel.selectedItem {
-                        EditItemView(item: selection)
+                        EditItemView(viewModel: viewModel,
+                                     item: selection)
                     }
                 }
             }

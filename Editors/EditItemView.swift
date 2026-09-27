@@ -11,6 +11,7 @@ import CoreData
 internal import OSLog
 
 struct EditItemView: View {
+    @ObservedObject var viewModel: ViewModel
     var item: CDItem
     
     let logger = PersistenceController.shared.logger
@@ -146,6 +147,7 @@ struct EditItemView: View {
                 item.price = price
             }
             saveContext()
+            viewModel.update(context: viewContext)
         }
     }
     
@@ -161,5 +163,6 @@ struct EditItemView: View {
 }
 
 #Preview {
-    EditItemView(item: .preview)
+    EditItemView(viewModel: .preview,
+                 item: .preview)
 }
