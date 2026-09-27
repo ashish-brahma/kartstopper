@@ -101,7 +101,7 @@ struct ManageView: View {
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     Text("\(message)")
-                        .foregroundStyle(Color.foreground)
+                        .foregroundStyle(Color.accentColor)
                 }
             }
             .task {
