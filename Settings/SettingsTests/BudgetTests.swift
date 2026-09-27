@@ -21,8 +21,8 @@ struct BudgetTests {
     
     @Test("Status correctness", arguments: 0...2)
     mutating func monthlySpendUpdatesBudgetStatus(_ index: Int) throws {
-        guard let amount = cases[index].budgetAmount else { return }
-        guard let mode = cases[index].budgetMode else { return }
+        let amount = cases[index].budgetAmount ?? 0.0
+        let mode = cases[index].budgetMode ?? .medium
         
         budget.budgetAmount = amount
         budget.budgetMode = mode
