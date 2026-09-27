@@ -4,7 +4,7 @@
 //
 //  Created by Ashish Brahma on 20/09/26.
 //
-//  A SwiftUI button view that is used to present an item's detail view.
+//  A SwiftUI label view that is used to present an item's detail view.
 
 import SwiftUI
 import CoreData
@@ -17,15 +17,14 @@ struct InformationButton: View {
     @Binding var showItemInfo: Bool
     
     var body: some View {
-        Button {
-            navModel.selectedItem = item
-            showItemInfo = true
-        } label: {
-            Label("Info", systemImage: "info.circle")
-                .imageScale(.large)
-                .tint(.info)
-                .labelStyle(.iconOnly)
-        }
+        Label("Info", systemImage: "info.circle")
+            .imageScale(.large)
+            .foregroundStyle(Color.info)
+            .labelStyle(.iconOnly)
+            .onTapGesture {
+                navModel.selectedItem = item
+                showItemInfo = true
+            }
     }
 }
 
