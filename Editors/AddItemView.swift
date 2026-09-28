@@ -27,6 +27,10 @@ struct AddItemView: View {
     }
     @FocusState private var focusedField: Field?
     
+    @State private var isValidInput: Bool = true
+    @State private var validationMessage: String = ""
+    @State private var borderColor: Color = Color.clear
+    
     private var totalItems: Int {
         CDCart.getTotalItems(for: cart, context: viewContext)
     }
@@ -44,6 +48,8 @@ struct AddItemView: View {
                     .autocorrectionDisabled()
                     .textInputAutocapitalization(.words)
                     .focused($focusedField, equals: .name)
+                    .foregroundStyle(isValidInput ? Color.primary : Color.red)
+                    .border(borderColor)
                     .submitLabel(.next)
                     .onSubmit {
                         focusedField = .price
@@ -52,19 +58,29 @@ struct AddItemView: View {
                 TextField("Price",
                           value: $price,
                           format: .currency(code: locale.currency?.identifier ?? "USD"))
-                .keyboardType(.numbersAndPunctuation)
+                .keyboardType(.decimalPad)
                 .focused($focusedField, equals: .price)
-                .submitLabel(.done)
-                .onSubmit {
-                    if !name.isEmpty && price != nil {
-                        addItem()
-                        name = ""
-                        price = nil
-                        focusedField = .name
-                    } else {
-                        focusedField = nil
-                    }
+            }
+        }
+        .toolbar {
+            ToolbarItemGroup(placement: .keyboard) {
+                CancelToolbarButton {
+                    reset()
+                    focusedField = nil
                 }
+                Spacer()
+                ConfirmToolbarButton {
+                    validateItem()
+                    if isValidInput {
+                        addItem()
+                        reset()
+                    }
+                    focusedField = .name
+                }
+            }
+            ToolbarItem(placement: .principal) {
+                Text("\(validationMessage)")
+                    .foregroundStyle(Color.accentColor)
             }
         }
         .onAppear {
@@ -73,6 +89,11 @@ struct AddItemView: View {
             if totalItems == 0 {
                 focusedField = .name
             }
+        }
+        .onChange(of: name) { newName in
+            isValidInput = true
+            validationMessage = ""
+            borderColor = Color.clear
         }
     }
     
@@ -97,6 +118,29 @@ struct AddItemView: View {
             saveContext(item: newItem)
             viewModel.update(context: viewContext)
         }
+    }
+    
+    private func validateItem() {
+        let existingItems = CDItem.getItems(by: name,
+                                            context: viewContext)
+        
+        isValidInput = !name.isEmpty && existingItems.count == 0
+        
+        if !isValidInput {
+            if name.isEmpty {
+                validationMessage = "Enter a valid name."
+                borderColor = Color.red
+            } else if existingItems.count != 0 {
+                validationMessage = "Item aleardy exists."
+            }
+        }
+    }
+    
+    private func reset() {
+        name = ""
+        price = nil
+        validationMessage = ""
+        borderColor = Color.clear
     }
 }
 
