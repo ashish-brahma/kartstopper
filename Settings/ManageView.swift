@@ -16,11 +16,7 @@ struct ManageView: View {
     
     @Environment(\.managedObjectContext) private var viewContext
     
-    @AppStorage("hasOnboarded") private var hasOnboarded = false
-    
     @StateObject var preferencesModel = PreferencesModel()
-    
-    @FocusState private var focusedField: ManageField?
     
     var message: String {
         if !viewModel.hasOnboarded
@@ -38,31 +34,12 @@ struct ManageView: View {
     var body: some View {
         NavigationStack(path: $navModel.presentedCredits) {
             Form {
-                Section {
-                    BudgetAmountField(
-                        viewModel: viewModel,
-                        budgetAmount: $preferencesModel.budgetAmount
-                    )
-                    .focused($focusedField, equals: .budgetAmount)
-                    .onSubmit {
-                        updateAmount()
-                        updateOnboarding()
-                        focusedField = nil
-                    }
-                } header: {
-                    Text("Monthly Budget")
-                } footer: {
-                    budgetAmountFooter()
-                }
-                .listRowBackground(viewModel.budget.isLocked ? Color(.tertiarySystemFill) : Color(.secondarySystemGroupedBackground))
+                BudgetAmountField(viewModel: viewModel,
+                                  preferencesModel: preferencesModel)
                 
-                Section {
-                    BudgetModePicker(difficulty: $preferencesModel.selectedMode)
-                } header: {
-                    Text("Budget Mode")
-                } footer: {
-                    Text(Constants.Manage.budgetModeFooter)
-                }
+                BudgetModePicker(viewModel: viewModel,
+                                 preferencesModel: preferencesModel)
+                
                 
                 Section {
                     LinkButton(urlString: Constants.Manage.faqURL,
@@ -105,101 +82,22 @@ struct ManageView: View {
                 }
             }
             .task {
-                if viewModel.hasOnboarded {
-                    viewModel.budget.updateBudgetLock()
-                } else {
-                    focusedField = .budgetAmount
+                preferencesModel.objectWillChange.send()
+                preferencesModel.loadData()
+                viewModel.objectWillChange.send()
+                
+                if let amount = preferencesModel.budgetAmount {
+                    viewModel.budget.budgetAmount = amount
                 }
                 
-                preferencesModel.loadData()
-                preferencesModel.objectWillChange.send()
-                initViewModel()
-            }
-            .onChange(of: preferencesModel.selectedMode) { _ in
-                updateMode()
-            }
-            .onChange(of: viewModel.hasOnboarded) { boarded in
-                if boarded {
-                    viewModel.objectWillChange.send()
-                    viewModel.budget.updateBudgetLock()
+                if let mode = preferencesModel.selectedMode {
+                    viewModel.budget.budgetMode = mode
                 }
             }
-        }
-    }
-    
-    @ViewBuilder
-    private func budgetAmountFooter() -> some View {
-        VStack(alignment: .leading) {
-            Text(Constants.Manage.monthlyBudgetFooter)
-            
-            if focusedField == .budgetAmount {
-                HStack(alignment: .firstTextBaseline) {
-                    Image(systemName: "exclamationmark.circle")
-                        .padding(.trailing, -Design.Padding.trailing/4)
-                    Text(Constants.Manage.monthlyBudgetWarning)
-                }
-                .padding(.vertical, -Design.Padding.vertical)
-                .font(.caption)
-                .foregroundStyle(Color.warning)
-            }
-        }
-    }
-    
-    private func updateAmount() {
-        guard let savedAmount = preferencesModel.budgetAmount
-        else { return }
-        
-        let displayAmount = viewModel.budget.budgetAmount
-        
-        if savedAmount != displayAmount {
-            preferencesModel.objectWillChange.send()
-            preferencesModel.saveData()
-            viewModel.objectWillChange.send()
-            viewModel.budget.budgetAmount = savedAmount
-            viewModel.update(context: viewContext)
-        }
-    }
-    
-    private func updateMode() {
-        guard let savedMode = preferencesModel.selectedMode
-        else { return }
-        
-        let displayMode = viewModel.budget.budgetMode
-        
-        if savedMode != displayMode {
-            preferencesModel.objectWillChange.send()
-            preferencesModel.saveData()
-            viewModel.objectWillChange.send()
-            viewModel.budget.budgetMode = savedMode
-            viewModel.update(context: viewContext)
-        }
-    }
-    
-    private func initViewModel() {
-        if let amount = preferencesModel.budgetAmount {
-            viewModel.budget.budgetAmount = amount
-        }
-        
-        if let mode = preferencesModel.selectedMode {
-            viewModel.budget.budgetMode = mode
-        }
-    }
-    
-    private func updateOnboarding() {
-        guard let amount = viewModel.budget.budgetAmount
-        else { return }
-        
-        if !viewModel.hasOnboarded && amount > 0 {
-            hasOnboarded = true
-            viewModel.updateOnboardingState()
         }
     }
 }
 
-/// Type that manages focus state in preferences.
-enum ManageField: Hashable {
-    case budgetAmount
-}
 
 #Preview {
     ManageView(viewModel: .preview,
