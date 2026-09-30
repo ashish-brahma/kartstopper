@@ -28,8 +28,6 @@ struct CartListView: View {
     @State private var showAddCart = false
     @State private var showEditCart = false
     
-    @State private var name = ""
-    @State private var notes = ""
     
     var body: some View {
         NavigationStack(path: $navModel.presentedCarts) {
@@ -52,11 +50,8 @@ struct CartListView: View {
                 }
                 
                 if showAddCart {
-                    Section {
-                        AddCartView(name: $name,
-                                    notes: $notes)
-                    }
-                    .listRowBackground(Rectangle().fill(Color(.secondarySystemGroupedBackground)))
+                    AddCartView(viewModel: viewModel,
+                                showAddCart: $showAddCart)
                 }
             }
             .overlay {
@@ -87,11 +82,16 @@ struct CartListView: View {
             .scrollContentBackground(.hidden)
             .background(Color.background)
             .toolbar {
-                CartsToolbar(viewModel: viewModel,
-                             showAddCart: $showAddCart,
-                             cartsEmpty: .constant(carts.isEmpty),
-                             name: $name,
-                             notes: $notes)
+                ToolbarItem(placement: .topBarLeading) {
+                    EditButton()
+                        .disabled(carts.isEmpty)
+                }
+                ToolbarItem(placement: .primaryAction) {
+                    AddToolbarButton(entityName: "cart") {
+                        showAddCart = true
+                    }
+                    .disabled(showAddCart)
+                }
             }
             .sheet(isPresented: $showEditCart) {
                 if let selection = navModel.selectedCart {

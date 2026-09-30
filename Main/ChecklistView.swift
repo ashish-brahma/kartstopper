@@ -44,9 +44,6 @@ struct ChecklistView: View {
     @State private var showEditItem = false
     @State private var showItemInfo = false
     
-    @State private var name = ""
-    @State private var price: Double? = 0.00
-    
     init(
         cart: CDCart,
         viewModel: ViewModel,
@@ -84,14 +81,10 @@ struct ChecklistView: View {
                         }
                     }
                     
-                    Section {
-                        AddItemView(viewModel: viewModel,
-                                    name: $name,
-                                    price: $price,
-                                    cart: cart)
-                        .id(bottomID)
-                    }
-                    .listRowBackground(Rectangle().fill(Color(.secondarySystemGroupedBackground)))
+                    
+                    AddItemView(viewModel: viewModel,
+                                cart: cart)
+                    .id(bottomID)
                 }
                 .overlay {
                     if totalItems != 0 && itemList.isEmpty {

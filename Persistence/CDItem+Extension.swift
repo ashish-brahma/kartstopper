@@ -34,20 +34,20 @@ extension CDItem {
         return .random(using: &generator)
     }
     
-    static func getItems(
+    static func findItems(
         by name: String,
         context: NSManagedObjectContext
-    ) -> [CDItem] {
+    ) -> Int {
         let request = CDItem.fetchRequest()
         request.predicate = NSPredicate(format: "name = %@", name)
-        guard let items = try? context.fetch(request), items.count != 0
-        else { return [] }
-        return items
+        guard let count = try? context.count(for: request), count != 0
+        else { return 0 }
+        return count
     }
     
     static func getTotalItems(context: NSManagedObjectContext) -> Int {
         guard let count = try? context.count(for: CDItem.fetchRequest()), count != 0
-                else { return 0 }
+        else { return 0 }
         return count
     }
     

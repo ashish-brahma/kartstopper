@@ -12,9 +12,7 @@ internal import OSLog
 
 struct AddItemView: View {
     @ObservedObject var viewModel: ViewModel
-    @Binding var name: String
-    @Binding var price: Double?
-    let cart: CDCart
+    var cart: CDCart
     
     let logger = PersistenceController.shared.logger
     
@@ -27,60 +25,67 @@ struct AddItemView: View {
     }
     @FocusState private var focusedField: Field?
     
-    @State private var isValidInput: Bool = true
-    @State private var validationMessage: String = ""
-    @State private var borderColor: Color = Color.clear
+    @State private var name: String = ""
+    @State private var price: Double?
+    @State private var isValidInput = true
+    @State private var showValidationMessage = false
     
     private var totalItems: Int {
         CDCart.getTotalItems(for: cart, context: viewContext)
     }
     
     var body: some View {
-        HStack {
-            Label("Checkcircle", systemImage: "circle")
-                .imageScale(.large)
-                .labelStyle(.iconOnly)
-                .foregroundStyle(Color.accentColor)
-                .padding(.trailing, Design.Padding.trailing)
-            
-            VStack {
-                TextField("Item Name", text: $name)
-                    .autocorrectionDisabled()
-                    .textInputAutocapitalization(.words)
-                    .focused($focusedField, equals: .name)
-                    .foregroundStyle(isValidInput ? Color.primary : Color.red)
-                    .border(borderColor)
-                    .submitLabel(.next)
-                    .onSubmit {
-                        focusedField = .price
-                    }
-                Divider()
-                TextField("Price",
-                          value: $price,
-                          format: .currency(code: locale.currency?.identifier ?? "USD"))
-                .keyboardType(.decimalPad)
-                .focused($focusedField, equals: .price)
-            }
-        }
-        .toolbar {
-            ToolbarItemGroup(placement: .keyboard) {
-                CancelToolbarButton {
-                    reset()
-                    focusedField = nil
-                }
-                Spacer()
-                ConfirmToolbarButton {
-                    validateItem()
-                    if isValidInput {
-                        addItem()
-                        reset()
-                    }
-                    focusedField = .name
-                }
-            }
-            ToolbarItem(placement: .principal) {
-                Text("\(validationMessage)")
+        Section {
+            HStack {
+                Label("Checkcircle", systemImage: "circle")
+                    .imageScale(.large)
+                    .labelStyle(.iconOnly)
                     .foregroundStyle(Color.accentColor)
+                    .padding(.trailing, Design.Padding.trailing)
+                
+                VStack {
+                    TextField("Item Name", text: $name)
+                        .autocorrectionDisabled()
+                        .textInputAutocapitalization(.words)
+                        .focused($focusedField, equals: .name)
+                        .foregroundStyle(isValidInput ? Color.primary : Color.red)
+                        .submitLabel(.next)
+                        .onSubmit {
+                            focusedField = .price
+                        }
+                    
+                    Divider()
+                    
+                    TextField("Price",
+                              value: $price,
+                              format: .currency(code: locale.currency?.identifier ?? "USD"))
+                    .keyboardType(.decimalPad)
+                    .focused($focusedField, equals: .price)
+                }
+            }
+            .toolbar {
+                ToolbarItemGroup(placement: .keyboard) {
+                    CancelToolbarButton {
+                        reset()
+                        focusedField = nil
+                    }
+                    Spacer()
+                    ConfirmToolbarButton {
+                        validateItem()
+                        if isValidInput {
+                            addItem()
+                            reset()
+                            focusedField = .name
+                        }
+                    }
+                    .disabled(name.isEmpty)
+                }
+            }
+            
+        } header: {
+            if showValidationMessage {
+                Text("Item already exists.")
+                    .foregroundStyle(Color.red)
             }
         }
         .onAppear {
@@ -92,18 +97,15 @@ struct AddItemView: View {
         }
         .onChange(of: name) { newName in
             isValidInput = true
-            validationMessage = ""
-            borderColor = Color.clear
+            showValidationMessage = false
         }
     }
     
-    private func saveContext(item: CDItem) {
+    private func saveContext() {
         do {
             try viewContext.save()
         } catch {
-            if !item.isInserted {
-                logger.error("Failed to insert new item.\(error.localizedDescription)")
-            }
+            logger.error("Failed to insert new item.\(error.localizedDescription)")
         }
     }
     
@@ -115,39 +117,31 @@ struct AddItemView: View {
             newItem.timestamp = Date()
             newItem.price = price ?? 0.00
             newItem.cart = cart
-            saveContext(item: newItem)
+            saveContext()
             viewModel.update(context: viewContext)
         }
     }
     
     private func validateItem() {
-        let existingItems = CDItem.getItems(by: name,
-                                            context: viewContext)
+        let existingItemCount = CDItem.findItems(by: name,
+                                                 context: viewContext)
         
-        isValidInput = !name.isEmpty && existingItems.count == 0
+        isValidInput = !name.isEmpty && existingItemCount == 0
         
-        if !isValidInput {
-            if name.isEmpty {
-                validationMessage = "Enter a valid name."
-                borderColor = Color.red
-            } else if existingItems.count != 0 {
-                validationMessage = "Item aleardy exists."
-            }
+        if existingItemCount != 0 {
+            showValidationMessage = true
         }
     }
     
     private func reset() {
         name = ""
         price = nil
-        validationMessage = ""
-        borderColor = Color.clear
+        showValidationMessage = false
     }
 }
 
 #Preview {
     AddItemView(viewModel: .preview,
-                name: .constant(CDItem.preview.displayName),
-                price: .constant(CDItem.preview.price),
                 cart: .preview)
     .environment(\.locale, Locale(identifier: "en-IN"))
     .environment(\.managedObjectContext,
