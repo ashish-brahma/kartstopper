@@ -25,9 +25,16 @@ struct BudgetAmountField: View {
         locale.currency?.identifier ?? "USD"
     }
     
+    var isValidAmount: Bool {
+        if let savedAmount = preferencesModel.budgetAmount {
+            return savedAmount > 0
+        }
+        return false
+    }
+    
     var body: some View {
-        Section {
-            HStack {
+        List {
+            Section {
                 TextField(
                     "Budget amount in \(currencyCode)",
                     value: $preferencesModel.budgetAmount,
@@ -36,27 +43,25 @@ struct BudgetAmountField: View {
                 .focused($isFocused)
                 .keyboardType(.decimalPad)
                 .disabled(viewModel.budget.isLocked)
-                
-                if viewModel.budget.isLocked {
-                    Label("Budget Lock", systemImage: "lock.fill")
-                        .labelStyle(.iconOnly)
-                }
+                .foregroundStyle(viewModel.budget.isLocked ? .secondary : .primary)
+            } footer: {
+                budgetAmountFooter()
             }
-            .foregroundStyle(viewModel.budget.isLocked ? .secondary : .primary)
-            .toolbar {
-                editorToolbar()
-            }
-        } header: {
-            Text("Monthly Budget")
-        } footer: {
-            budgetAmountFooter()
+            .listRowBackground(viewModel.budget.isLocked ? Color(.tertiarySystemFill) : Color(.secondarySystemGroupedBackground))
         }
-        .listRowBackground(viewModel.budget.isLocked ? Color(.tertiarySystemFill) : Color(.secondarySystemGroupedBackground))
+        .navigationTitle("Monthly Budget")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            editorToolbar()
+        }
+        .onAppear {
+            if !viewModel.budget.isLocked {
+                isFocused = true
+            }
+        }
         .task {
             if viewModel.hasOnboarded {
                 viewModel.budget.updateBudgetLock()
-            } else {
-                isFocused = true
             }
         }
         .onChange(of: viewModel.hasOnboarded) { boarded in
@@ -69,7 +74,7 @@ struct BudgetAmountField: View {
     
     private func updateAmount() {
         guard let savedAmount = preferencesModel.budgetAmount
-                else { return }
+        else { return }
         
         let displayAmount = viewModel.budget.budgetAmount
         
@@ -83,10 +88,7 @@ struct BudgetAmountField: View {
     }
     
     private func updateOnboarding() {
-        guard let amount = viewModel.budget.budgetAmount
-        else { return }
-        
-        if !viewModel.hasOnboarded && amount > 0 {
+        if !viewModel.hasOnboarded && isValidAmount {
             hasOnboarded = true
             viewModel.updateOnboardingState()
         }
@@ -94,44 +96,37 @@ struct BudgetAmountField: View {
     
     @ViewBuilder
     private func budgetAmountFooter() -> some View {
-        VStack(alignment: .leading) {
-            Text(Constants.Manage.monthlyBudgetFooter)
-            
-            if isFocused {
-                HStack(alignment: .firstTextBaseline) {
-                    Image(systemName: "exclamationmark.circle")
-                        .padding(.trailing, -Design.Padding.trailing/4)
-                    
-                    Text(Constants.Manage.monthlyBudgetWarning)
-                }
-                .padding(.vertical, -Design.Padding.vertical)
-                .font(.caption)
-                .foregroundStyle(Color.warning)
+        if !viewModel.budget.isLocked {
+            HStack(alignment: .firstTextBaseline) {
+                Image(systemName: "exclamationmark.circle")
+                    .padding(.trailing, -Design.Padding.trailing/4)
+                
+                Text(Constants.Manage.monthlyBudgetWarning)
             }
+            .font(.caption)
+            .foregroundStyle(Color.warning)
         }
     }
     
     @ToolbarContentBuilder
     private func editorToolbar() -> some ToolbarContent {
-        if isFocused {
-            ToolbarItem(placement: .confirmationAction) {
-                ConfirmToolbarButton {
-                    updateAmount()
-                    updateOnboarding()
-                    isFocused = false
-                }
+        ToolbarItemGroup(placement: .keyboard) {
+            CancelToolbarButton {
+                isFocused = false
             }
-            ToolbarItem(placement: .cancellationAction) {
-                CancelToolbarButton {
-                    isFocused = false
-                }
+            Spacer()
+            ConfirmToolbarButton {
+                updateAmount()
+                updateOnboarding()
+                isFocused = false
             }
+            .disabled(!isValidAmount)
         }
     }
 }
 
 #Preview {
-    List {
+    NavigationStack {
         BudgetAmountField(
             viewModel: .preview,
             preferencesModel: PreferencesModel()

@@ -20,6 +20,10 @@ struct ContentView: View {
     
     @State private var showPreferences = false
     
+    var showBadge: Bool {
+        viewModel.hasOnboarded && viewModel.budget.budgetMode != nil
+    }
+    
     var body: some View {
         TabView(selection: $navModel.selectedTab) {
             CartListView(viewModel: viewModel,
@@ -46,6 +50,7 @@ struct ContentView: View {
                       systemImage: Tabs.manage.symbol)
             }
             .tag(Tabs.manage)
+            .badge(showBadge ? nil : "!")
         }
         .task {
             viewModel.update(context: viewContext)

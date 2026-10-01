@@ -14,32 +14,43 @@ struct ManageView: View {
     @ObservedObject var viewModel: ViewModel
     @ObservedObject var navModel: NavigationModel
     
+    @Environment(\.locale) private var locale
     @Environment(\.managedObjectContext) private var viewContext
     
     @StateObject var preferencesModel = PreferencesModel()
     
-    var message: String {
-        if !viewModel.hasOnboarded
-            && viewModel.budget.budgetAmount == nil {
-            
-            return "Enter an amount"
-        
-        } else if viewModel.budget.budgetMode == nil {
-            
-            return "Choose a mode"
-        }
-        return ""
-    }
-    
     var body: some View {
         NavigationStack(path: $navModel.presentedCredits) {
             Form {
-                BudgetAmountField(viewModel: viewModel,
-                                  preferencesModel: preferencesModel)
+                Section {
+                    NavigationLink {
+                        BudgetAmountField(viewModel: viewModel,
+                                          preferencesModel: preferencesModel)
+                    } label: {
+                        if let amount = viewModel.budget.budgetAmount {
+                            LabeledContent(
+                                "Amount",
+                                value: amount,
+                                format: .currency(code: locale.currency?.identifier ?? "USD")
+                            )
+                        } else {
+                            LabeledContent("Amount", value: "Setup")
+                        }
+                    }
+                } header: {
+                    Text("Monthly Budget")
+                } footer: {
+                    Text(Constants.Manage.monthlyBudgetFooter)
+                }
                 
-                BudgetModePicker(viewModel: viewModel,
-                                 preferencesModel: preferencesModel)
-                
+                Section {
+                    BudgetModePicker(viewModel: viewModel,
+                                     preferencesModel: preferencesModel)
+                } header: {
+                    Text("Budget Mode")
+                } footer: {
+                    Text(Constants.Manage.budgetModeFooter)
+                }
                 
                 Section {
                     LinkButton(urlString: Constants.Manage.faqURL,
@@ -73,12 +84,6 @@ struct ManageView: View {
                     LegalView()
                 case .developer:
                     DeveloperView()
-                }
-            }
-            .toolbar {
-                ToolbarItem(placement: .principal) {
-                    Text("\(message)")
-                        .foregroundStyle(Color.accentColor)
                 }
             }
             .task {

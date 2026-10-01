@@ -18,16 +18,15 @@ struct BudgetModePicker: View {
     @Environment(\.managedObjectContext) private var viewContext
     
     var body: some View {
-        Section {
-            Picker("Difficulty", selection: $preferencesModel.selectedMode) {
-                ForEach(BudgetMode.allCases) { mode in
-                    Text(mode.rawValue).tag(mode)
-                }
+        Picker(selection: $preferencesModel.selectedMode) {
+            ForEach(BudgetMode.allCases) { mode in
+                Text(mode.rawValue).tag(mode)
             }
-        } header: {
-            Text("Budget Mode")
-        } footer: {
-            Text(Constants.Manage.budgetModeFooter)
+        } label: {
+            Text("Difficulty")
+            if viewModel.budget.budgetMode == nil {
+                Text("Choose a mode")
+            }
         }
         .onChange(of: preferencesModel.selectedMode) { _ in
             updateMode()
