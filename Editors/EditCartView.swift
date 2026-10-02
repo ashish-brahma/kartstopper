@@ -28,6 +28,9 @@ struct EditCartView: View {
     }
     @FocusState private var focusedField: Field?
     
+    @State private var isValidInput = true
+    @State private var showValidationMessage = false
+    
     var body: some View {
         NavigationStack {
             Form {
@@ -38,16 +41,24 @@ struct EditCartView: View {
                 }
                 .listRowBackground(Color(.tertiarySystemFill))
                 
-                Section(header: Text("Cart Name")) {
+                Section {
                     Group {
                         TextField("Enter a name for the cart", text: $name)
                             .autocorrectionDisabled()
                             .textInputAutocapitalization(.words)
                             .focused($focusedField, equals: .name)
+                            .foregroundStyle(isValidInput ? Color.primary : Color.red)
                             .submitLabel(.next)
                             .onSubmit {
                                 focusedField = .notes
                             }
+                    }
+                } header: {
+                    Text("Cart Name")
+                } footer: {
+                    if showValidationMessage {
+                        Text("Cart already exists.")
+                            .foregroundStyle(Color.red)
                     }
                 }
                 
@@ -73,8 +84,11 @@ struct EditCartView: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     ConfirmToolbarButton {
-                        updateCart()
-                        dismiss()
+                        validateCart()
+                        if isValidInput {
+                            updateCart()
+                            dismiss()
+                        }
                     }
                 }
             }
@@ -83,6 +97,10 @@ struct EditCartView: View {
             name = cart.name ?? ""
             notes = cart.notes ?? ""
             focusedField = .name
+        }
+        .onChange(of: name) { newName in
+            isValidInput = true
+            showValidationMessage = false
         }
     }
     
@@ -104,9 +122,20 @@ struct EditCartView: View {
         do {
             try viewContext.save()
         } catch {
-            if !cart.isUpdated {
-                logger.error("Failed to update cart. \(error.localizedDescription)")
-            }
+            logger.error("Failed to update cart. \(error.localizedDescription)")
+        }
+    }
+    
+    private func validateCart() {
+        if name == cart.displayName { return }
+        
+        let existingCartCount = CDCart.findCarts(by: name,
+                                                 context: viewContext)
+        
+        isValidInput = !name.isEmpty && existingCartCount == 0
+        
+        if existingCartCount != 0 {
+            showValidationMessage = true
         }
     }
 }

@@ -23,6 +23,8 @@ struct EditItemView: View {
     @State private var name = ""
     @State private var notes = ""
     @State private var price: Double = 0.00
+    @State private var isValidInput = true
+    @State private var showValidationMessage = false
     
     private enum Field: Hashable {
         case name
@@ -51,27 +53,31 @@ struct EditItemView: View {
                     }
                     .listRowBackground(Color(.tertiarySystemFill))
                     
-                    Section(header: Text("Item Name")) {
+                    Section {
                         TextField("Enter a name for the item", text: $name)
                             .autocorrectionDisabled()
                             .textInputAutocapitalization(.words)
                             .focused($focusedField, equals: .name)
+                            .foregroundStyle(isValidInput ? Color.primary : Color.red)
                             .submitLabel(.next)
                             .onSubmit {
                                 focusedField = .price
                             }
+                    } header: {
+                        Text("Item Name")
+                    } footer: {
+                        if showValidationMessage {
+                            Text("Item already exists.")
+                                .foregroundStyle(Color.red)
+                        }
                     }
                     
                     Section(header: Text("Price")) {
                         TextField("Price",
                                   value: $price,
                                   format: .currency(code: locale.currency?.identifier ?? "USD"))
-                        .keyboardType(.numbersAndPunctuation)
+                        .keyboardType(.decimalPad)
                         .focused($focusedField, equals: .price)
-                        .submitLabel(.next)
-                        .onSubmit {
-                            focusedField = .notes
-                        }
                     }
                     
                     Section(header: Text("Item Description")) {
@@ -93,8 +99,19 @@ struct EditItemView: View {
                     }
                     ToolbarItem(placement: .confirmationAction) {
                         ConfirmToolbarButton {
-                            updateItem()
-                            dismiss()
+                            validateItem()
+                            if isValidInput {
+                                updateItem()
+                                dismiss()
+                            }
+                        }
+                    }
+                    if focusedField == .price {
+                        ToolbarItemGroup(placement: .keyboard) {
+                            Spacer()
+                            Button("Next") {
+                                focusedField = .notes
+                            }
                         }
                     }
                 }
@@ -104,6 +121,10 @@ struct EditItemView: View {
                 notes = item.notes ?? ""
                 price = item.price
                 focusedField = .name
+            }
+            .onChange(of: name) { newName in
+                isValidInput = true
+                showValidationMessage = false
             }
         }
     }
@@ -158,6 +179,19 @@ struct EditItemView: View {
             if !item.isUpdated {
                 logger.error("Failed to update item. \(error.localizedDescription)")
             }
+        }
+    }
+    
+    private func validateItem() {
+        if name == item.displayName { return }
+        
+        let existingItemCount = CDItem.findItems(by: name,
+                                                 context: viewContext)
+        
+        isValidInput = !name.isEmpty && existingItemCount == 0
+        
+        if existingItemCount != 0 {
+            showValidationMessage = true
         }
     }
 }
