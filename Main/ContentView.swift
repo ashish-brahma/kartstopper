@@ -18,10 +18,16 @@ struct ContentView: View {
     @StateObject var navModel = NavigationModel()
     @SceneStorage("ContentView.navigation") private var navData: Data?
     
+    @StateObject var preferencesModel = PreferencesModel()
     @State private var showPreferences = false
     
-    var showBadge: Bool {
-        viewModel.hasOnboarded && viewModel.budget.budgetMode != nil
+    private var isSetupComplete: Bool {
+        if viewModel.hasOnboarded
+            && viewModel.budget.budgetMode != nil {
+            
+            return true
+        }
+        return false
     }
     
     var body: some View {
@@ -44,15 +50,17 @@ struct ContentView: View {
             .tag(Tabs.track)
             
             ManageView(viewModel: viewModel,
-                       navModel: navModel)
+                       navModel: navModel,
+                       preferencesModel: preferencesModel)
             .tabItem {
                 Label(Tabs.manage.localizedName,
                       systemImage: Tabs.manage.symbol)
             }
             .tag(Tabs.manage)
-            .badge(showBadge ? nil : "!")
+            .badge(isSetupComplete ? nil : "!")
         }
         .task {
+            viewModel.loadPreferences(preferencesModel: preferencesModel)
             viewModel.update(context: viewContext)
             
             // Onboard user if not already done.

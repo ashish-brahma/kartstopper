@@ -13,11 +13,10 @@ internal import Combine
 struct ManageView: View {
     @ObservedObject var viewModel: ViewModel
     @ObservedObject var navModel: NavigationModel
+    @ObservedObject var preferencesModel: PreferencesModel
     
     @Environment(\.locale) private var locale
     @Environment(\.managedObjectContext) private var viewContext
-    
-    @StateObject var preferencesModel = PreferencesModel()
     
     var body: some View {
         NavigationStack(path: $navModel.presentedCredits) {
@@ -86,19 +85,6 @@ struct ManageView: View {
                     DeveloperView()
                 }
             }
-            .task {
-                preferencesModel.objectWillChange.send()
-                preferencesModel.loadData()
-                viewModel.objectWillChange.send()
-                
-                if let amount = preferencesModel.budgetAmount {
-                    viewModel.budget.budgetAmount = amount
-                }
-                
-                if let mode = preferencesModel.selectedMode {
-                    viewModel.budget.budgetMode = mode
-                }
-            }
         }
     }
 }
@@ -106,5 +92,6 @@ struct ManageView: View {
 
 #Preview {
     ManageView(viewModel: .preview,
-               navModel: NavigationModel())
+               navModel: NavigationModel(),
+               preferencesModel: PreferencesModel())
 }

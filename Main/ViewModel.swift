@@ -46,6 +46,21 @@ class ViewModel: ObservableObject {
         self.hasOnboarded = hasOnboarded
     }
     
+    /// Load preferences.
+    func loadPreferences(preferencesModel: PreferencesModel) {
+        preferencesModel.objectWillChange.send()
+        preferencesModel.loadData()
+        self.objectWillChange.send()
+        
+        if let amount = preferencesModel.budgetAmount {
+            self.budget.budgetAmount = amount
+        }
+        
+        if let mode = preferencesModel.selectedMode {
+            self.budget.budgetMode = mode
+        }
+    }
+    
     /// Update dashboard.
     func update(context: NSManagedObjectContext) {
         self.objectWillChange.send()
