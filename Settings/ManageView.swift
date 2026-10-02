@@ -60,13 +60,13 @@ struct ManageView: View {
                                title: "Privacy Policy")
                     
                     LinkButton(urlString: Constants.Manage.contactURL,
-                               title: "Write to us")
+                               title: "Send us an email")
                 } header: {
                     Text("Help & Support")
                 }
                 
                 Section {
-                    NavigationLink("Legal", value: Credits.legal)
+                    NavigationLink("License", value: Credits.license)
                     
                     NavigationLink("Developer", value: Credits.developer)
                     
@@ -80,8 +80,8 @@ struct ManageView: View {
             .navigationTitleColor(Color.foreground)
             .navigationDestination(for: Credits.self) { document in
                 switch document {
-                case .legal:
-                    LegalView()
+                case .license:
+                    LicenseView()
                 case .developer:
                     DeveloperView()
                 }

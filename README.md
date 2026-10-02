@@ -21,7 +21,7 @@
 
 ## Contributing
 
-Please report any bugs/suggestions through email at [ashish.brahma@outlook.com](mailto:ashish.brahma@outlook.com)
+Please report any bugs/suggestions through email at [kartstopper@outlook.com](mailto:kartstopper@outlook.com) .
 
 You may support this project financially-
 

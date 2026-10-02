@@ -157,7 +157,7 @@ enum TimeRange: TimeInterval, Hashable, CaseIterable, Codable  {
 
 /// Type that manages author information in preferences.
 enum Credits: Int, Hashable, CaseIterable, Identifiable, Codable {
-    case legal
+    case license
     case developer
     
     var id: Int { rawValue }

@@ -11,24 +11,11 @@ import Foundation
 enum Constants {
     enum Manage {
         static let monthlyBudgetFooter = "Budget amount is unlocked for modification on the first day of each month."
-        
         static let monthlyBudgetWarning = "Review the amount before submission. This field remains disabled for editing for the rest of the month."
-        
         static let budgetModeFooter = "Budget mode sets the level of strictness with which expenses are monitored with respect to budget limit."
         
-        static let aboutDeveloperLine1 = "Ashish is currently working as an open-source mobile app developer for "
-        
-        static let aboutDeveloperLine2 = ". He has previously worked in Analytics and Data Science before embarking on his development journey. When not coding, he likes to look after his plants."
-        
-        static let appName = "KartStopper"
-        
-        static let developerName = PersonNameComponents(
-            givenName: "Ashish",
-            familyName: "Brahma"
-        )
-        
         static let faqURL = "https://kartstopper.netlify.app/support/"
-        static let privacyURL = "https://kartstopper.netlify.app/legal-notice/"
+        static let privacyURL = "https://kartstopper.netlify.app/privacy-policy/"
         static let contactURL = "mailto:kartstopper@outlook.com"
         static let developerURL = "https://ashish-brahma.github.io/portfolio/"
         static let repositoryURL = "https://github.com/ashish-brahma/kartstopper"

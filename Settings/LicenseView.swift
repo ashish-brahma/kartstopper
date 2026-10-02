@@ -8,14 +8,14 @@
 
 import SwiftUI
 
-struct LegalView: View {
+struct LicenseView: View {
     var body: some View {
         ScrollView {
             Text(notice())
                 .bold()
         }
         .padding(Design.Padding.standard * 1.89)
-        .navigationTitle("Legal Notice")
+        .navigationTitle("License")
         .navigationBarTitleDisplayMode(.inline)
     }
     
@@ -35,6 +35,6 @@ struct LegalView: View {
 
 #Preview {
     NavigationStack {
-        LegalView()
+        LicenseView()
     }
 }
