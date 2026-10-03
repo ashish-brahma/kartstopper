@@ -32,8 +32,15 @@ struct BudgetAmountField: View {
         return false
     }
     
+    var unlockInformation: String {
+        let nextDate = Date.nextMonthStartDate.formatted(date: .complete,
+                                                         time: .omitted)
+        
+        return "Budget amount would be unlocked for modification on \(nextDate)."
+    }
+    
     var body: some View {
-        List {
+        Form {
             Section {
                 TextField(
                     "Budget amount in \(currencyCode)",
@@ -96,16 +103,14 @@ struct BudgetAmountField: View {
     
     @ViewBuilder
     private func budgetAmountFooter() -> some View {
-        if !viewModel.budget.isLocked {
-            HStack(alignment: .firstTextBaseline) {
-                Image(systemName: "exclamationmark.circle")
-                    .padding(.trailing, -Design.Padding.trailing/4)
-                
-                Text(Constants.Manage.monthlyBudgetWarning)
-            }
-            .font(.caption)
-            .foregroundStyle(Color.warning)
+        if viewModel.budget.isLocked {
+            Label(unlockInformation, systemImage: "info.circle")
+                .foregroundStyle(Color.info)
+        } else {
+            Label(Constants.Manage.monthlyBudgetWarning, systemImage: "exclamationmark.circle")
+                .foregroundStyle(Color.warning)
         }
+        
     }
     
     @ToolbarContentBuilder
@@ -122,6 +127,16 @@ struct BudgetAmountField: View {
             }
             .disabled(!isValidAmount)
         }
+    }
+}
+
+extension Date {
+    static var nextMonthStartDate: Date {
+        Calendar.current.date(
+            byAdding: .month,
+            value: 1,
+            to: Date.startOfMonth(from: .now)
+        ) ?? .distantFuture
     }
 }
 
