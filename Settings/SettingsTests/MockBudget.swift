@@ -35,6 +35,7 @@ extension MockBudget {
     static var positive: Budget {
         .init(totalMonthlySpend: 1200.00,
               budgetAmount: 5500.00,
+              budgetMode: .medium,
               status: .positive
         )
     }
@@ -42,6 +43,7 @@ extension MockBudget {
     static var neutral: Budget {
         .init(totalMonthlySpend: 3000.00,
               budgetAmount: 5500.00,
+              budgetMode: .medium,
               status: .neutral
         )
     }
@@ -49,6 +51,7 @@ extension MockBudget {
     static var negative: Budget {
         .init(totalMonthlySpend: 5000.00,
               budgetAmount: 5500.00,
+              budgetMode: .medium,
               status: .negative
         )
     }

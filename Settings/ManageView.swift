@@ -85,6 +85,7 @@ struct ManageView: View {
                     DeveloperView()
                 }
             }
+            
         }
     }
 }

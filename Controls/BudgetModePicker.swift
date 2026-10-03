@@ -44,7 +44,9 @@ struct BudgetModePicker: View {
             preferencesModel.saveData()
             viewModel.objectWillChange.send()
             viewModel.budget.budgetMode = savedMode
-            viewModel.update(context: viewContext)
+            
+            viewModel.validateOnboarding()
+            viewModel.updateOnboardingState()
         }
     }
 }

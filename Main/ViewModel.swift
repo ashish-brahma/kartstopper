@@ -53,11 +53,11 @@ class ViewModel: ObservableObject {
         self.objectWillChange.send()
         
         if let amount = preferencesModel.budgetAmount {
-            self.budget.budgetAmount = amount
+            budget.budgetAmount = amount
         }
         
         if let mode = preferencesModel.selectedMode {
-            self.budget.budgetMode = mode
+            budget.budgetMode = mode
         }
     }
     
@@ -65,7 +65,6 @@ class ViewModel: ObservableObject {
     func update(context: NSManagedObjectContext) {
         self.objectWillChange.send()
         
-        updateOnboardingState()
         if hasOnboarded {
             budget.totalMonthlySpend = CDCart.getTotalMonthlySpend(context: context)
             budget.updateBudgetStatus()
@@ -77,6 +76,15 @@ class ViewModel: ObservableObject {
         dynamicTitle = setTitle()
         fontColor = setFontColor()
         gaugeColor = setGaugeColor()
+    }
+    
+    /// Check if both amount and difficulty mode of budget have been set.
+    func validateOnboarding() {
+        if budget.budgetAmount != nil
+            && budget.budgetMode != nil {
+            
+            UserDefaults.standard.set(true, forKey: "hasOnboarded")
+        }
     }
     
     /// Set onboarding state of the user.

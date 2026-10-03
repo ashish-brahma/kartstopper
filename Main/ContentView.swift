@@ -21,15 +21,6 @@ struct ContentView: View {
     @StateObject var preferencesModel = PreferencesModel()
     @State private var showPreferences = false
     
-    private var isSetupComplete: Bool {
-        if viewModel.hasOnboarded
-            && viewModel.budget.budgetMode != nil {
-            
-            return true
-        }
-        return false
-    }
-    
     var body: some View {
         TabView(selection: $navModel.selectedTab) {
             CartListView(viewModel: viewModel,
@@ -57,10 +48,11 @@ struct ContentView: View {
                       systemImage: Tabs.manage.symbol)
             }
             .tag(Tabs.manage)
-            .badge(isSetupComplete ? nil : "!")
+            .badge(viewModel.hasOnboarded ? nil : "!")
         }
         .task {
             viewModel.loadPreferences(preferencesModel: preferencesModel)
+            viewModel.updateOnboardingState()
             viewModel.update(context: viewContext)
             
             // Onboard user if not already done.
@@ -81,6 +73,12 @@ struct ContentView: View {
         .onChange(of: showPreferences) { newValue in
             if !viewModel.hasOnboarded && newValue {
                 navModel.selectedTab = .manage
+            }
+        }
+        .onChange(of: viewModel.hasOnboarded) { boarded in
+            if boarded {
+                viewModel.objectWillChange.send()
+                viewModel.updateOnboardingState()
             }
         }
     }

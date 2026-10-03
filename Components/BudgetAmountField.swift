@@ -18,7 +18,6 @@ struct BudgetAmountField: View {
     @Environment(\.locale) private var locale
     @Environment(\.managedObjectContext) private var viewContext
     
-    @AppStorage("hasOnboarded") private var hasOnboarded = false
     @FocusState private var isFocused: Bool
     
     var currencyCode: String {
@@ -71,8 +70,8 @@ struct BudgetAmountField: View {
                 viewModel.budget.updateBudgetLock()
             }
         }
-        .onChange(of: viewModel.hasOnboarded) { boarded in
-            if boarded {
+        .onChange(of: viewModel.budget.budgetAmount) { displayAmount in
+            if displayAmount != nil {
                 viewModel.objectWillChange.send()
                 viewModel.budget.updateBudgetLock()
             }
@@ -90,13 +89,8 @@ struct BudgetAmountField: View {
             preferencesModel.saveData()
             viewModel.objectWillChange.send()
             viewModel.budget.budgetAmount = savedAmount
-            viewModel.update(context: viewContext)
-        }
-    }
-    
-    private func updateOnboarding() {
-        if !viewModel.hasOnboarded && isValidAmount {
-            hasOnboarded = true
+            
+            viewModel.validateOnboarding()
             viewModel.updateOnboardingState()
         }
     }
@@ -121,9 +115,10 @@ struct BudgetAmountField: View {
             }
             Spacer()
             ConfirmToolbarButton {
-                updateAmount()
-                updateOnboarding()
-                isFocused = false
+                if isValidAmount {
+                    updateAmount()
+                    isFocused = false
+                }
             }
             .disabled(!isValidAmount)
         }
