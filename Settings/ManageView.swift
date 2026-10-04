@@ -15,40 +15,25 @@ struct ManageView: View {
     @ObservedObject var navModel: NavigationModel
     @ObservedObject var preferencesModel: PreferencesModel
     
-    @Environment(\.locale) private var locale
     @Environment(\.managedObjectContext) private var viewContext
+    
+    @State private var showEditor = false
+    @State private var field: ManageField?
     
     var body: some View {
         NavigationStack(path: $navModel.presentedCredits) {
             Form {
-                Section {
-                    NavigationLink {
-                        BudgetAmountField(viewModel: viewModel,
-                                          preferencesModel: preferencesModel)
-                    } label: {
-                        if let amount = viewModel.budget.budgetAmount {
-                            LabeledContent(
-                                "Amount",
-                                value: amount,
-                                format: .currency(code: locale.currency?.identifier ?? "USD")
-                            )
-                        } else {
-                            LabeledContent("Amount", value: "Setup")
-                        }
-                    }
-                } header: {
-                    Text("Monthly Budget")
-                } footer: {
-                    Text(Constants.Manage.monthlyBudgetFooter)
-                }
-                
-                Section {
-                    BudgetModePicker(viewModel: viewModel,
-                                     preferencesModel: preferencesModel)
-                } header: {
-                    Text("Budget Mode")
-                } footer: {
-                    Text(Constants.Manage.budgetModeFooter)
+                Section("Budget") {
+                    BudgetAmountNavigationButton(
+                        viewModel: viewModel,
+                        preferencesModel: preferencesModel,
+                        showEditor: $showEditor,
+                        field: $field
+                    )
+                    
+                    BudgetModePicker(
+                        viewModel: viewModel,
+                        preferencesModel: preferencesModel)
                 }
                 
                 Section {
@@ -77,6 +62,12 @@ struct ManageView: View {
             }
             .navigationTitle("Preferences")
             .navigationTitleColor(Color.foreground)
+            .navigationDestination(isPresented: $showEditor) {
+                if field == .budgetAmount {
+                    EditBudgetAmountView(viewModel: viewModel,
+                                         preferencesModel: preferencesModel)
+                }
+            }
             .navigationDestination(for: Credits.self) { document in
                 switch document {
                 case .license:
@@ -85,7 +76,6 @@ struct ManageView: View {
                     DeveloperView()
                 }
             }
-            
         }
     }
 }

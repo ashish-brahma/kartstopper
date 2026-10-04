@@ -162,3 +162,10 @@ enum Credits: Int, Hashable, CaseIterable, Identifiable, Codable {
     
     var id: Int { rawValue }
 }
+
+/// Type that manages form fields in preferences.
+enum ManageField: Int, Hashable, CaseIterable, Identifiable, Codable {
+    case budgetAmount
+    
+    var id: Int { rawValue }
+}

@@ -1,5 +1,5 @@
 //
-//  BudgetAmountField.swift
+//  EditBudgetAmountView.swift
 //  KartStopper
 //
 //  Created by Ashish Brahma on 20/09/26.
@@ -11,7 +11,7 @@ import SwiftUI
 import CoreData
 internal import Combine
 
-struct BudgetAmountField: View {
+struct EditBudgetAmountView: View {
     @ObservedObject var viewModel: ViewModel
     @ObservedObject var preferencesModel: PreferencesModel
     
@@ -137,7 +137,7 @@ extension Date {
 
 #Preview {
     NavigationStack {
-        BudgetAmountField(
+        EditBudgetAmountView(
             viewModel: .preview,
             preferencesModel: PreferencesModel()
         )

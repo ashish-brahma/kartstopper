@@ -10,9 +10,7 @@ import Foundation
 
 enum Constants {
     enum Manage {
-        static let monthlyBudgetFooter = "Budget amount is unlocked for modification on the first day of each month."
         static let monthlyBudgetWarning = "Review the amount before submission. This field remains disabled for editing for the rest of the month."
-        static let budgetModeFooter = "Budget mode sets the level of strictness with which expenses are monitored with respect to budget limit."
         
         static let faqURL = "https://kartstopper.netlify.app/support/"
         static let privacyURL = "https://kartstopper.netlify.app/privacy-policy/"

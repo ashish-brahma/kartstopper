@@ -39,6 +39,7 @@
 			membershipExceptions = (
 				AddCartView.swift,
 				AddItemView.swift,
+				EditBudgetAmountView.swift,
 				EditCartView.swift,
 				EditItemView.swift,
 			);

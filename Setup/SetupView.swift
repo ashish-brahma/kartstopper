@@ -15,7 +15,7 @@ struct SetupView: View {
     var body: some View {
         if !dismiss {
             HStack(alignment: .top) {
-                Image(systemName: "plus.circle")
+                Image(systemName: "number.square.fill")
                     .imageScale(.large)
                     .font(.system(size: Design.setupImageFontSize,
                                   weight: .medium))

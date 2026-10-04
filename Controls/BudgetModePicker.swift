@@ -23,11 +23,17 @@ struct BudgetModePicker: View {
                 Text(mode.rawValue).tag(mode)
             }
         } label: {
-            Text("Difficulty")
-            if viewModel.budget.budgetMode == nil {
-                Text("Choose a mode")
+            LabeledContent {
+                if viewModel.budget.budgetMode == nil {
+                    Text("Select a mode")
+                } else {
+                    EmptyView()
+                }
+            } label: {
+                Label("Tracking Difficulty", systemImage: "barometer")
             }
         }
+        .pickerStyle(.navigationLink)
         .onChange(of: preferencesModel.selectedMode) { _ in
             updateMode()
         }
