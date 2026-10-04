@@ -12,11 +12,10 @@
 
 ## Features
 
-- **Intutive lists**: Create lists with price and notes. Mark as complete to save in history. ✅
-- **Search Online**: Save items from across the web without leaving the app. 🚧
-- **Dashboard**: Track your monthly spend against set budget. ✅
-- **Insights**: Visualize spend history by week, month and year. Check top expense categories. ✅
-- **Difficulty Mode**: Set your comfort level for budget monitoring. ✅
+- **Intutive lists**: Create lists with price and notes. Mark as complete to track expenses. 
+- **Dashboard**: Track your monthly spend against set budget. 
+- **Insights**: Visualize spend history by week, month and year. Check top expense categories.
+- **Difficulty Mode**: Set your comfort level for budget monitoring.
 
 
 ## Contributing
