@@ -40,7 +40,7 @@ extension PersistenceController {
         item1.timestamp = Date.previewDate(year: 2023, month: 11, day: 9)
         item1.price = 350.00
         item1.quantity = 5
-        item1.name = "Sesame oil"
+        item1.name = "Sesame Oil"
         item1.notes = "Oil for body massage"
         item1.cart = cart1
         
@@ -58,7 +58,7 @@ extension PersistenceController {
         item3.id = Int32(2)
         item3.isComplete = true
         item3.timestamp = Date.previewDate(year: 2024, month: 3, day: 4)
-        item3.price = 2500.00
+        item3.price = 250.00
         item3.quantity = 1
         item3.name = "Pumice Stone"
         item3.notes = "Feet scrubber"
@@ -78,10 +78,10 @@ extension PersistenceController {
         item5.id = Int32(4)
         item5.isComplete = true
         item5.timestamp = Date.previewDate(year: 2024, month: 3, day: 7)
-        item5.price = 100.00
+        item5.price = 200.00
         item5.quantity = 1
-        item5.name = "Breathable strap"
-        item5.notes = "Sweat absorption material for wrist, knees and waist."
+        item5.name = "Wristband"
+        item5.notes = "Breathable strap made of sweat absorption material."
         item5.cart = cart1
         
         let cart2 = CDCart(context: context)
@@ -94,10 +94,10 @@ extension PersistenceController {
         item6.id = Int32(5)
         item6.isComplete = true
         item6.timestamp = Date.previewDate(year: 2024, month: 2, day: 28)
-        item6.price = 3520.52
+        item6.price = 5499.99
         item6.quantity = 1
-        item6.name = "JBL Earbuds"
-        item6.notes = "In-ear wireless with sweat protection, ANC and ambient noise control."
+        item6.name = "Earbuds"
+        item6.notes = "In-ear wireless with sweat protection, active noise cancellation, and ambient noise control."
         item6.cart = cart2
         
         let cart3 = CDCart(context: context)

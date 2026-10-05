@@ -32,7 +32,7 @@ struct SetupView: View {
                     }
                     
                     HStack(alignment: .bottom) {
-                        Text("Budget amount would be used to track items marked as complete.")
+                        Text(Constants.Setup.purpose)
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                         Spacer()

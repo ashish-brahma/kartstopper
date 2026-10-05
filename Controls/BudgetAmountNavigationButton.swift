@@ -4,7 +4,7 @@
 //
 //  Created by Ashish Brahma on 04/10/26.
 //
-//  A SwiftUI navigation link that presents budget amount editor view.
+//  A SwiftUI button view that presents budget amount editor view.
 
 import SwiftUI
 

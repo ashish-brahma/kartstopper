@@ -20,6 +20,10 @@ enum Constants {
         
         static let preferencesFilePath = FileManager.documentsDirectory.appending(path: "Preferences")
     }
+    
+    enum Setup {
+        static let purpose = "Budget amount would be used to gauge monthly expenditure."
+    }
 }
 
 extension FileManager {
