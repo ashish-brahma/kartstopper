@@ -80,7 +80,6 @@ extension ExpenditureData {
 
 struct CartExpenseData: Identifiable {
     let name: String
-    let date: Date
     let expense: Double
     let itemCount: Int
     var id: String { name }
@@ -105,27 +104,12 @@ extension CartExpenseData {
             
             if count > 0 {
                 data.append(.init(name: cart.displayName,
-                                  date: cart.displayDate,
                                   expense: expense,
                                   itemCount: count))
             }
         }
         
-        return data
-    }
-    
-    static func sort(
-        _ data: [CartExpenseData],
-        by sortBy: SortParameter
-    ) -> [CartExpenseData] {
-        return data.sorted {
-            switch sortBy {
-            case .expense:
-                $0.expense > $1.expense
-            case .time:
-                $0.date > $1.date
-            }
-        }
+        return data.sorted { $0.expense > $1.expense }
     }
     
     static func getPercentage(

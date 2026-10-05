@@ -68,13 +68,11 @@ struct CategoriesOverview : View {
     }
     
     var data: [CartExpenseData] {
-        let data = CartExpenseData.periodicData(
+        CartExpenseData.periodicData(
             range: filterDateRange,
             carts: Array(carts),
             context: viewContext
         )
-        
-        return CartExpenseData.sort(data, by: .expense)
     }
     
     var topCartName: String {

@@ -23,10 +23,9 @@ struct CategoryDetailsChart: View {
     init(
         data: [CartExpenseData]
     ){
-        self.data = CartExpenseData.sort(data, by: .expense)
+        self.data = data
         
         let unknownCart = CartExpenseData(name: "Unknown",
-                                          date: .now,
                                           expense: 0,
                                           itemCount: 0)
         
@@ -193,13 +192,11 @@ struct CategoryDetails : View {
     }
     
     var data: [CartExpenseData] {
-        let data = CartExpenseData.periodicData(
+        CartExpenseData.periodicData(
             range: filterDateRange,
             carts: Array(carts),
             context: viewContext
         )
-        
-        return CartExpenseData.sort(data, by: sortParameter)
     }
     
     var top5data: [CartExpenseData] {
@@ -222,17 +219,21 @@ struct CategoryDetails : View {
                     }
                     
                     Section {
-                        SortButton(value: $sortParameter)
+                        expenses(data: showAllData ? data : top5data)
+                        
+                        if data.count > 5 {
+                            ExpandButton(showAllData: $showAllData)
+                        }
                     } header: {
-                        Text("Cart Value")
-                            .font(.title2.bold())
-                            .foregroundStyle(Color.foreground)
-                    }
-                    
-                    expenses(data: showAllData ? data : top5data)
-                    
-                    if data.count > 5 {
-                        ExpandButton(showAllData: $showAllData)
+                        VStack(alignment: .leading) {
+                            Text("Cart Value")
+                                .font(.title2.bold())
+                                .foregroundStyle(Color.foreground)
+                            
+                            Text("Percentage of Total (Number of Expenses)")
+                                .font(.caption.bold())
+                                .foregroundStyle(Color.secondary)
+                        }
                     }
                 }
             }
@@ -255,34 +256,24 @@ struct CategoryDetails : View {
     @ViewBuilder
     private func expenses(data: [CartExpenseData]) -> some View {
         ForEach(data) { cart in
-            Section {
-                HStack(alignment: .center) {
-                    VStack(alignment: .leading) {
-                        Text(cart.date.formatted(date: .omitted,
-                                                 time: .shortened))
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                        
-                        Text("\(cart.name)")
-                            .font(.title3)
-                            .foregroundStyle(.primary)
-                        
-                        Group {
-                            Text("\(percentage(expense: cart.expense), format: .percent.precision(.significantDigits(3)))")
-                            + Text(" (^[\(cart.itemCount) Item](inflect: true))")
-                        }
-                        .font(.caption.bold())
-                        .foregroundStyle(Color.foreground)
+            HStack(alignment: .center) {
+                VStack(alignment: .leading) {
+                    Text("\(cart.name)")
+                        .font(.title3)
+                        .foregroundStyle(.primary)
+                    
+                    Group {
+                        Text("\(percentage(expense: cart.expense), format: .percent.precision(.significantDigits(3)))")
+                        + Text(" (^[\(cart.itemCount) Item](inflect: true))")
                     }
-                    
-                    Spacer()
-                    
-                    Text("\(cart.expense, format: .currency(code: locale.currency?.identifier ?? "USD"))")
-                        .foregroundStyle(.secondary)
+                    .font(.caption.bold())
+                    .foregroundStyle(Color.foreground)
                 }
-            } header: {
-                Text(cart.date.formatted(date: .abbreviated,
-                                         time: .omitted))
+                
+                Spacer()
+                
+                Text("\(cart.expense, format: .currency(code: locale.currency?.identifier ?? "USD"))")
+                    .foregroundStyle(.secondary)
             }
         }
     }
