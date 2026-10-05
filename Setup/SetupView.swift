@@ -62,7 +62,7 @@ struct SetupView: View {
         } label: {
             Label("Setup", systemImage: "plus.circle.fill")
                 .bold()
-                .foregroundStyle(.gray700)
+                .foregroundStyle(Color.affirmative)
                 .labelStyle(.titleOnly)
                 .buttonStyle(.borderless)
         }

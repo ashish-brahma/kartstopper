@@ -63,28 +63,32 @@ struct ChecklistView: View {
         GeometryReader { geometryProxy in
             ScrollViewReader { scrollProxy in
                 List(selection: $navModel.selectedItem) {
-                    ForEach(itemList) { item in
-                        ItemRowView(
-                            viewModel: viewModel,
-                            navModel: navModel,
-                            item: item,
-                            showItemInfo: $showItemInfo,
-                            reader: geometryProxy,
-                            deleteAction: { deleteItem(item) }
-                        )
-                    }
-                    .onDelete(perform: deleteItem(at:))
-                    .onMove(perform: move)
-                    .task {
-                        withAnimation {
-                            scrollProxy.scrollTo(bottomID)
+                    Section {
+                        ForEach(itemList) { item in
+                            ItemRowView(
+                                viewModel: viewModel,
+                                navModel: navModel,
+                                item: item,
+                                showItemInfo: $showItemInfo,
+                                reader: geometryProxy,
+                                deleteAction: { deleteItem(item) }
+                            )
+                        }
+                        .onDelete(perform: deleteItem(at:))
+                        .onMove(perform: move)
+                        .task {
+                            withAnimation {
+                                scrollProxy.scrollTo(bottomID)
+                            }
                         }
                     }
+                    .listRowBackground(Color.clear)
                     
                     
                     AddItemView(viewModel: viewModel,
                                 cart: cart)
                     .id(bottomID)
+                    .listRowBackground(Color(.tertiarySystemFill))
                 }
                 .overlay {
                     if totalItems != 0 && itemList.isEmpty {

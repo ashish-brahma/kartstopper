@@ -47,7 +47,6 @@ enum Design {
 
 // Design Constants
 extension Color {
-    static let reversal = Color("Gray500")
     static let affirmative = Color("Gray700")
     static let edit = Color("Sanskrit")
     static let info = Color("TurkishAqua")
