@@ -8,14 +8,14 @@
 ![Deployment Version](https://img.shields.io/badge/compatibility-iOS%2016.0%20%2B-green)
 [![License](https://img.shields.io/github/license/ashish-brahma/kartstopper?color=blue)](https://github.com/ashish-brahma/kartstopper?tab=BSD-3-Clause-1-ov-file)
    
-**KartStopper** is a one-stop solution for buyers looking to make informed choices before shopping their daily needs. It improves spending habits of people.
+**KartStopper** is a one-stop solution for shoppers looking to improve their spending habits.
 
 ## Features
 
 - **Intutive lists**: Create lists with price and notes. Mark as complete to track expenses. 
-- **Dashboard**: Track your monthly spend against set budget. 
+- **Dashboard**: Track how much you spend out of your allocated budget for each month.
 - **Insights**: Visualize spend history by week, month and year. Check top expense categories.
-- **Difficulty Mode**: Set your comfort level for budget monitoring.
+- **Difficulty Mode**: Set your comfort level for expenditure tracking.
 
 
 ## Contributing
