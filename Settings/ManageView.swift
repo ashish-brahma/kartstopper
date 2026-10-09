@@ -50,8 +50,6 @@ struct ManageView: View {
                 }
                 
                 Section {
-                    NavigationLink("License", value: Credits.license)
-                    
                     NavigationLink("Developer", value: Credits.developer)
                     
                     LinkButton(urlString: Constants.Manage.repositoryURL,
@@ -70,8 +68,6 @@ struct ManageView: View {
             }
             .navigationDestination(for: Credits.self) { document in
                 switch document {
-                case .license:
-                    LicenseView()
                 case .developer:
                     DeveloperView()
                 }
