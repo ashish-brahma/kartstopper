@@ -35,15 +35,14 @@ struct Checkcircle: View {
         do {
             try viewContext.save()
         } catch {
-            if !item.isUpdated {
-                logger.error("Failed to toggle item's completion status. \(error.localizedDescription)")
-            }
+            logger.error("Failed to toggle item's completion status. \(error.localizedDescription)")
         }
     }
     
     private func toggleStatus() {
         viewModel.objectWillChange.send()
         item.isComplete.toggle()
+        item.completionDate = Date.now
         saveContext()
         viewModel.update(context: viewContext)
     }

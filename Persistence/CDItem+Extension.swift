@@ -60,7 +60,7 @@ extension CDItem {
         let end = range.upperBound as NSDate
         
         request.predicate = NSPredicate(format: "isComplete == true && %K >= %@ && %K <= %@",
-                                        "timestamp", start, "timestamp", end)
+                                        "completionDate", start, "completionDate", end)
         
         guard let items = try? context.fetch(request), items.count != 0
         else { return []}
@@ -70,10 +70,10 @@ extension CDItem {
     
     static func dateRange(context: NSManagedObjectContext) -> ClosedRange<Date> {
         let request = CDItem.fetchRequest()
-        request.sortDescriptors = [NSSortDescriptor(keyPath: \CDItem.timestamp, ascending: true)]
+        request.sortDescriptors = [NSSortDescriptor(keyPath: \CDItem.completionDate, ascending: true)]
         guard let items = try? context.fetch(request), items.count != 0,
-              let first = items.first?.timestamp,
-              let last = items.last?.timestamp else { return .distantPast ... .distantFuture }
+              let first = items.first?.completionDate,
+              let last = items.last?.completionDate else { return .distantPast ... .distantFuture }
         return first...last
     }
 }

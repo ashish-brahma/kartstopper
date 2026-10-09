@@ -44,9 +44,7 @@ struct QuantityStepper: View {
         do {
             try viewContext.save()
         } catch {
-            if !item.isUpdated {
-                logger.error("Failed to update item's quantity. \(error.localizedDescription)")
-            }
+            logger.error("Failed to update item's quantity. \(error.localizedDescription)")
         }
     }
 }

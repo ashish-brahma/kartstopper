@@ -61,7 +61,7 @@ extension ExpenditureData {
         var data = items.map {
             ExpenditureData(name: $0.displayName,
                             cartName: $0.cart?.displayName ?? "",
-                            date: $0.displayDate,
+                            date: $0.completionDate ?? .distantPast,
                             expense: $0.price * Double($0.quantity))
         }
         

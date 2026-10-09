@@ -87,7 +87,7 @@ extension CDCart {
         let end = range.upperBound as NSDate
         
         request.predicate = NSPredicate(format: "isComplete == true && cart.name = %@ && %K >= %@ && %K <= %@",
-                                        cart.name ?? "", "timestamp", start, "timestamp", end)
+                                        cart.name ?? "", "completionDate", start, "completionDate", end)
         
         guard let items = try? context.fetch(request), items.count != 0
         else { return 0.00 }
