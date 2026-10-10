@@ -41,7 +41,6 @@ struct ContentView: View {
             .tag(Tabs.track)
             
             ManageView(viewModel: viewModel,
-                       navModel: navModel,
                        preferencesModel: preferencesModel)
             .tabItem {
                 Label(Tabs.manage.localizedName,

@@ -12,7 +12,7 @@
 
 ## Features
 
-- **Intutive lists**: Create lists with price and notes. Mark as complete to track expenses. 
+- **Intuitive lists**: Create lists with price and notes. Mark as complete to track expenses. 
 - **Dashboard**: Track how much you spend out of your allocated budget for each month.
 - **Insights**: Visualize spend history by week, month and year. Check top expense categories.
 - **Difficulty Mode**: Set your comfort level for expenditure tracking.

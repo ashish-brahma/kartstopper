@@ -31,8 +31,6 @@ class NavigationModel: ObservableObject, Codable {
     /// Currently selected time range for Expenditure Details chart.
     @Published var selectedTimeRangeForExpenses: TimeRange = .last7days
     
-    /// Array of author documents pushed on preferences' navigation stack.
-    @Published var presentedCredits: [Credits] = []
     
     /// Type that enumerates keys used for encoding and decoding.
     enum CodingKeys: String, CodingKey {
@@ -41,7 +39,6 @@ class NavigationModel: ObservableObject, Codable {
         case cardPathIds
         case timeRangeCategories
         case timeRangeExpenses
-        case creditPathIds
     }
     
     /// Encode all values using coding keys and store them.
@@ -52,7 +49,6 @@ class NavigationModel: ObservableObject, Codable {
         try container.encode(presentedCards.map(\.id), forKey: .cardPathIds)
         try container.encode(selectedTimeRangeForCategories.rawValue, forKey: .timeRangeCategories)
         try container.encode(selectedTimeRangeForExpenses.rawValue, forKey: .timeRangeExpenses)
-        try container.encode(presentedCredits.map(\.id), forKey: .creditPathIds)
     }
     
     init() {}
@@ -79,8 +75,6 @@ class NavigationModel: ObservableObject, Codable {
             $0.rawValue == timeRangeExpenses
         } ?? .last7days
         
-        let creditPathIds = try container.decode([Credits.ID].self, forKey: .creditPathIds)
-        self.presentedCredits = creditPathIds.compactMap { Credits.allCases[$0] }
     }
     
     /// Persisted navigation data in JSON format.
@@ -97,7 +91,6 @@ class NavigationModel: ObservableObject, Codable {
             self.presentedCards = model.presentedCards
             self.selectedTimeRangeForCategories = model.selectedTimeRangeForCategories
             self.selectedTimeRangeForExpenses = model.selectedTimeRangeForExpenses
-            self.presentedCredits = model.presentedCredits
         }
     }
     
@@ -153,13 +146,6 @@ enum TimeRange: TimeInterval, Hashable, CaseIterable, Codable  {
     case last7days = 7
     case last30days = 30
     case last365days = 365
-}
-
-/// Type that manages author information in preferences.
-enum Credits: Int, Hashable, CaseIterable, Identifiable, Codable {
-    case developer
-    
-    var id: Int { rawValue }
 }
 
 /// Type that manages form fields in preferences.

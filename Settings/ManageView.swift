@@ -12,7 +12,6 @@ internal import Combine
 
 struct ManageView: View {
     @ObservedObject var viewModel: ViewModel
-    @ObservedObject var navModel: NavigationModel
     @ObservedObject var preferencesModel: PreferencesModel
     
     @Environment(\.managedObjectContext) private var viewContext
@@ -21,7 +20,7 @@ struct ManageView: View {
     @State private var field: ManageField?
     
     var body: some View {
-        NavigationStack(path: $navModel.presentedCredits) {
+        NavigationStack {
             Form {
                 Section("Budget") {
                     BudgetAmountNavigationButton(
@@ -37,23 +36,13 @@ struct ManageView: View {
                 }
                 
                 Section {
-                    LinkButton(urlString: Constants.Manage.faqURL,
-                               title: "Frequently Asked Questions")
+                    NavigationLink("KartStopper") {
+                        AppInformationView()
+                    }
                     
-                    LinkButton(urlString: Constants.Manage.privacyURL,
-                               title: "Privacy Policy")
-                    
-                    LinkButton(urlString: Constants.Manage.contactURL,
-                               title: "Send us an email")
-                } header: {
-                    Text("Help & Support")
-                }
-                
-                Section {
-                    NavigationLink("Developer", value: Credits.developer)
-                    
-                    LinkButton(urlString: Constants.Manage.repositoryURL,
-                               title: "Github Repository")
+                    NavigationLink("Developer") {
+                        DeveloperInformationView()
+                    }
                 } header: {
                     Text("About")
                 }
@@ -66,12 +55,6 @@ struct ManageView: View {
                                          preferencesModel: preferencesModel)
                 }
             }
-            .navigationDestination(for: Credits.self) { document in
-                switch document {
-                case .developer:
-                    DeveloperView()
-                }
-            }
         }
     }
 }
@@ -79,6 +62,5 @@ struct ManageView: View {
 
 #Preview {
     ManageView(viewModel: .preview,
-               navModel: NavigationModel(),
                preferencesModel: PreferencesModel())
 }

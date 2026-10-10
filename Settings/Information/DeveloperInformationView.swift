@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct DeveloperView: View {
+struct DeveloperInformationView: View {
     let appName = Text("KartStopper").bold()
     
     let developerName = PersonNameComponents(
@@ -35,11 +35,11 @@ struct DeveloperView: View {
                 .padding(.bottom, Design.Padding.bottom/2)
             }
         }
-        .navigationTitle("Developer")
+        .navigationTitle("About Developer")
         .navigationBarTitleDisplayMode(.inline)
     }
 }
 
 #Preview {
-    DeveloperView()
+    DeveloperInformationView()
 }
