@@ -14,7 +14,7 @@ enum Constants {
         
         static let homeURL = "https://kartstopper.netlify.app/"
         static let faqURL = "https://kartstopper.netlify.app/support/"
-        static let privacyURL = "https://kartstopper.netlify.app/privacy-policy/"
+        static let privacyURL = "https://kartstopper.netlify.app/app-privacy/"
         static let contactURL = "mailto:kartstopper@outlook.com"
         static let developerURL = "https://ashish-brahma.github.io/portfolio/"
         static let repositoryURL = "https://github.com/ashish-brahma/kartstopper"
