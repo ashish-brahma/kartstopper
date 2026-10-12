@@ -28,6 +28,6 @@ struct LinkButton: View {
 
 
 #Preview {
-    LinkButton(urlString: Constants.Manage.repositoryURL,
-               title: "GitHub")
+    LinkButton(urlString: Constants.Manage.Social.repository.urlString,
+               title: Constants.Manage.Social.repository.title)
 }
