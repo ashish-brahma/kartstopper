@@ -176,9 +176,7 @@ struct EditItemView: View {
         do {
             try viewContext.save()
         } catch {
-            if !item.isUpdated {
-                logger.error("Failed to update item. \(error.localizedDescription)")
-            }
+            logger.error("Failed to update item. \(error.localizedDescription)")
         }
     }
     

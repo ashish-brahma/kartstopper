@@ -106,9 +106,7 @@ struct CartListView: View {
         do {
             try viewContext.save()
         } catch {
-            if !cart.isDeleted {
-                logger.error("Failed to delete cart. \(error.localizedDescription)")
-            }
+            logger.error("Failed to delete cart. \(error.localizedDescription)")
         }
     }
     

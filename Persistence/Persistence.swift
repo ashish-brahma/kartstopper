@@ -27,7 +27,6 @@ struct PersistenceController {
                 print("Unresolved error \(error), \(error.userInfo)")
             }
         }
-        logger.debug("Successfully loaded persistent stores.")
         
         container.viewContext.mergePolicy = NSMergePolicy.mergeByPropertyStoreTrump
         container.viewContext.automaticallyMergesChangesFromParent = false

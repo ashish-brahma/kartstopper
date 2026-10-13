@@ -8,9 +8,9 @@
 import SwiftUI
 
 struct DeveloperInformationView: View {
-    let appName = Text("KartStopper").bold()
+    private let appName = Text("KartStopper").bold()
     
-    let developerName = PersonNameComponents(
+    private let developerName = PersonNameComponents(
         givenName: "Ashish",
         familyName: "Brahma"
     )

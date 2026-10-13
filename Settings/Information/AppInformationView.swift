@@ -9,11 +9,11 @@
 import SwiftUI
 
 struct AppInformationView: View {
-    var version: String {
+    private var version: String {
         Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown"
     }
     
-    var icon: UIImage? {
+    private var icon: UIImage? {
         if let icons = Bundle.main.infoDictionary?["CFBundleIcons"] as? [String: Any],
            let primaryIcon = icons["CFBundlePrimaryIcon"] as? [String: Any],
            let iconFiles = primaryIcon["CFBundleIconFiles"] as? [String],
@@ -23,7 +23,7 @@ struct AppInformationView: View {
         return nil
     }
     
-    let copyright: Image = Image(systemName: "c.circle")
+    private let copyright: Image = Image(systemName: "c.circle")
     
     var body: some View {
         GeometryReader { reader in
