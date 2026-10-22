@@ -20,18 +20,18 @@ struct EditBudgetAmountView: View {
     
     @FocusState private var isFocused: Bool
     
-    var currencyCode: String {
+    private var currencyCode: String {
         locale.currency?.identifier ?? "USD"
     }
     
-    var isValidAmount: Bool {
+    private var isValidAmount: Bool {
         if let savedAmount = preferencesModel.budgetAmount {
             return savedAmount > 0
         }
         return false
     }
     
-    var unlockInformation: String {
+    private var unlockInformation: String {
         let nextDate = Date.nextMonthStartDate.formatted(date: .complete,
                                                          time: .omitted)
         

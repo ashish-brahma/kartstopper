@@ -17,7 +17,7 @@ struct BudgetAmountNavigationButton: View {
     
     @Environment(\.locale) private var locale
     
-    var currencyCode: String {
+    private var currencyCode: String {
         locale.currency?.identifier ?? "USD"
     }
     
