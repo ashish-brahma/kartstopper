@@ -17,22 +17,41 @@ struct StatusCardView: View {
     @State private var minValue = 0.0
     @State private var maxValue = 0.0
     
+    private var currencyCode: String {
+        locale.currency?.identifier ?? "USD"
+    }
+    
     var body: some View {
         VStack {
             Gauge(value: current > maxValue ? maxValue: current, in: minValue...maxValue) {
                 Text("This month you have spent")
-                    .font(Font.custom(Design.Fonts.italicCaption,
-                                      size: Design.Fonts.itaticCaptionFontSize))
+                    .font(
+                        Font.system(.headline,
+                                    design: .serif,
+                                    weight: .medium)
+                        .italic()
+                    )
                     .padding(.bottom, Design.Padding.bottom * 4)
+                
             } currentValueLabel: {
-                currencyLabel(for: current)
-                    .font(Font.custom(Design.Fonts.largeNumber,
-                                      size: Design.Fonts.largeNumberFontSize))
+                
+                Text(current, format: .currency(code: currencyCode))
+                    .font(
+                        Font.system(.largeTitle,
+                                    design: .serif,
+                                    weight: .light)
+                    )
                     .foregroundStyle(viewModel.fontColor)
+                
             } minimumValueLabel: {
-                currencyLabel(for: minValue)
+                
+                Text(minValue, format: .currency(code: currencyCode))
+                    .font(.callout)
+                
             } maximumValueLabel: {
-                currencyLabel(for: maxValue)
+                
+                Text(maxValue, format: .currency(code: currencyCode))
+                    .font(.callout)
             }
             .tint(viewModel.gaugeColor)
         }
@@ -43,10 +62,6 @@ struct StatusCardView: View {
             current = viewModel.budget.totalMonthlySpend
             maxValue = viewModel.budget.budgetAmount ?? 0.0
         }
-    }
-    
-    func currencyLabel(for amount: Double) -> some View {
-        Text(amount, format: .currency(code: locale.currency?.identifier ?? "USD"))
     }
 }
 

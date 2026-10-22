@@ -111,11 +111,6 @@
 			path = Preview;
 			sourceTree = "<group>";
 		};
-		6D89C7C12ED9BD8C00EC4D3F /* Fonts */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Fonts;
-			sourceTree = "<group>";
-		};
 		6DCADE572EDD9D6300CD61F2 /* Settings */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -161,7 +156,6 @@
 				6D71AC092EBDF5470009182F /* Persistence */,
 				6D71AC0B2EBDF8250009182F /* Resources */,
 				6D71AC3C2EBE0B720009182F /* Preview */,
-				6D89C7C12ED9BD8C00EC4D3F /* Fonts */,
 				6D977A7A2EE3177500D922E9 /* KartStopper.app */,
 				6D058F642EE066BE00DCDACF /* KartStopperTests.xctest */,
 				6D0590252EE0712800DCDACF /* KSTestPlan.xctestplan */,
@@ -212,7 +206,6 @@
 				6D71AC092EBDF5470009182F /* Persistence */,
 				6D71AC0B2EBDF8250009182F /* Resources */,
 				6D71AC3C2EBE0B720009182F /* Preview */,
-				6D89C7C12ED9BD8C00EC4D3F /* Fonts */,
 				6DCADE572EDD9D6300CD61F2 /* Settings */,
 				6DD8F5C62F112B5400164707 /* Controls */,
 			);

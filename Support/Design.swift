@@ -38,13 +38,6 @@ enum Design {
     enum Spacing {
         static let listRow = CGFloat(8)
     }
-    
-    enum Fonts {
-        static let largeNumber = "NewYorkLarge-Regular"
-        static let largeNumberFontSize = CGFloat(48)
-        static let italicCaption = "NewYorkMedium-SemiboldItalic"
-        static let itaticCaptionFontSize = CGFloat(16)
-    }
 }
 
 // Design Constants
