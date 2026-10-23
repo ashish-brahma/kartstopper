@@ -42,11 +42,25 @@ struct BudgetAmountNavigationButton: View {
     }
 }
 
-#Preview {
+#Preview("Onboarded") {
     NavigationStack {
         Form {
             BudgetAmountNavigationButton(
                 viewModel: .preview,
+                preferencesModel: PreferencesModel(),
+                showEditor: .constant(false),
+                field: .constant(.budgetAmount)
+            )
+        }
+    }
+}
+
+#Preview("Not Onboarded") {
+    let viewModel = ViewModel(budget: Budget(), hasOnboarded: false)
+    NavigationStack {
+        Form {
+            BudgetAmountNavigationButton(
+                viewModel: viewModel,
                 preferencesModel: PreferencesModel(),
                 showEditor: .constant(false),
                 field: .constant(.budgetAmount)

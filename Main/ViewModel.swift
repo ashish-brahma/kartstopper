@@ -38,6 +38,9 @@ class ViewModel: ObservableObject {
     /// Flag to check if user has onboarded.
     @Published var hasOnboarded: Bool = false
     
+    /// Number of onboarding steps pending.
+    @Published var onboardingSteps: Int = 2
+    
     init(
         budget: Budget,
         hasOnboarded: Bool
@@ -80,9 +83,7 @@ class ViewModel: ObservableObject {
     
     /// Check if both amount and difficulty mode of budget have been set.
     func validateOnboarding() {
-        if budget.budgetAmount != nil
-            && budget.budgetMode != nil {
-            
+        if !hasOnboarded && onboardingSteps == 0 {
             UserDefaults.standard.set(true, forKey: "hasOnboarded")
         }
     }

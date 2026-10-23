@@ -47,7 +47,7 @@ struct ContentView: View {
                       systemImage: Tabs.manage.symbol)
             }
             .tag(Tabs.manage)
-            .badge(viewModel.hasOnboarded ? nil : "!")
+            .badge(viewModel.hasOnboarded ? nil : "\(viewModel.onboardingSteps)")
         }
         .task {
             viewModel.loadPreferences(preferencesModel: preferencesModel)

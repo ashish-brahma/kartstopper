@@ -87,7 +87,11 @@ struct EditBudgetAmountView: View {
         if savedAmount != displayAmount {
             preferencesModel.objectWillChange.send()
             preferencesModel.saveData()
+            
             viewModel.objectWillChange.send()
+            if displayAmount == nil {
+                viewModel.onboardingSteps -= 1
+            }
             viewModel.budget.budgetAmount = savedAmount
             
             viewModel.validateOnboarding()
@@ -135,7 +139,7 @@ extension Date {
     }
 }
 
-#Preview {
+#Preview("Onboarded") {
     NavigationStack {
         EditBudgetAmountView(
             viewModel: .preview,
@@ -143,3 +147,14 @@ extension Date {
         )
     }
 }
+
+#Preview("Not Onboarded") {
+    let viewModel = ViewModel(budget: Budget(), hasOnboarded: false)
+    NavigationStack {
+        EditBudgetAmountView(
+            viewModel: viewModel,
+            preferencesModel: PreferencesModel()
+        )
+    }
+}
+

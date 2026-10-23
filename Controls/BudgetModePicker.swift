@@ -48,7 +48,11 @@ struct BudgetModePicker: View {
         if savedMode != displayMode {
             preferencesModel.objectWillChange.send()
             preferencesModel.saveData()
+            
             viewModel.objectWillChange.send()
+            if displayMode == nil {
+                viewModel.onboardingSteps -= 1
+            }
             viewModel.budget.budgetMode = savedMode
             
             viewModel.validateOnboarding()
@@ -57,9 +61,23 @@ struct BudgetModePicker: View {
     }
 }
 
-#Preview {
+#Preview("Onboarded") {
+    let context = PersistenceController.preview.container.viewContext
+    let viewModel = ViewModel.preview
     List {
-        BudgetModePicker(viewModel: .preview,
+        BudgetModePicker(viewModel: viewModel,
+                         preferencesModel: PreferencesModel())
+    }
+    .task {
+        viewModel.budget.budgetMode = .medium
+        viewModel.update(context: context)
+    }
+}
+
+#Preview("Not Onboarded") {
+    let viewModel = ViewModel(budget: Budget(), hasOnboarded: false)
+    List {
+        BudgetModePicker(viewModel: viewModel,
                          preferencesModel: PreferencesModel())
     }
 }

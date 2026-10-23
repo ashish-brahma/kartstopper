@@ -19,10 +19,14 @@ struct ManageView: View {
     @State private var showEditor = false
     @State private var field: ManageField?
     
+    private var onboardingSteps: Text {
+        Text("^[\(viewModel.onboardingSteps) step](inflect: true)").bold()
+    }
+    
     var body: some View {
         NavigationStack {
             Form {
-                Section("Budget") {
+                Section {
                     BudgetAmountNavigationButton(
                         viewModel: viewModel,
                         preferencesModel: preferencesModel,
@@ -33,7 +37,16 @@ struct ManageView: View {
                     BudgetModePicker(
                         viewModel: viewModel,
                         preferencesModel: preferencesModel)
+                } header: {
+                    Text("Budget")
+                } footer: {
+                    if !viewModel.hasOnboarded {
+                        Label("You are \(onboardingSteps) away from setting up your budget.", systemImage: "info.circle")
+                            .labelStyle(.titleOnly)
+                            .foregroundStyle(Color.accentColor)
+                    }
                 }
+                
                 
                 Section {
                     NavigationLink("KartStopper") {
@@ -60,7 +73,14 @@ struct ManageView: View {
 }
 
 
-#Preview {
+#Preview("Onboarded") {
     ManageView(viewModel: .preview,
                preferencesModel: PreferencesModel())
 }
+
+#Preview("Not onboarded") {
+    let viewModel = ViewModel(budget: Budget(), hasOnboarded: false)
+    ManageView(viewModel: viewModel,
+               preferencesModel: PreferencesModel())
+}
+
