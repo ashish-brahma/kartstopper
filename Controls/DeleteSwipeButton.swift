@@ -12,10 +12,11 @@ struct DeleteSwipeButton: View {
     let action: () -> Void
     
     var body: some View {
-        Button(role: .destructive, action: action) {
+        Button(action: action) {
             Label("Delete", systemImage: "trash")
                 .labelStyle(.iconOnly)
         }
+        .tint(Color.red)
     }
 }
 

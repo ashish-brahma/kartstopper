@@ -14,9 +14,9 @@ struct EditSwipeButton: View {
     var body: some View {
         Button(action: action) {
             Label("Edit", systemImage: "pencil")
-                .tint(.edit)
                 .labelStyle(.iconOnly)
         }
+        .tint(.edit)
     }
 }
 
