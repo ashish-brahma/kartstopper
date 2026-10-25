@@ -18,86 +18,148 @@ struct CartListView: View {
     @ObservedObject var navModel: NavigationModel
     
     @Environment(\.managedObjectContext) private var viewContext
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @Environment(\.verticalSizeClass) private var verticalSizeClass
     
     @SectionedFetchRequest<String, CDCart>(
         sectionIdentifier: \.sectionDate,
-        sortDescriptors: [NSSortDescriptor(keyPath: \CDCart.id, ascending: true)]
+        sortDescriptors: [NSSortDescriptor(keyPath: \CDCart.id, ascending: false)]
     )
     private var carts: SectionedFetchResults<String, CDCart>
     
     @State private var showAddCart = false
     @State private var showEditCart = false
-    
+    @State private var columnVisibility =
+    NavigationSplitViewVisibility.detailOnly
     
     var body: some View {
-        NavigationStack(path: $navModel.presentedCarts) {
-            List(selection: $navModel.selectedCart) {
-                ForEach(carts) { section in
-                    Section(header: Text(section.id)) {
-                        ForEach(section) { cart in
-                            CartNavigationButton(
-                                navModel: navModel,
-                                cart: cart,
-                                showEditCart: $showEditCart,
-                                onDelete: { deleteCart(cart) }
-                            )
-                        }
-                        .onDelete { indexSet in
-                            deleteCart(in: Array(section),
-                                       at: indexSet)
+        GeometryReader { proxy in
+            NavigationSplitView(columnVisibility: $columnVisibility) {
+                ZStack {
+                    Rectangle()
+                        .fill(Color.background)
+                        .ignoresSafeArea()
+                    
+                    listView()
+                        .scrollContentBackground(.hidden)
+                        .background(Material.thin)
+                }
+            } detail: {
+                ZStack {
+                    Rectangle()
+                        .fill(Color.background)
+                        .ignoresSafeArea()
+                    
+                    
+                    if let cart = navModel.selectedCart {
+                        ChecklistView(cart: cart,
+                                      viewModel: viewModel,
+                                      navModel: navModel)
+                    }
+                    
+                    if horizontalSizeClass == .regular
+                        && verticalSizeClass == .regular {
+                        
+                        if viewModel.totalCarts == 0 {
+                            VStack {
+                                ContentView.unavailableView(
+                                    label: "No Carts",
+                                    symbolName: "cart.badge.plus",
+                                    description: "New carts you add will group items."
+                                )
+                                .padding(.bottom, Design.Padding.bottom)
+                                
+                                Button("Let's  start.") {
+                                    columnVisibility =
+                                    NavigationSplitViewVisibility.doubleColumn
+                                }
+                                .buttonStyle(.bordered)
+                            }
+                            .frame(maxHeight: proxy.size.height/2)
                         }
                     }
                 }
-                
-                if showAddCart {
-                    AddCartView(viewModel: viewModel,
-                                showAddCart: $showAddCart)
-                }
             }
             .overlay {
-                if !showAddCart {
+                if horizontalSizeClass == .compact
+                    && verticalSizeClass == .regular {
+                    
                     if viewModel.totalCarts == 0 {
+                        
                         ContentView.unavailableView(
                             label: "No Carts",
                             symbolName: "cart.badge.plus",
                             description: "New carts you add will appear here."
                         )
-                    } else if carts.isEmpty {
-                        ContentView.searchUnavailableView
                     }
                 }
             }
-            .searchable(text: $viewModel.cartQuery, placement: .navigationBarDrawer)
-            .onChange(of: viewModel.cartQuery) { newValue in
-                carts.nsPredicate = newValue.isEmpty ? nil : NSPredicate(format: "name CONTAINS[cd] %@", viewModel.cartQuery)
-            }
-            .navigationTitle("Carts")
-            .navigationTitleColor(Color.foreground)
-            .navigationDestination(for: CDCart.self) { cart in
-                ChecklistView(cart: cart,
-                              viewModel: viewModel,
-                              navModel: navModel)
-            }
-            .textInputAutocapitalization(.never)
-            .scrollContentBackground(.hidden)
-            .background(Color.background)
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    EditButton()
-                        .disabled(carts.isEmpty)
-                }
-                ToolbarItem(placement: .primaryAction) {
-                    AddToolbarButton(entityName: "cart") {
-                        showAddCart = true
+            .ignoresSafeArea()
+        }
+    }
+    
+    @ViewBuilder
+    private func listView() -> some View {
+        List(selection: $navModel.selectedCart) {
+            ForEach(carts) { section in
+                Section(header: Text(section.id)) {
+                    ForEach(section) { cart in
+                        CartNavigationButton(
+                            navModel: navModel,
+                            cart: cart,
+                            showEditCart: $showEditCart,
+                            onDelete: { deleteCart(cart) }
+                        )
+                        .listRowBackground(navModel.selectedCart == cart ? Color.blue : Color(.secondarySystemGroupedBackground))
                     }
-                    .disabled(showAddCart)
+                    .onDelete { indexSet in
+                        deleteCart(in: Array(section),
+                                   at: indexSet)
+                    }
                 }
             }
-            .sheet(isPresented: $showEditCart) {
-                if let selection = navModel.selectedCart {
-                    EditCartView(viewModel: viewModel,
-                                 cart: selection)
+            
+            if showAddCart {
+                AddCartView(viewModel: viewModel,
+                            showAddCart: $showAddCart)
+            }
+        }
+        .overlay {
+            if !showAddCart
+                && viewModel.totalCarts != 0
+                && carts.isEmpty {
+                ContentView.searchUnavailableView
+            }
+        }
+        .searchable(text: $viewModel.cartQuery, placement: .navigationBarDrawer)
+        .navigationTitle("Carts")
+        .navigationTitleColor(Color.foreground)
+        .textInputAutocapitalization(.never)
+        .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                EditButton()
+                    .disabled(carts.isEmpty)
+            }
+            ToolbarItem(placement: .primaryAction) {
+                AddToolbarButton(entityName: "cart") {
+                    showAddCart = true
                 }
+                .disabled(showAddCart)
+            }
+        }
+        .sheet(isPresented: $showEditCart) {
+            if let selection = navModel.selectedCart {
+                EditCartView(viewModel: viewModel,
+                             cart: selection)
+            }
+        }
+        .onChange(of: viewModel.cartQuery) { newValue in
+            carts.nsPredicate = newValue.isEmpty ? nil : NSPredicate(format: "name CONTAINS[cd] %@", viewModel.cartQuery)
+        }
+        .onChange(of: viewModel.totalCarts) { newCount in
+            if let section = carts.first,
+               let cart = section.first {
+                navModel.selectedCart = cart
             }
         }
     }

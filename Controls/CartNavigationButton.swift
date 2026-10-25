@@ -19,11 +19,10 @@ struct CartNavigationButton: View {
     
     var body: some View {
         Button {
-            withAnimation {
-                navModel.presentedCarts.append(cart)
-            }
+            navModel.selectedCart = cart
         } label: {
-            CartRowView(cart: cart)
+            CartRowView(cart: cart,
+                        navModel: navModel)
         }
         .swipeActions(edge: .trailing) {
             DeleteSwipeButton(action: onDelete)

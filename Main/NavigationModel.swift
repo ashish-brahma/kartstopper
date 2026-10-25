@@ -16,9 +16,6 @@ class NavigationModel: ObservableObject, Codable {
     /// Currently selected cart in carts list.
     @Published var selectedCart: CDCart?
     
-    /// Array of carts pushed on carts' navigation stack.
-    @Published var presentedCarts: [CDCart] = []
-    
     /// Currently selected item in checklist.
     @Published var selectedItem: CDItem?
     
@@ -35,7 +32,7 @@ class NavigationModel: ObservableObject, Codable {
     /// Type that enumerates keys used for encoding and decoding.
     enum CodingKeys: String, CodingKey {
         case selectedTab
-        case cartPathIds
+        case selectedCart
         case cardPathIds
         case timeRangeCategories
         case timeRangeExpenses
@@ -45,7 +42,7 @@ class NavigationModel: ObservableObject, Codable {
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encodeIfPresent(selectedTab, forKey: .selectedTab)
-        try container.encode(presentedCarts.map(\.id), forKey: .cartPathIds)
+        try container.encodeIfPresent(selectedCart.map(\.id), forKey: .selectedCart)
         try container.encode(presentedCards.map(\.id), forKey: .cardPathIds)
         try container.encode(selectedTimeRangeForCategories.rawValue, forKey: .timeRangeCategories)
         try container.encode(selectedTimeRangeForExpenses.rawValue, forKey: .timeRangeExpenses)
@@ -59,8 +56,10 @@ class NavigationModel: ObservableObject, Codable {
         
         self.selectedTab = try container.decodeIfPresent(Tabs.self, forKey: .selectedTab)
         
-        let cartPathIds = try container.decode([CDCart.ID].self, forKey: .cartPathIds)
-        self.presentedCarts = CDCart.getCarts(by: cartPathIds)
+        let selectedCartId = try container.decodeIfPresent(CDCart.ID.self, forKey: .selectedCart)
+        if let cartId = selectedCartId {
+            self.selectedCart = CDCart.getCarts(by: [cartId]).first
+        }
         
         let cardPathIds = try container.decode([Card.ID].self, forKey: .cardPathIds)
         self.presentedCards = cardPathIds.compactMap { Card.allCases[$0] }
@@ -87,7 +86,7 @@ class NavigationModel: ObservableObject, Codable {
                   let model = try? JSONDecoder().decode(NavigationModel.self, from: data)
             else { return }
             self.selectedTab = model.selectedTab
-            self.presentedCarts = model.presentedCarts
+            self.selectedCart = model.selectedCart
             self.presentedCards = model.presentedCards
             self.selectedTimeRangeForCategories = model.selectedTimeRangeForCategories
             self.selectedTimeRangeForExpenses = model.selectedTimeRangeForExpenses

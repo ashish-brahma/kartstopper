@@ -25,6 +25,11 @@ enum Design {
     
     static let iconRadius = CGFloat(36)
     
+    static let addItemMaxWidth = CGFloat(300)
+    static let addItemCornerRadius = CGFloat(21)
+    
+    static let quantityStepperWidth = CGFloat(256)
+    
     enum Padding {
         static let vertical = CGFloat(4)
         static let horizontal = CGFloat(4)
@@ -37,6 +42,7 @@ enum Design {
     
     enum Spacing {
         static let listRow = CGFloat(8)
+        static let checklistSection = CGFloat(12)
     }
 }
 

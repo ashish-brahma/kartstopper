@@ -84,11 +84,22 @@ struct ChecklistView: View {
                     }
                     .listRowBackground(Color.clear)
                     
-                    
-                    AddItemView(viewModel: viewModel,
-                                cart: cart)
+                    HStack {
+                        Spacer()
+                        
+                        AddItemView(viewModel: viewModel,
+                                    cart: cart)
+                        .frame(maxWidth: Design.addItemMaxWidth)
+                        .padding(Design.Padding.standard)
+                        .background {
+                            RoundedRectangle(cornerRadius: Design.addItemCornerRadius)
+                                .fill(Color(.tertiarySystemFill))
+                        }
+                        
+                        Spacer()
+                    }
                     .id(bottomID)
-                    .listRowBackground(Color(.tertiarySystemFill))
+                    .listRowBackground(Color.clear)
                 }
                 .overlay {
                     if totalItems != 0 && itemList.isEmpty {
@@ -103,7 +114,6 @@ struct ChecklistView: View {
                 .navigationTitle(cart.displayName)
                 .navigationTitleColor(Color.foreground)
                 .scrollContentBackground(.hidden)
-                .background(Color.background)
                 .toolbar {
                     ToolbarItem(placement: .primaryAction) {
                         EditButton()

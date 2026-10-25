@@ -11,11 +11,16 @@ import CoreData
 
 struct CartRowView: View {
     @ObservedObject var cart: CDCart
+    @ObservedObject var navModel: NavigationModel
     
     @Environment(\.managedObjectContext) private var viewContext
     
     private var totalItems: Int {
         CDCart.getTotalItems(for: cart, context: viewContext)
+    }
+    
+    private var isSelected: Bool {
+        navModel.selectedCart == cart
     }
     
     var body: some View {
@@ -28,7 +33,7 @@ struct CartRowView: View {
                 HStack {
                     Text(cart.displayName)
                         .font(.largeTitle)
-                        .foregroundStyle(Color.foreground)
+                        .foregroundStyle(isSelected ? Color.white : Color.foreground)
                     Spacer()
                     Text("\(totalItems)")
                         .font(.system(size: Design.itemCountFontSize, weight: .semibold))
@@ -41,16 +46,34 @@ struct CartRowView: View {
                     .frame(alignment: .leading)
                 
             }
-            .foregroundStyle(.gray.opacity(0.8))
+            .foregroundStyle(isSelected ? Color.white : .secondary)
         }
     }
 }
 
-#Preview {
+#Preview("Not Selected") {
     GeometryReader { reader in
-        CartRowView(cart: .preview)
-            .position(x: reader.size.width/2, y: reader.size.height/2)
-            .environment(\.managedObjectContext,
-                          PersistenceController.preview.container.viewContext)
+        CartRowView(cart: .preview,
+                    navModel: NavigationModel())
+        .position(x: reader.size.width/2, y: reader.size.height/2)
+        .environment(\.managedObjectContext,
+                      PersistenceController.preview.container.viewContext)
+    }
+}
+
+#Preview("Selected") {
+    let navModel = NavigationModel()
+    let cart = CDCart.preview
+    
+    GeometryReader { reader in
+        CartRowView(cart: cart,
+                    navModel: navModel)
+        .background(.blue)
+        .position(x: reader.size.width/2, y: reader.size.height/2)
+        .environment(\.managedObjectContext,
+                      PersistenceController.preview.container.viewContext)
+        .task {
+            navModel.selectedCart = cart
+        }
     }
 }

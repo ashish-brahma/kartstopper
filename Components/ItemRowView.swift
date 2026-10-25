@@ -58,38 +58,49 @@ struct ItemRowView: View {
     }
     
     private func columnLabel() -> some View {
-        VStack(alignment: .leading) {
-            ItemOverviewLabel(
-                imageURL: item.imageURL,
-                name: item.displayName,
-                price: item.price,
-                itemColor: item.itemColor,
-                reader: reader
-            )
-            .frame(height: reader.size.height/6)
+        VStack {
+            HStack {
+                VStack(alignment: .leading) {
+                    ItemOverviewLabel(
+                        imageURL: item.imageURL,
+                        name: item.displayName,
+                        price: item.price,
+                        itemColor: item.itemColor,
+                        reader: reader
+                    )
+                    .padding(.horizontal, Design.Padding.horizontal)
+                }
+                .frame(width: reader.size.width/2,
+                       height: reader.size.height/9)
+                
+                Spacer()
+            }
             
-            QuantityStepper(viewModel: viewModel,
-                            item: item)
-            .frame(width: reader.size.width/2)
-            .padding(.horizontal, Design.Padding.horizontal)
+            HStack(alignment: .bottom) {
+                Spacer()
+                
+                VStack(alignment: .trailing) {
+                    Spacer()
+                    QuantityStepper(viewModel: viewModel,
+                                    item: item)
+                    .padding(.horizontal, Design.Padding.horizontal)
+                }
+                .frame(width: Design.quantityStepperWidth)
+            }
         }
-        .frame(width: reader.size.width * 0.6,
-               alignment: .leading)
     }
 }
 
 #Preview() {
     GeometryReader { reader in
-        ItemRowView(viewModel: .preview,
-                    navModel: NavigationModel(),
-                    item: .preview,
-                    showItemInfo: .constant(false),
-                    reader: reader,
-                    deleteAction: { })
-        
-        .position(x: reader.size.width/2,
-                  y: reader.size.height/2)
-        
+        List {
+            ItemRowView(viewModel: .preview,
+                        navModel: NavigationModel(),
+                        item: .preview,
+                        showItemInfo: .constant(false),
+                        reader: reader,
+                        deleteAction: { })
+        }
         .environment(\.managedObjectContext,
                       PersistenceController.preview.container.viewContext)
     }
