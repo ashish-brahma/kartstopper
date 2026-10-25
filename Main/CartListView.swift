@@ -60,7 +60,7 @@ struct CartListView: View {
                     if horizontalSizeClass == .regular
                         && verticalSizeClass == .regular {
                         
-                        if viewModel.totalCarts == 0 {
+                        if !showAddCart && viewModel.totalCarts == 0 {
                             VStack {
                                 ContentView.unavailableView(
                                     label: "No Carts",
@@ -84,8 +84,7 @@ struct CartListView: View {
                 if horizontalSizeClass == .compact
                     && verticalSizeClass == .regular {
                     
-                    if viewModel.totalCarts == 0 {
-                        
+                    if !showAddCart && viewModel.totalCarts == 0 {
                         ContentView.unavailableView(
                             label: "No Carts",
                             symbolName: "cart.badge.plus",
@@ -157,9 +156,11 @@ struct CartListView: View {
             carts.nsPredicate = newValue.isEmpty ? nil : NSPredicate(format: "name CONTAINS[cd] %@", viewModel.cartQuery)
         }
         .onChange(of: viewModel.totalCarts) { newCount in
-            if let section = carts.first,
-               let cart = section.first {
-                navModel.selectedCart = cart
+            if UIDevice.current.userInterfaceIdiom == .pad {
+                if let section = carts.first,
+                   let cart = section.first {
+                    navModel.selectedCart = cart
+                }
             }
         }
     }
