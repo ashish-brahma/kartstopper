@@ -29,76 +29,59 @@ struct CartListView: View {
     
     @State private var showAddCart = false
     @State private var showEditCart = false
-    @State private var columnVisibility =
-    NavigationSplitViewVisibility.detailOnly
+    @State private var columnVisibility = NavigationSplitViewVisibility.detailOnly
+    
+    // MARK: - Navigation split view
     
     var body: some View {
         GeometryReader { proxy in
             NavigationSplitView(columnVisibility: $columnVisibility) {
-                ZStack {
-                    Rectangle()
-                        .fill(Color.background)
-                        .ignoresSafeArea()
-                    
-                    listView()
-                        .scrollContentBackground(.hidden)
-                        .background(Material.thin)
-                }
+                cartsSidebar()
             } detail: {
-                ZStack {
-                    Rectangle()
-                        .fill(Color.background)
-                        .ignoresSafeArea()
-                    
-                    
-                    if let cart = navModel.selectedCart {
-                        ChecklistView(cart: cart,
-                                      viewModel: viewModel,
-                                      navModel: navModel)
-                    }
-                    
-                    if horizontalSizeClass == .regular
-                        && verticalSizeClass == .regular {
-                        
-                        if !showAddCart && viewModel.totalCarts == 0 {
-                            VStack {
-                                ContentView.unavailableView(
-                                    label: "No Carts",
-                                    symbolName: "cart.badge.plus",
-                                    description: "New carts you add will group items."
-                                )
-                                .padding(.bottom, Design.Padding.bottom)
-                                
-                                Button("Let's  start.") {
-                                    columnVisibility =
-                                    NavigationSplitViewVisibility.doubleColumn
-                                }
-                                .buttonStyle(.bordered)
-                            }
-                            .frame(maxHeight: proxy.size.height/2)
-                        }
-                    }
-                }
+                cartsDetail(proxy: proxy)
             }
             .overlay {
-                if horizontalSizeClass == .compact
-                    && verticalSizeClass == .regular {
-                    
-                    if !showAddCart && viewModel.totalCarts == 0 {
-                        ContentView.unavailableView(
-                            label: "No Carts",
-                            symbolName: "cart.badge.plus",
-                            description: "New carts you add will appear here."
-                        )
-                    }
-                }
+                cartsUnavailableOverlay()
             }
             .ignoresSafeArea()
         }
     }
     
     @ViewBuilder
-    private func listView() -> some View {
+    private func cartsSidebar() -> some View {
+        ZStack {
+            Rectangle()
+                .fill(Color.background)
+                .ignoresSafeArea()
+            
+            cartsList()
+                .scrollContentBackground(.hidden)
+                .background(Material.thin)
+        }
+    }
+    
+    @ViewBuilder
+    private func cartsDetail(proxy: GeometryProxy) -> some View {
+        ZStack {
+            Rectangle()
+                .fill(Color.background)
+                .ignoresSafeArea()
+            
+            
+            if let cart = navModel.selectedCart {
+                ChecklistView(cart: cart,
+                              viewModel: viewModel,
+                              navModel: navModel)
+            }
+            
+            cartsUnavailableDetail(proxy: proxy)
+        }
+    }
+    
+    // MARK: - List view
+    
+    @ViewBuilder
+    private func cartsList() -> some View {
         List(selection: $navModel.selectedCart) {
             ForEach(carts) { section in
                 Section(header: Text(section.id)) {
@@ -156,14 +139,64 @@ struct CartListView: View {
             carts.nsPredicate = newValue.isEmpty ? nil : NSPredicate(format: "name CONTAINS[cd] %@", viewModel.cartQuery)
         }
         .onChange(of: viewModel.totalCarts) { newCount in
-            if UIDevice.current.userInterfaceIdiom == .pad {
-                if let section = carts.first,
-                   let cart = section.first {
-                    navModel.selectedCart = cart
-                }
+            selectLatestCart()
+        }
+        .task {
+            selectLatestCart()
+        }
+    }
+    
+    
+    private func selectLatestCart() {
+        if horizontalSizeClass == .regular {
+            if let section = carts.first,
+               let cart = section.first {
+                navModel.selectedCart = cart
             }
         }
     }
+    
+    // MARK: - Content unavailable views
+    
+    @ViewBuilder
+    private func cartsUnavailableDetail(proxy: GeometryProxy) -> some View {
+        if horizontalSizeClass == .regular {
+            
+            if !showAddCart && viewModel.totalCarts == 0 {
+                VStack {
+                    CartListView.unavailableView(
+                        label: "No Carts",
+                        symbolName: "cart.badge.plus",
+                        description: "New carts you add will group items."
+                    )
+                    .padding(.bottom, Design.Padding.bottom)
+                    
+                    Button("Let's  start.") {
+                        columnVisibility = NavigationSplitViewVisibility.doubleColumn
+                    }
+                    .buttonStyle(.bordered)
+                }
+                .frame(maxHeight: proxy.size.height/2)
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private func cartsUnavailableOverlay() -> some View {
+        if horizontalSizeClass == .compact
+            && verticalSizeClass == .regular {
+            
+            if !showAddCart && viewModel.totalCarts == 0 {
+                CartListView.unavailableView(
+                    label: "No Carts",
+                    symbolName: "cart.badge.plus",
+                    description: "New carts you add will appear here."
+                )
+            }
+        }
+    }
+    
+    // MARK: - Core Data methods
     
     private func saveContext(cart: CDCart) {
         do {
