@@ -70,7 +70,7 @@ struct ChecklistView: View {
                                 navModel: navModel,
                                 item: item,
                                 showItemInfo: $showItemInfo,
-                                reader: geometryProxy,
+                                proxy: geometryProxy,
                                 deleteAction: { deleteItem(item) }
                             )
                         }

@@ -41,7 +41,7 @@ struct CartsFrequencyChart: View {
 }
 
 struct TopFrequentCarts: View {
-    let reader: GeometryProxy
+    let proxy: GeometryProxy
     
     @Environment(\.managedObjectContext) private var viewContext
     
@@ -72,7 +72,7 @@ struct TopFrequentCarts: View {
                     .foregroundStyle(Color.foreground)
                 
                 HStack {
-                    Spacer(minLength: reader.size.width / 3)
+                    Spacer(minLength: proxy.size.width / 3)
                     CartsFrequencyChart(data: data)
                         .padding(.top, -1.5 * Design.Padding.top)
                         .frame(height: 60)
@@ -89,9 +89,9 @@ struct TopFrequentCarts: View {
 }
 
 #Preview {
-    GeometryReader { reader in
+    GeometryReader { proxy in
         VStack {
-            TopFrequentCarts(reader: reader)
+            TopFrequentCarts(proxy: proxy)
                 .frame(height: 300)
         }
         .padding()

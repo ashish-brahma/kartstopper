@@ -19,7 +19,7 @@ struct ItemRowView: View {
     
     @ObservedObject var item: CDItem
     @Binding var showItemInfo: Bool
-    let reader: GeometryProxy
+    let proxy: GeometryProxy
     let deleteAction: () -> Void
     
     var body: some View {
@@ -66,12 +66,12 @@ struct ItemRowView: View {
                         name: item.displayName,
                         price: item.price,
                         itemColor: item.itemColor,
-                        reader: reader
+                        proxy: proxy
                     )
                     .padding(.horizontal, Design.Padding.horizontal)
                 }
-                .frame(width: reader.size.width/2,
-                       height: reader.size.height/9)
+                .frame(width: proxy.size.width/2,
+                       height: proxy.size.height/9)
                 
                 Spacer()
             }
@@ -92,13 +92,13 @@ struct ItemRowView: View {
 }
 
 #Preview() {
-    GeometryReader { reader in
+    GeometryReader { proxy in
         List {
             ItemRowView(viewModel: .preview,
                         navModel: NavigationModel(),
                         item: .preview,
                         showItemInfo: .constant(false),
-                        reader: reader,
+                        proxy: proxy,
                         deleteAction: { })
         }
         .environment(\.managedObjectContext,

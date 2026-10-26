@@ -52,7 +52,7 @@ struct CategoriesOverviewChart: View {
 }
 
 struct CategoriesOverview : View {
-    var reader: GeometryProxy
+    var proxy: GeometryProxy
     @State private var timeRange: TimeRange = .last30days
     
     @Environment(\.managedObjectContext) private var viewContext
@@ -103,7 +103,7 @@ struct CategoriesOverview : View {
                     .foregroundStyle(.accent)
                 
                 HStack {
-                    Spacer(minLength: reader.size.width / 2.8)
+                    Spacer(minLength: proxy.size.width / 2.8)
                     CategoriesOverviewChart(data: data)
                         .frame(height: 80)
                 }
@@ -113,9 +113,9 @@ struct CategoriesOverview : View {
 }
 
 #Preview {
-    GeometryReader { reader in
+    GeometryReader { proxy in
         VStack {
-            CategoriesOverview(reader: reader)
+            CategoriesOverview(proxy: proxy)
                 .frame(height: 300)
         }
         .padding()

@@ -25,7 +25,7 @@ struct ExpenditureOverviewChart: View {
 }
 
 struct ExpenditureOverview: View {
-    var reader: GeometryProxy
+    var proxy: GeometryProxy
     @State private var timeRange: TimeRange = .last7days
     
     @Environment(\.managedObjectContext) private var viewContext
@@ -70,7 +70,7 @@ struct ExpenditureOverview: View {
                     .foregroundStyle(.accent)
                 
                 HStack {
-                    Spacer(minLength: reader.size.width / 2.8)
+                    Spacer(minLength: proxy.size.width / 2.8)
                     ExpenditureOverviewChart(data: data)
                         .frame(height: 60)
                 }
@@ -81,9 +81,9 @@ struct ExpenditureOverview: View {
 }
 
 #Preview {
-    GeometryReader { reader in
+    GeometryReader { proxy in
         VStack {
-            ExpenditureOverview(reader: reader)
+            ExpenditureOverview(proxy: proxy)
         }
         .frame(height: 300)
     }

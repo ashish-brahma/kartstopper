@@ -14,7 +14,7 @@ struct ItemOverviewLabel: View {
     let name: String
     let price: Double
     let itemColor: Color
-    let reader: GeometryProxy
+    let proxy: GeometryProxy
     
     var body: some View {
         HStack(alignment: .top) {
@@ -51,8 +51,8 @@ struct ItemOverviewLabel: View {
             ProgressView()
         }
         .frame(
-            maxWidth: reader.size.width/6,
-            maxHeight: reader.size.width/6,
+            maxWidth: proxy.size.width/6,
+            maxHeight: proxy.size.width/6,
         )
         .padding(.trailing)
     }
@@ -68,8 +68,8 @@ struct ItemOverviewLabel: View {
                     .font(.system(size: Design.avatarTextFontSize))
             }
             .frame(
-                maxWidth: reader.size.width/6,
-                maxHeight: reader.size.width/6,
+                maxWidth: proxy.size.width/6,
+                maxHeight: proxy.size.width/6,
             )
             .padding(.trailing)
     }
@@ -77,13 +77,13 @@ struct ItemOverviewLabel: View {
 
 #Preview {
     let item = CDItem.preview
-    GeometryReader { reader in
+    GeometryReader { proxy in
         ItemOverviewLabel(imageURL: nil,
                           name: item.displayName,
                           price: item.price,
                           itemColor: item.itemColor,
-                          reader: reader)
-        .position(x: reader.size.width/2,
-                  y: reader.size.height/2)
+                          proxy: proxy)
+        .position(x: proxy.size.width/2,
+                  y: proxy.size.height/2)
     }
 }

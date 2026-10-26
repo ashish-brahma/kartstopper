@@ -52,10 +52,10 @@ struct CartRowView: View {
 }
 
 #Preview("Not Selected") {
-    GeometryReader { reader in
+    GeometryReader { proxy in
         CartRowView(cart: .preview,
                     navModel: NavigationModel())
-        .position(x: reader.size.width/2, y: reader.size.height/2)
+        .position(x: proxy.size.width/2, y: proxy.size.height/2)
         .environment(\.managedObjectContext,
                       PersistenceController.preview.container.viewContext)
     }
@@ -65,11 +65,11 @@ struct CartRowView: View {
     let navModel = NavigationModel()
     let cart = CDCart.preview
     
-    GeometryReader { reader in
+    GeometryReader { proxy in
         CartRowView(cart: cart,
                     navModel: navModel)
         .background(.blue)
-        .position(x: reader.size.width/2, y: reader.size.height/2)
+        .position(x: proxy.size.width/2, y: proxy.size.height/2)
         .environment(\.managedObjectContext,
                       PersistenceController.preview.container.viewContext)
         .task {

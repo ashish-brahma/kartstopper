@@ -26,10 +26,10 @@ struct AppInformationView: View {
     private let copyright: Image = Image(systemName: "c.circle")
     
     var body: some View {
-        GeometryReader { reader in
+        GeometryReader { proxy in
             List {
                 Section {
-                    heroView(proxy: reader)
+                    heroView(proxy: proxy)
                 }
                 .listRowBackground(Color.clear)
                 

@@ -18,7 +18,7 @@ struct DashboardView: View {
     @Binding var showPreferences: Bool
     
     var body: some View {
-        GeometryReader { reader in
+        GeometryReader { proxy in
             NavigationStack(path: $navModel.presentedCards) {
                 List {
                     if !viewModel.hasOnboarded {
@@ -29,18 +29,18 @@ struct DashboardView: View {
                     }
                     
                     Section {
-                        TopFrequentCarts(reader: reader)
+                        TopFrequentCarts(proxy: proxy)
                     }
                     
                     Section {
                         StatusCardView(viewModel: viewModel)
                         
                         NavigationLink(value: Card.expenses) {
-                            ExpenditureOverview(reader: reader)
+                            ExpenditureOverview(proxy: proxy)
                         }
                         
                         NavigationLink(value: Card.categories) {
-                            CategoriesOverview(reader: reader)
+                            CategoriesOverview(proxy: proxy)
                         }
                     } header: {
                         Text(viewModel.dynamicTitle)

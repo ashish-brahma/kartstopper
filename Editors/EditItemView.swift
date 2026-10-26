@@ -34,14 +34,14 @@ struct EditItemView: View {
     @FocusState private var focusedField: Field?
     
     var body: some View {
-        GeometryReader { reader in
+        GeometryReader { proxy in
             NavigationStack {
                 Form {
                     Section {
                         if item.imageURL != nil {
-                            displayImage(reader: reader)
+                            displayImage(proxy: proxy)
                         } else {
-                            placeholderImage(reader: reader)
+                            placeholderImage(proxy: proxy)
                         }
                     }
                     .listRowBackground(Color.clear)
@@ -129,7 +129,7 @@ struct EditItemView: View {
         }
     }
     
-    private func displayImage(reader: GeometryProxy) -> some View {
+    private func displayImage(proxy: GeometryProxy) -> some View {
         AsyncImage(url: item.imageURL) { image in
             image
                 .resizable()
@@ -137,11 +137,11 @@ struct EditItemView: View {
         } placeholder: {
             ProgressView()
         }
-        .frame(width: reader.size.width/1.11,
-               height: reader.size.height/2)
+        .frame(width: proxy.size.width/1.11,
+               height: proxy.size.height/2)
     }
     
-    private func placeholderImage(reader: GeometryProxy) -> some View {
+    private func placeholderImage(proxy: GeometryProxy) -> some View {
         RoundedRectangle(cornerRadius: Design.avatarDetailCornerRadius)
             .fill(item.itemColor)
             .overlay {
@@ -150,8 +150,8 @@ struct EditItemView: View {
                         .font(.system(size: Design.avatarDetailTextFontSize))
                 }
             }
-            .frame(width: reader.size.width/1.11,
-                   height: reader.size.height/2)
+            .frame(width: proxy.size.width/1.11,
+                   height: proxy.size.height/2)
     }
     
     private func updateItem() {

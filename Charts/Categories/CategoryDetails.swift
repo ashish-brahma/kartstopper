@@ -52,9 +52,9 @@ struct CategoryDetailsChart: View {
     }
     
     var body: some View {
-        GeometryReader { reader in
+        GeometryReader { proxy in
             VStack {
-                header(reader: reader)
+                header(proxy: proxy)
                 
                 if #available(iOS 17.0, *) {
                     chartView()
@@ -71,12 +71,12 @@ struct CategoryDetailsChart: View {
     }
     
     @ViewBuilder
-    private func header(reader: GeometryProxy) -> some View {
+    private func header(proxy: GeometryProxy) -> some View {
         if #available(iOS 17.0, *) {
             // Use chart background to display label.
         } else {
             HStack {
-                chartLabel(reader: reader,
+                chartLabel(proxy: proxy,
                            horizontalAlignment: .leading)
                 Spacer()
             }
@@ -124,23 +124,23 @@ struct CategoryDetailsChart: View {
     @available(iOS 17.0, *)
     @ViewBuilder
     private func backgroundView(chartProxy: ChartProxy) -> some View {
-        GeometryReader { reader in
+        GeometryReader { proxy in
             if let anchor = chartProxy.plotFrame {
                 chartLabel(
-                    reader: reader,
+                    proxy: proxy,
                     horizontalAlignment: .center
                 )
                 .multilineTextAlignment(.center)
-                .frame(maxWidth: reader.size.width / 2.2)
-                .position(x: reader[anchor].midX,
-                          y: reader[anchor].midY)
+                .frame(maxWidth: proxy.size.width / 2.2)
+                .position(x: proxy[anchor].midX,
+                          y: proxy[anchor].midY)
             }
         }
     }
     
     @ViewBuilder
     private func chartLabel(
-        reader: GeometryProxy,
+        proxy: GeometryProxy,
         horizontalAlignment: HorizontalAlignment
     ) -> some View {
         VStack(alignment: horizontalAlignment) {
@@ -204,12 +204,12 @@ struct CategoryDetails : View {
     }
     
     var body: some View {
-        GeometryReader { reader in
+        GeometryReader { proxy in
             List {
                 if !data.isEmpty {
                     Section {
                         CategoryDetailsChart(data: data)
-                            .frame(height: reader.size.height/2)
+                            .frame(height: proxy.size.height/2)
                     } header: {
                         TimeRangePicker(value: $selectedTimeRange)
                     } footer: {
