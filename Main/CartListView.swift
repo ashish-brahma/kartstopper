@@ -20,6 +20,7 @@ struct CartListView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(\.verticalSizeClass) private var verticalSizeClass
+    @Environment(\.colorScheme) private var colorScheme
     
     @SectionedFetchRequest<String, CDCart>(
         sectionIdentifier: \.sectionDate,
@@ -49,15 +50,19 @@ struct CartListView: View {
     
     @ViewBuilder
     private func cartsSidebar() -> some View {
-        ZStack {
-            Rectangle()
-                .fill(Color.background)
-                .ignoresSafeArea()
-            
-            cartsList()
-                .scrollContentBackground(.hidden)
-                .background(Material.thin)
-        }
+        cartsList()
+            .scrollContentBackground(.hidden)
+            .background {
+                Rectangle()
+                    .fill(Color.background)
+                    .overlay {
+                        if colorScheme == .light {
+                            Rectangle()
+                                .fill(Material.thin)
+                        }
+                    }
+                    .ignoresSafeArea()
+            }
     }
     
     @ViewBuilder
@@ -145,7 +150,6 @@ struct CartListView: View {
             selectLatestCart()
         }
     }
-    
     
     private func selectLatestCart() {
         if horizontalSizeClass == .regular {
