@@ -13,11 +13,14 @@ internal import OSLog
 struct AddItemView: View {
     @ObservedObject var viewModel: ViewModel
     var cart: CDCart
+    var proxy: GeometryProxy
     
     let logger = PersistenceController.shared.logger
     
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.locale) private var locale
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @Environment(\.colorScheme) private var colorScheme
     
     private enum Field: Hashable {
         case name
@@ -37,36 +40,79 @@ struct AddItemView: View {
     var body: some View {
         Section {
             HStack {
-                Label("Checkcircle", systemImage: "circle")
-                    .imageScale(.large)
-                    .labelStyle(.iconOnly)
-                    .foregroundStyle(Color.accentColor)
-                    .padding(.trailing, Design.Padding.trailing)
-                
-                VStack {
-                    TextField("Item Name", text: $name)
-                        .autocorrectionDisabled()
-                        .textInputAutocapitalization(.words)
-                        .focused($focusedField, equals: .name)
-                        .foregroundStyle(isValidInput ? Color.primary : Color.red)
-                        .submitLabel(.next)
-                        .onSubmit {
-                            focusedField = .price
-                        }
+                Spacer()
+                VStack(alignment: .center) {
+                    cell()
                     
-                    Divider()
-                    
-                    TextField("Price",
-                              value: $price,
-                              format: .currency(code: locale.currency?.identifier ?? "USD"))
-                    .keyboardType(.decimalPad)
-                    .focused($focusedField, equals: .price)
+                    if !name.isEmpty {
+                        addButton()
+                    }
                 }
+                .frame(maxWidth: horizontalSizeClass == .regular ?  Design.addItemMaxWidth : proxy.size.width)
+                Spacer()
+            }
+            .padding(.bottom, Design.Padding.bottom * 2)
+        } header: {
+            if showValidationMessage {
+                Text("Item already exists.")
+                    .foregroundStyle(Color.red)
+            }
+        }
+        .listRowBackground(Color.clear)
+        .onChange(of: name) { newName in
+            isValidInput = true
+            showValidationMessage = false
+        }
+    }
+    
+    private func addButton() -> some View {
+        Button {
+            validateItem()
+            if isValidInput {
+                addItem()
+                reset()
+                focusedField = .name
+            }
+        } label: {
+            Label("Add Item", systemImage: "plus")
+                .foregroundStyle(colorScheme == .dark ? .black : .white)
+                .frame(width: Design.addItemMaxWidth/1.6)
+        }
+        .tint(Color.accent)
+        .buttonStyle(.borderedProminent)
+    }
+    
+    @ViewBuilder
+    private func cell() -> some View {
+        HStack {
+            Label("Checkcircle", systemImage: "circle")
+                .imageScale(.large)
+                .labelStyle(.iconOnly)
+                .foregroundStyle(Color.accentColor)
+                .padding(.trailing, Design.Padding.trailing)
+            
+            VStack(alignment: .leading) {
+                TextField("Item Name", text: $name)
+                    .autocorrectionDisabled()
+                    .textInputAutocapitalization(.words)
+                    .focused($focusedField, equals: .name)
+                    .foregroundStyle(isValidInput ? Color.primary : Color.red)
+                    .submitLabel(.next)
+                    .onSubmit {
+                        focusedField = .price
+                    }
+                
+                Divider()
+                
+                TextField("Price",
+                          value: $price,
+                          format: .currency(code: locale.currency?.identifier ?? "USD"))
+                .keyboardType(.decimalPad)
+                .focused($focusedField, equals: .price)
             }
             .toolbar {
                 ToolbarItemGroup(placement: .keyboard) {
                     CancelToolbarButton {
-                        reset()
                         focusedField = nil
                     }
                     Spacer()
@@ -81,23 +127,16 @@ struct AddItemView: View {
                     .disabled(name.isEmpty)
                 }
             }
-            
-        } header: {
-            if showValidationMessage {
-                Text("Item already exists.")
-                    .foregroundStyle(Color.red)
-            }
+        }
+        .padding(Design.Padding.standard)
+        .background {
+            RoundedRectangle(cornerRadius: Design.addItemCornerRadius)
+                .fill(Color(.tertiarySystemFill))
         }
         .onAppear {
-            name = ""
-            price = nil
             if totalItems == 0 {
                 focusedField = .name
             }
-        }
-        .onChange(of: name) { newName in
-            isValidInput = true
-            showValidationMessage = false
         }
     }
     
@@ -141,9 +180,15 @@ struct AddItemView: View {
 }
 
 #Preview {
-    AddItemView(viewModel: .preview,
-                cart: .preview)
-    .environment(\.locale, Locale(identifier: "en-IN"))
-    .environment(\.managedObjectContext,
-                  PersistenceController.preview.container.viewContext)
+    GeometryReader { proxy in
+        List {
+            AddItemView(viewModel: .preview,
+                        cart: .preview,
+                        proxy: proxy
+            )
+        }
+        .environment(\.locale, Locale(identifier: "en-IN"))
+        .environment(\.managedObjectContext,
+                      PersistenceController.preview.container.viewContext)
+    }
 }

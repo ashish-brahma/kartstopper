@@ -84,22 +84,14 @@ struct ChecklistView: View {
                     }
                     .listRowBackground(Color.clear)
                     
-                    HStack {
-                        Spacer()
+                    
                         
-                        AddItemView(viewModel: viewModel,
-                                    cart: cart)
-                        .frame(maxWidth: Design.addItemMaxWidth)
-                        .padding(Design.Padding.standard)
-                        .background {
-                            RoundedRectangle(cornerRadius: Design.addItemCornerRadius)
-                                .fill(Color(.tertiarySystemFill))
-                        }
-                        
-                        Spacer()
-                    }
+                    AddItemView(
+                        viewModel: viewModel,
+                        cart: cart,
+                        proxy: geometryProxy
+                    )
                     .id(bottomID)
-                    .listRowBackground(Color.clear)
                 }
                 .overlay {
                     if totalItems != 0 && itemList.isEmpty {
