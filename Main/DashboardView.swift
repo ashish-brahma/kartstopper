@@ -20,7 +20,7 @@ struct DashboardView: View {
     
     private var columns: [GridItem] {
         Array(
-            repeating: GridItem(.adaptive(minimum: 360)),
+            repeating: GridItem(.adaptive(minimum: Design.dashboardColumnMinWidth)),
             count: horizontalSizeClass == .regular ? 2 : 1
         )
     }
@@ -30,33 +30,24 @@ struct DashboardView: View {
             NavigationStack(path: $navModel.presentedCards) {
                 ScrollView {
                     LazyVGrid(columns: columns) {
+                        if !viewModel.hasOnboarded {
+                            gridLayout(
+                                proxy: proxy,
+                                style: Material.thickMaterial
+                            ) {
+                                SetupView(showPreferences: $showPreferences)
+                            }
+                        }
+                        
                         ForEach(Card.allCases) { card in
-                            VStack(alignment: .leading) {
+                            gridLayout(
+                                proxy: proxy,
+                                style: Color(.secondarySystemGroupedBackground)
+                            ) {
                                 statCard(for: card,
                                          proxy: proxy)
                             }
-                            .frame(
-                                minHeight: horizontalSizeClass == .regular ? proxy.size.height/6 :  proxy.size.height/3.8,
-                                maxHeight: horizontalSizeClass == .regular ? proxy.size.height/3 :  proxy.size.height/1.6,
-                                alignment: .topLeading
-                            )
-                            .padding(Design.Padding.standard * 2)
-                            .background {
-                                RoundedRectangle(cornerRadius: 21)
-                                    .fill(Color(.secondarySystemGroupedBackground))
-                            }
-                            .padding(.horizontal, Design.Padding.horizontal * 4)
-                            .padding(.vertical, Design.Padding.vertical)
                         }
-                    }
-                }
-                .overlay {
-                    if !viewModel.hasOnboarded {
-                        SetupView(showPreferences: $showPreferences)
-                            .background {
-                                Rectangle()
-                                    .fill(.thickMaterial)
-                            }
                     }
                 }
                 .background(Color.background)
@@ -126,6 +117,29 @@ struct DashboardView: View {
                 .foregroundStyle(.secondary)
         }
         .foregroundStyle(Color.primary)
+    }
+    
+    @ViewBuilder
+    private func gridLayout(
+        proxy: GeometryProxy,
+        style: some ShapeStyle,
+        _ content: () -> some View
+    ) -> some View {
+        VStack(alignment: .leading) {
+            content()
+        }
+        .frame(
+            minHeight: horizontalSizeClass == .regular ? proxy.size.height/6 :  proxy.size.height/3.8,
+            maxHeight: horizontalSizeClass == .regular ? proxy.size.height/3 :  proxy.size.height/1.6,
+            alignment: .topLeading
+        )
+        .padding(Design.Padding.standard * 2)
+        .background {
+            RoundedRectangle(cornerRadius: Design.cardRadius)
+                .fill(style)
+        }
+        .padding(.horizontal, Design.Padding.horizontal * 4)
+        .padding(.vertical, Design.Padding.vertical)
     }
 }
 

@@ -14,30 +14,38 @@ struct SetupView: View {
     
     var body: some View {
         if !dismiss {
-            HStack(alignment: .top) {
-                Image(systemName: "number.square.fill")
-                    .imageScale(.large)
-                    .font(.system(size: Design.setupImageFontSize,
-                                  weight: .medium))
-                    .foregroundStyle(.gray900)
-                    .padding(.vertical, Design.Padding.vertical)
+            VStack(alignment: .leading) {
+                HStack(alignment: .top) {
+                    Spacer()
+                    closeButton()
+                }
                 
-                VStack(alignment: .leading) {
-                    HStack(alignment: .top) {
+                HStack(alignment: .top) {
+                    Image(systemName: "number.square.fill")
+                        .imageScale(.large)
+                        .font(.system(size: Design.setupImageFontSize,
+                                      weight: .medium))
+                        .foregroundStyle(.gray900)
+                        .padding(.vertical, Design.Padding.vertical)
+                        .padding(.horizontal, Design.Padding.horizontal)
+                    
+                    VStack(alignment: .leading) {
                         Text("Create Budget")
                             .font(.headline)
                             .foregroundStyle(Color.foreground)
-                        Spacer()
-                        closeButton()
-                    }
-                    
-                    HStack(alignment: .bottom) {
+                        
                         Text(Constants.Setup.purpose)
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
-                        Spacer()
-                        ctaButton()
+                            .multilineTextAlignment(.leading)
                     }
+                }
+                
+                Spacer()
+                
+                HStack {
+                    Spacer()
+                    ctaButton()
                 }
             }
         }
@@ -66,6 +74,7 @@ struct SetupView: View {
                 .labelStyle(.titleOnly)
                 .buttonStyle(.borderless)
         }
+        .buttonStyle(.bordered)
     }
 }
 

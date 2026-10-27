@@ -28,6 +28,9 @@ enum Design {
     static let addItemMaxWidth = CGFloat(300)
     static let addItemCornerRadius = CGFloat(21)
     
+    static let dashboardColumnMinWidth = CGFloat(360)
+    static let cardRadius = CGFloat(21)
+    
     static let quantityStepperWidth = CGFloat(256)
     
     enum Padding {
