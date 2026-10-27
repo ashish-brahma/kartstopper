@@ -69,8 +69,10 @@ struct ExpenditureOverview: View {
                     .font(.headline)
                     .foregroundStyle(.accent)
                 
+                Spacer()
+                
                 HStack {
-                    Spacer(minLength: proxy.size.width / 2.8)
+                    Spacer(minLength: proxy.size.width / 4)
                     ExpenditureOverviewChart(data: data)
                         .frame(height: 60)
                 }

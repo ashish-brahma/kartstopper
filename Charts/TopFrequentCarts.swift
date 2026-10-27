@@ -111,12 +111,17 @@ struct TopFrequentCarts: View {
                     }
                 }
                 
+                Spacer()
+                Spacer()
+                
                 HStack {
-                    Spacer(minLength: proxy.size.width/3)
+                    Spacer(minLength: proxy.size.width / 4)
                     CartsFrequencyChart(data: data)
                         .padding(.top, -1.5 * Design.Padding.top)
                         .frame(height: topCartNames.count > 1 ? 180 : 60)
                 }
+                
+                Spacer()
             }
         } else {
             DisclosureGroup {

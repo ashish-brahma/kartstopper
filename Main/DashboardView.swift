@@ -14,41 +14,52 @@ struct DashboardView: View {
     @ObservedObject var navModel: NavigationModel
     
     @Environment(\.managedObjectContext) private var viewContext
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     
     @Binding var showPreferences: Bool
+    
+    private var columns: [GridItem] {
+        Array(
+            repeating: GridItem(.adaptive(minimum: 360)),
+            count: horizontalSizeClass == .regular ? 2 : 1
+        )
+    }
     
     var body: some View {
         GeometryReader { proxy in
             NavigationStack(path: $navModel.presentedCards) {
-                List {
-                    if !viewModel.hasOnboarded {
-                        Section {
-                            SetupView(showPreferences: $showPreferences)
+                ScrollView {
+                    LazyVGrid(columns: columns) {
+                        ForEach(Card.allCases) { card in
+                            VStack(alignment: .leading) {
+                                statCard(for: card,
+                                         proxy: proxy)
+                            }
+                            .frame(
+                                minHeight: horizontalSizeClass == .regular ? proxy.size.height/6 :  proxy.size.height/3.8,
+                                maxHeight: horizontalSizeClass == .regular ? proxy.size.height/3 :  proxy.size.height/1.6,
+                                alignment: .topLeading
+                            )
+                            .padding(Design.Padding.standard * 2)
+                            .background {
+                                RoundedRectangle(cornerRadius: 21)
+                                    .fill(Color(.secondarySystemGroupedBackground))
+                            }
+                            .padding(.horizontal, Design.Padding.horizontal * 4)
+                            .padding(.vertical, Design.Padding.vertical)
                         }
-                        .listRowBackground(Rectangle().fill(.thickMaterial))
-                    }
-                    
-                    Section {
-                        TopFrequentCarts(proxy: proxy)
-                    }
-                    
-                    Section {
-                        StatusCardView(viewModel: viewModel)
-                        
-                        NavigationLink(value: Card.expenses) {
-                            ExpenditureOverview(proxy: proxy)
-                        }
-                        
-                        NavigationLink(value: Card.categories) {
-                            CategoriesOverview(proxy: proxy)
-                        }
-                    } header: {
-                        Text(viewModel.dynamicTitle)
-                            .font(.title2.bold())
-                            .foregroundStyle(viewModel.fontColor)
                     }
                 }
-                .listRowSpacing(Design.Spacing.listRow)
+                .overlay {
+                    if !viewModel.hasOnboarded {
+                        SetupView(showPreferences: $showPreferences)
+                            .background {
+                                Rectangle()
+                                    .fill(.thickMaterial)
+                            }
+                    }
+                }
+                .background(Color.background)
                 .navigationTitle("Track")
                 .navigationTitleColor(Color.foreground)
                 .navigationDestination(for: Card.self) { card in
@@ -57,15 +68,64 @@ struct DashboardView: View {
                         ExpenditureDetails(selectedTimeRange: $navModel.selectedTimeRangeForExpenses)
                     case .categories:
                         CategoryDetails(selectedTimeRange: $navModel.selectedTimeRangeForCategories)
+                    default:
+                        EmptyView()
                     }
                 }
-                .scrollContentBackground(.hidden)
-                .background(Color.background)
                 .task {
                     viewModel.update(context: viewContext)
                 }
             }
         }
+    }
+    
+    @ViewBuilder
+    private func statCard(
+        for card: Card,
+        proxy: GeometryProxy
+    ) -> some View {
+        switch card {
+        case .topCarts:
+            TopFrequentCarts(proxy: proxy)
+            
+        case .status:
+            VStack(alignment: .leading) {
+                Text(viewModel.dynamicTitle)
+                    .font(.title2.bold())
+                    .foregroundStyle(viewModel.fontColor)
+                
+                Spacer()
+                
+                StatusCardView(viewModel: viewModel)
+                
+                Spacer()
+            }
+            
+        case .expenses:
+                navigationButton(value: Card.expenses) {
+                    ExpenditureOverview(proxy: proxy)
+                }
+            
+        case .categories:
+                navigationButton(value: Card.categories) {
+                    CategoriesOverview(proxy: proxy)
+                }
+        }
+    }
+    
+    private func navigationButton(
+        value: Card,
+        label: () -> some View
+    ) -> some View {
+        HStack {
+            NavigationLink(value: value) {
+                label()
+            }
+            Spacer()
+            Image(systemName: "chevron.right")
+                .foregroundStyle(.secondary)
+        }
+        .foregroundStyle(Color.primary)
     }
 }
 

@@ -134,6 +134,8 @@ enum Tabs: Int, Hashable, CaseIterable, Identifiable, Codable {
 
 /// Type that manages card data in dashboard.
 enum Card: Int, Hashable, CaseIterable, Identifiable, Codable {
+    case topCarts
+    case status
     case expenses
     case categories
     
