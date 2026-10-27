@@ -18,6 +18,8 @@ struct DashboardView: View {
     
     @Binding var showPreferences: Bool
     
+    @State var dismissSetup: Bool = false
+    
     private var columns: [GridItem] {
         Array(
             repeating: GridItem(.adaptive(minimum: Design.dashboardColumnMinWidth)),
@@ -30,12 +32,15 @@ struct DashboardView: View {
             NavigationStack(path: $navModel.presentedCards) {
                 ScrollView {
                     LazyVGrid(columns: columns) {
-                        if !viewModel.hasOnboarded {
+                        if !viewModel.hasOnboarded && !dismissSetup {
                             gridLayout(
                                 proxy: proxy,
                                 style: Material.thickMaterial
                             ) {
-                                SetupView(showPreferences: $showPreferences)
+                                SetupView(
+                                    showPreferences: $showPreferences,
+                                    dismiss: $dismissSetup
+                                )
                             }
                         }
                         

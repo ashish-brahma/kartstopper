@@ -10,43 +10,41 @@ import SwiftUI
 
 struct SetupView: View {
     @Binding var showPreferences: Bool
-    @State var dismiss: Bool = false
+    @Binding var dismiss: Bool
     
     var body: some View {
-        if !dismiss {
-            VStack(alignment: .leading) {
-                HStack(alignment: .top) {
-                    Spacer()
-                    closeButton()
-                }
-                
-                HStack(alignment: .top) {
-                    Image(systemName: "number.square.fill")
-                        .imageScale(.large)
-                        .font(.system(size: Design.setupImageFontSize,
-                                      weight: .medium))
-                        .foregroundStyle(.gray900)
-                        .padding(.vertical, Design.Padding.vertical)
-                        .padding(.horizontal, Design.Padding.horizontal)
-                    
-                    VStack(alignment: .leading) {
-                        Text("Create Budget")
-                            .font(.headline)
-                            .foregroundStyle(Color.foreground)
-                        
-                        Text(Constants.Setup.purpose)
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                            .multilineTextAlignment(.leading)
-                    }
-                }
-                
+        VStack(alignment: .leading) {
+            HStack(alignment: .top) {
                 Spacer()
+                closeButton()
+            }
+            
+            HStack(alignment: .top) {
+                Image(systemName: "number.square.fill")
+                    .imageScale(.large)
+                    .font(.system(size: Design.setupImageFontSize,
+                                  weight: .medium))
+                    .foregroundStyle(.gray900)
+                    .padding(.vertical, Design.Padding.vertical)
+                    .padding(.horizontal, Design.Padding.horizontal)
                 
-                HStack {
-                    Spacer()
-                    ctaButton()
+                VStack(alignment: .leading) {
+                    Text("Create Budget")
+                        .font(.headline)
+                        .foregroundStyle(Color.foreground)
+                    
+                    Text(Constants.Setup.purpose)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.leading)
                 }
+            }
+            
+            Spacer()
+            
+            HStack {
+                Spacer()
+                ctaButton()
             }
         }
     }
@@ -79,6 +77,7 @@ struct SetupView: View {
 }
 
 #Preview {
-    SetupView(showPreferences: .constant(false))
+    SetupView(showPreferences: .constant(false),
+              dismiss: .constant(false))
         .frame(height: 80)
 }
