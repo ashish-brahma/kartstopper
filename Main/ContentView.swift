@@ -23,31 +23,14 @@ struct ContentView: View {
     
     var body: some View {
         TabView(selection: $navModel.selectedTab) {
-            CartListView(viewModel: viewModel,
-                         navModel: navModel)
-            .tabItem {
-                Label(Tabs.home.localizedName,
-                      systemImage: Tabs.home.symbol)
+            ForEach(Tabs.allCases) { tab in
+                if tab == .manage {
+                    primitiveTab(tab: tab)
+                        .badge(viewModel.hasOnboarded ? nil : "\(viewModel.onboardingSteps)")
+                } else {
+                    primitiveTab(tab: tab)
+                }
             }
-            .tag(Tabs.home)
-            
-            DashboardView(viewModel: viewModel,
-                          navModel: navModel,
-                          showPreferences: $showPreferences)
-            .tabItem {
-                Label(Tabs.track.localizedName,
-                      systemImage: Tabs.track.symbol)
-            }
-            .tag(Tabs.track)
-            
-            ManageView(viewModel: viewModel,
-                       preferencesModel: preferencesModel)
-            .tabItem {
-                Label(Tabs.manage.localizedName,
-                      systemImage: Tabs.manage.symbol)
-            }
-            .tag(Tabs.manage)
-            .badge(viewModel.hasOnboarded ? nil : "\(viewModel.onboardingSteps)")
         }
         .task {
             viewModel.loadPreferences(preferencesModel: preferencesModel)
@@ -79,6 +62,32 @@ struct ContentView: View {
                 viewModel.objectWillChange.send()
                 viewModel.updateOnboardingState()
             }
+        }
+    }
+    
+    @ViewBuilder
+    private func primitiveTab(tab: Tabs) -> some View {
+        tabContent(for: tab)
+            .tabItem {
+                Label(tab.localizedName,
+                      systemImage: tab.symbol)
+            }
+            .tag(tab)
+    }
+    
+    @ViewBuilder
+    private func tabContent(for tab: Tabs) -> some View {
+        switch tab {
+        case .home:
+            CartListView(viewModel: viewModel,
+                         navModel: navModel)
+        case .track:
+            DashboardView(viewModel: viewModel,
+                          navModel: navModel,
+                          showPreferences: $showPreferences)
+        case .manage:
+            ManageView(viewModel: viewModel,
+                       preferencesModel: preferencesModel)
         }
     }
 }
