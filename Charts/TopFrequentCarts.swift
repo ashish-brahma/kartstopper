@@ -13,23 +13,45 @@ import CoreData
 struct CartsFrequencyChart: View {
     var data: [CartCountData]
     
+    private var topCarts: [CartCountData] {
+        data.filter {
+            $0.itemCount == CartCountData.getMaxCount(data: data)
+        }
+    }
+    
+    private var topCount: Int? {
+        CartCountData.getMaxCount(data: data)
+    }
+    
     var body: some View {
         Chart(data) { element in
             BarMark(
                 x: .value("Items", element.itemCount),
                 y: .value("Name", element.name)
             )
-            .foregroundStyle(element.itemCount ==  CartCountData.getMaxCount(data: data) ? .mint : .secondary)
-            .annotation {
-                if element.itemCount ==  CartCountData.getMaxCount(data: data) {
+            .foregroundStyle(element.itemCount == topCount ? .mint : .secondary)
+            .annotation(position: .top) {
+                if element.itemCount == topCount {
                     Text("\(element.itemCount)")
-                        .font(.callout)
+                        .font(topCarts.count > 1 ? .caption : .callout)
+                        .fontWeight(.semibold)
                         .foregroundStyle(.secondary)
                 }
             }
         }
         .chartXAxis(.hidden)
-        .chartYAxis(.hidden)
+        .chartYAxis(topCarts.count > 1 ? .visible : .hidden)
+        .chartYAxis {
+            AxisMarks(values: .automatic(desiredCount: 5)) { value in
+                if let cartName = value.as(String.self) {
+                    AxisTick()
+                    AxisGridLine()
+                    AxisValueLabel()
+                        .font(isTopCart(cartName) ? .callout.bold() : .callout)
+                        .foregroundStyle(isTopCart(cartName) ? .accent : .secondary)
+                }
+            }
+        }
         .overlay {
             if data.isEmpty {
                 Text("No data")
@@ -37,6 +59,10 @@ struct CartsFrequencyChart: View {
                     .foregroundStyle(.secondary)
             }
         }
+    }
+    
+    private func isTopCart(_ cartName: String) -> Bool {
+        topCarts.map(\.name).contains { $0 == cartName }
     }
 }
 
@@ -48,41 +74,69 @@ struct TopFrequentCarts: View {
     @FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \CDCart.id, ascending: true)])
     private var carts: FetchedResults<CDCart>
     
-    var data: [CartCountData] {
+    private var data: [CartCountData] {
         CartCountData.topCartsData(carts: Array(carts),
                                    context: viewContext)
     }
     
-    var topCartName: String {
-        let name = data.first {
+    private var topCartNames: [String] {
+        let topCarts = data.filter {
             $0.itemCount == CartCountData.getMaxCount(data: data)
-        }?.name
-        return name ?? ""
+        }
+        let names = topCarts.map(\.name)
+        return names
+    }
+    
+    private var subtitle: String {
+        let topCount = topCartNames.count > 1 ? topCartNames.count : nil
+        if let count = topCount {
+            return "Top \(count) Carts"
+        } else {
+            return "Top Cart"
+        }
     }
     
     var body: some View {
-        VStack(alignment: .leading) {
-            Text("Most Frequent Cart")
-                .font(.callout)
-                .foregroundStyle(.secondary)
-            
-            if !data.isEmpty {
-                Text("\(topCartName)")
-                    .font(.title2.bold())
-                    .foregroundStyle(Color.foreground)
+        if !data.isEmpty {
+            VStack(alignment: .leading) {
+                Text("\(subtitle)")
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+                
+                if topCartNames.count == 1 {
+                    if let cartName = topCartNames.first {
+                        Text("\(cartName)")
+                            .font(.title2.bold())
+                            .foregroundStyle(Color.foreground)
+                    }
+                }
                 
                 HStack {
-                    Spacer(minLength: proxy.size.width / 3)
+                    Spacer(minLength: proxy.size.width/3)
                     CartsFrequencyChart(data: data)
                         .padding(.top, -1.5 * Design.Padding.top)
-                        .frame(height: 60)
+                        .frame(height: topCartNames.count > 1 ? 180 : 60)
                 }
-            } else {
-                ContentView.unavailableView(
-                    label: "No Items",
-                    symbolName: "checklist",
-                    description: "Cart with the most number of items is analyzed here."
-                )
+            }
+        } else {
+            DisclosureGroup {
+                HStack {
+                    Spacer()
+                    ContentView.unavailableView(
+                        label: "No Items",
+                        symbolName: "checklist",
+                        description: "Carts with the most number of items are analyzed here."
+                    )
+                    .frame(minWidth: proxy.size.width/1.2)
+                    Spacer()
+                }
+            } label: {
+                Text("Top Carts")
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+                
+                Image(systemName: "exclamationmark.circle")
+                    .foregroundStyle(Color.warning)
             }
         }
     }
@@ -90,11 +144,9 @@ struct TopFrequentCarts: View {
 
 #Preview {
     GeometryReader { proxy in
-        VStack {
+        List {
             TopFrequentCarts(proxy: proxy)
-                .frame(height: 300)
         }
-        .padding()
     }
     .environment(\.managedObjectContext,
                   PersistenceController.preview.container.viewContext)
