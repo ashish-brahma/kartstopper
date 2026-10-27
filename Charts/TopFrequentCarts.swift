@@ -127,12 +127,11 @@ struct TopFrequentCarts: View {
             DisclosureGroup {
                 HStack {
                     Spacer()
-                    ContentView.unavailableView(
+                    TopFrequentCarts.unavailableView(
                         label: "No Items",
                         symbolName: "checklist",
                         description: "Carts with the most number of items are analyzed here."
                     )
-                    .frame(minWidth: proxy.size.width/1.2)
                     Spacer()
                 }
             } label: {
