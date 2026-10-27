@@ -24,7 +24,7 @@ struct ManageView: View {
     }
     
     var body: some View {
-        NavigationStack {
+        NavigationSplitView {
             Form {
                 Section {
                     BudgetAmountNavigationButton(
@@ -67,6 +67,18 @@ struct ManageView: View {
                     EditBudgetAmountView(viewModel: viewModel,
                                          preferencesModel: preferencesModel)
                 }
+            }
+        } detail: {
+            switch field {
+            case .budgetAmount:
+                EditBudgetAmountView(viewModel: viewModel,
+                                     preferencesModel: preferencesModel)
+            case nil:
+                ManageView.unavailableView(
+                    label: "No selection",
+                    symbolName: "filemenu.and.selection",
+                    description: "Select a preference to view details."
+                )
             }
         }
     }
