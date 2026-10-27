@@ -18,7 +18,7 @@ struct DashboardView: View {
     
     @Binding var showPreferences: Bool
     
-    @State var dismissSetup: Bool = false
+    @State private var dismissSetup: Bool = false
     
     private var columns: [GridItem] {
         Array(
