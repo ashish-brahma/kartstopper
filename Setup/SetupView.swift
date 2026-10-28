@@ -13,37 +13,31 @@ struct SetupView: View {
     @Binding var dismiss: Bool
     
     var body: some View {
-        VStack(alignment: .leading) {
-            HStack(alignment: .top) {
-                Spacer()
-                closeButton()
-            }
+        HStack(alignment: .top) {
+            Image(systemName: "number.square.fill")
+                .imageScale(.large)
+                .font(.system(size: Design.setupImageFontSize,
+                              weight: .medium))
+                .foregroundStyle(.gray900)
+                .padding(.vertical, Design.Padding.vertical)
+                .padding(.horizontal, Design.Padding.horizontal)
             
-            HStack(alignment: .top) {
-                Image(systemName: "number.square.fill")
-                    .imageScale(.large)
-                    .font(.system(size: Design.setupImageFontSize,
-                                  weight: .medium))
-                    .foregroundStyle(.gray900)
-                    .padding(.vertical, Design.Padding.vertical)
-                    .padding(.horizontal, Design.Padding.horizontal)
-                
-                VStack(alignment: .leading) {
+            VStack(alignment: .leading) {
+                HStack(alignment: .top) {
                     Text("Create Budget")
                         .font(.headline)
                         .foregroundStyle(Color.foreground)
-                    
-                    Text(Constants.Setup.purpose)
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                        .multilineTextAlignment(.leading)
+                    Spacer()
+                    closeButton()
                 }
-            }
-            
-            Spacer()
-            
-            HStack {
+                
+                Text(Constants.Setup.purpose)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.leading)
+                
                 Spacer()
+                
                 ctaButton()
             }
         }
@@ -70,7 +64,6 @@ struct SetupView: View {
                 .bold()
                 .foregroundStyle(Color.affirmative)
                 .labelStyle(.titleOnly)
-                .buttonStyle(.borderless)
         }
         .buttonStyle(.bordered)
     }
@@ -79,5 +72,5 @@ struct SetupView: View {
 #Preview {
     SetupView(showPreferences: .constant(false),
               dismiss: .constant(false))
-        .frame(height: 80)
+        .frame(height: 100)
 }

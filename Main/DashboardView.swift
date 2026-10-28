@@ -21,39 +21,55 @@ struct DashboardView: View {
     @State private var dismissSetup: Bool = false
     
     private var columns: [GridItem] {
-        Array(
-            repeating: GridItem(.adaptive(minimum: Design.dashboardColumnMinWidth)),
-            count: horizontalSizeClass == .regular ? 2 : 1
-        )
+        let gridItem = GridItem(.flexible())
+        let count = horizontalSizeClass == .compact ? 1 : 2
+        return [GridItem](repeating: gridItem, count: count)
+    }
+    
+    private var isCompact: Bool {
+        horizontalSizeClass == .compact
     }
     
     var body: some View {
         GeometryReader { proxy in
             NavigationStack(path: $navModel.presentedCards) {
                 ScrollView {
-                    LazyVGrid(columns: columns) {
+                    VStack {
                         if !viewModel.hasOnboarded && !dismissSetup {
-                            gridLayout(
-                                proxy: proxy,
-                                style: Material.thickMaterial
-                            ) {
+                            Section {
                                 SetupView(
                                     showPreferences: $showPreferences,
                                     dismiss: $dismissSetup
                                 )
+                                .padding(Design.Padding.card)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .background(Rectangle().fill(Material.thick))
+                                .clipShape(.rect(cornerRadius: Design.cornerRadius))
+                                .padding(Design.Padding.standard)
                             }
                         }
                         
-                        ForEach(Card.allCases) { card in
-                            gridLayout(
-                                proxy: proxy,
-                                style: Color(.secondarySystemGroupedBackground)
-                            ) {
-                                statCard(for: card,
-                                         proxy: proxy)
+                        LazyVGrid(
+                            columns: columns,
+                            spacing: Design.Spacing.listRow
+                        ) {
+                            ForEach(Card.allCases) { card in
+                                VStack(spacing: Design.Spacing.listRow) {
+                                    Section {
+                                        statCard(for: card,
+                                                 proxy: proxy)
+                                        .padding(Design.Padding.card)
+                                        .frame(maxWidth: .infinity,
+                                               alignment: .leading)
+                                        .background(Color(.secondarySystemGroupedBackground))
+                                        .clipShape(.rect(cornerRadius: Design.cornerRadius))
+                                    }
+                                }
+                                .padding(Design.Padding.standard)
                             }
                         }
                     }
+                    .padding(Design.Padding.standard)
                 }
                 .background(Color.background)
                 .navigationTitle("Track")
@@ -113,38 +129,15 @@ struct DashboardView: View {
         value: Card,
         label: () -> some View
     ) -> some View {
-        HStack {
-            NavigationLink(value: value) {
+        NavigationLink(value: value) {
+            HStack {
                 label()
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .foregroundStyle(.secondary)
             }
-            Spacer()
-            Image(systemName: "chevron.right")
-                .foregroundStyle(.secondary)
         }
         .foregroundStyle(Color.primary)
-    }
-    
-    @ViewBuilder
-    private func gridLayout(
-        proxy: GeometryProxy,
-        style: some ShapeStyle,
-        _ content: () -> some View
-    ) -> some View {
-        VStack(alignment: .leading) {
-            content()
-        }
-        .frame(
-            minHeight: horizontalSizeClass == .regular ? proxy.size.height/6 :  proxy.size.height/3.8,
-            maxHeight: horizontalSizeClass == .regular ? proxy.size.height/3 :  proxy.size.height/1.6,
-            alignment: .topLeading
-        )
-        .padding(Design.Padding.standard * 2)
-        .background {
-            RoundedRectangle(cornerRadius: Design.cardRadius)
-                .fill(style)
-        }
-        .padding(.horizontal, Design.Padding.horizontal * 4)
-        .padding(.vertical, Design.Padding.vertical)
     }
 }
 

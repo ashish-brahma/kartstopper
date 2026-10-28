@@ -130,7 +130,7 @@ struct AddItemView: View {
         }
         .padding(Design.Padding.standard)
         .background {
-            RoundedRectangle(cornerRadius: Design.addItemCornerRadius)
+            RoundedRectangle(cornerRadius: Design.cornerRadius)
                 .fill(Color(.tertiarySystemFill))
         }
         .onAppear {

@@ -124,23 +124,27 @@ struct TopFrequentCarts: View {
                 Spacer()
             }
         } else {
-            DisclosureGroup {
-                HStack {
-                    Spacer()
-                    TopFrequentCarts.unavailableView(
-                        label: "No Items",
-                        symbolName: "checklist",
-                        description: "Carts with the most number of items are analyzed here."
-                    )
-                    Spacer()
+            VStack(alignment: .leading) {
+                DisclosureGroup {
+                    VStack(alignment: .center) {
+                        TopFrequentCarts.unavailableView(
+                            label: "No Items",
+                            symbolName: "checklist",
+                            description: "Carts with the most number of items are analyzed here."
+                        )
+                        .frame(maxWidth: .infinity, alignment: .center)
+                    }
+                } label: {
+                    Text("Top Carts")
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
+                    
+                    Image(systemName: "exclamationmark.circle")
+                        .foregroundStyle(Color.warning)
                 }
-            } label: {
-                Text("Top Carts")
-                    .font(.callout)
-                    .foregroundStyle(.secondary)
+                .tint(.secondary)
                 
-                Image(systemName: "exclamationmark.circle")
-                    .foregroundStyle(Color.warning)
+                Spacer()
             }
         }
     }

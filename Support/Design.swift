@@ -23,15 +23,15 @@ enum Design {
     static let avatarDetailCornerRadius = CGFloat(41)
     static let avatarDetailTextFontSize = CGFloat(144)
     
+    static let quantityStepperWidth = CGFloat(256)
+    
     static let iconRadius = CGFloat(36)
     
+    static let cornerRadius = CGFloat(21)
+    
     static let addItemMaxWidth = CGFloat(300)
-    static let addItemCornerRadius = CGFloat(21)
     
-    static let dashboardColumnMinWidth = CGFloat(360)
-    static let cardRadius = CGFloat(21)
-    
-    static let quantityStepperWidth = CGFloat(256)
+    static let compactCardWidth = CGFloat(360)
     
     enum Padding {
         static let vertical = CGFloat(4)
@@ -41,6 +41,7 @@ enum Design {
         static let trailing = CGFloat(16)
         static let top = CGFloat(8)
         static let bottom = CGFloat(8)
+        static let card = CGFloat(20)
     }
     
     enum Spacing {

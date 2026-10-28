@@ -83,8 +83,6 @@ struct ChecklistView: View {
                         }
                     }
                     .listRowBackground(Color.clear)
-                    
-                    
                         
                     AddItemView(
                         viewModel: viewModel,

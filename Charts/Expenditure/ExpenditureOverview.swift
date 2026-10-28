@@ -74,9 +74,8 @@ struct ExpenditureOverview: View {
                 HStack {
                     Spacer(minLength: proxy.size.width / 4)
                     ExpenditureOverviewChart(data: data)
-                        .frame(height: 60)
+                        .frame(height: 80)
                 }
-                .padding(.top, -1.5 * Design.Padding.top)
             }
         }
     }
