@@ -175,7 +175,7 @@ struct CartListView: View {
                     )
                     .padding(.bottom, Design.Padding.bottom)
                     
-                    Button("Let's  start.") {
+                    Button("Let's  start") {
                         columnVisibility = NavigationSplitViewVisibility.doubleColumn
                     }
                     .buttonStyle(.bordered)

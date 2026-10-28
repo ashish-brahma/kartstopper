@@ -15,8 +15,10 @@ struct ManageView: View {
     @ObservedObject var preferencesModel: PreferencesModel
     
     @Environment(\.managedObjectContext) private var viewContext
+    @Environment(\.horizontalSizeClass) private var horizontalClassSize
     
     @State private var showEditor = false
+    @State private var columnVisibility = NavigationSplitViewVisibility.detailOnly
     @State private var field: ManageField?
     
     private var onboardingSteps: Text {
@@ -24,61 +26,78 @@ struct ManageView: View {
     }
     
     var body: some View {
-        NavigationSplitView {
-            Form {
-                Section {
-                    BudgetAmountNavigationButton(
-                        viewModel: viewModel,
-                        preferencesModel: preferencesModel,
-                        showEditor: $showEditor,
-                        field: $field
-                    )
-                    
-                    BudgetModePicker(
-                        viewModel: viewModel,
-                        preferencesModel: preferencesModel)
-                } header: {
-                    Text("Budget")
-                } footer: {
-                    if !viewModel.hasOnboarded {
-                        Label("You are \(onboardingSteps) away from setting up your budget.", systemImage: "info.circle")
-                            .labelStyle(.titleOnly)
-                            .foregroundStyle(Color.accentColor)
-                    }
-                }
-                
-                
-                Section {
-                    NavigationLink("KartStopper") {
-                        AppInformationView()
+        GeometryReader { proxy in
+            NavigationSplitView(columnVisibility: $columnVisibility) {
+                Form {
+                    Section {
+                        BudgetAmountNavigationButton(
+                            viewModel: viewModel,
+                            preferencesModel: preferencesModel,
+                            showEditor: $showEditor,
+                            field: $field
+                        )
+                        
+                        BudgetModePicker(
+                            viewModel: viewModel,
+                            preferencesModel: preferencesModel)
+                    } header: {
+                        Text("Budget")
+                    } footer: {
+                        if !viewModel.hasOnboarded {
+                            Label("You are \(onboardingSteps) away from setting up your budget.", systemImage: "info.circle")
+                                .labelStyle(.titleOnly)
+                                .foregroundStyle(Color.accentColor)
+                        }
                     }
                     
-                    NavigationLink("Developer") {
-                        DeveloperInformationView()
+                    
+                    Section {
+                        NavigationLink("KartStopper") {
+                            AppInformationView()
+                        }
+                        
+                        NavigationLink("Developer") {
+                            DeveloperInformationView()
+                        }
+                    } header: {
+                        Text("About")
                     }
-                } header: {
-                    Text("About")
                 }
-            }
-            .navigationTitle("Preferences")
-            .navigationTitleColor(Color.foreground)
-            .navigationDestination(isPresented: $showEditor) {
-                if field == .budgetAmount {
+                .navigationTitle("Preferences")
+                .navigationTitleColor(Color.foreground)
+                .navigationDestination(isPresented: $showEditor) {
+                    if field == .budgetAmount {
+                        EditBudgetAmountView(viewModel: viewModel,
+                                             preferencesModel: preferencesModel)
+                    }
+                }
+            } detail: {
+                switch field {
+                case .budgetAmount:
                     EditBudgetAmountView(viewModel: viewModel,
                                          preferencesModel: preferencesModel)
+                case nil:
+                    VStack {
+                        ManageView.unavailableView(
+                            label: "No selection",
+                            symbolName: "filemenu.and.selection",
+                            description: "Select a preference to view details."
+                        )
+                        
+                        Button("Show preferences") {
+                            columnVisibility = NavigationSplitViewVisibility.doubleColumn
+                        }
+                        .buttonStyle(.bordered)
+                    }
+                    .frame(maxHeight: proxy.size.height/2)
                 }
             }
-        } detail: {
-            switch field {
-            case .budgetAmount:
-                EditBudgetAmountView(viewModel: viewModel,
-                                     preferencesModel: preferencesModel)
-            case nil:
-                ManageView.unavailableView(
-                    label: "No selection",
-                    symbolName: "filemenu.and.selection",
-                    description: "Select a preference to view details."
-                )
+            .task {
+                if horizontalClassSize == .regular
+                    && !viewModel.hasOnboarded {
+                    field = .budgetAmount
+                    columnVisibility = NavigationSplitViewVisibility.doubleColumn
+                }
             }
         }
     }
