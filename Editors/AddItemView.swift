@@ -14,6 +14,7 @@ struct AddItemView: View {
     @ObservedObject var viewModel: ViewModel
     var cart: CDCart
     var proxy: GeometryProxy
+    @Binding var showAddItem: Bool
     
     let logger = PersistenceController.shared.logger
     
@@ -37,49 +38,75 @@ struct AddItemView: View {
         CDCart.getTotalItems(for: cart, context: viewContext)
     }
     
+    private var addButtonTextColor: Color {
+        colorScheme == .dark ? .black : .white
+    }
+    
     var body: some View {
-        Section {
+        VStack {
+            Spacer()
             HStack {
                 Spacer()
+                
                 VStack(alignment: .center) {
                     cell()
                     
-                    if !name.isEmpty {
-                        addButton()
+                    if showValidationMessage {
+                        Text("Item already exists.")
+                            .foregroundStyle(Color.red)
                     }
+                    
+                    addButton()
+                    
+                    cancelButton()
                 }
-                .frame(maxWidth: horizontalSizeClass == .regular ?  Design.addItemMaxWidth : proxy.size.width)
+                .frame(maxWidth: horizontalSizeClass == .regular ?  Design.addItemMaxWidth : proxy.size.width/1.2)
+                .padding(.bottom, Design.Padding.bottom * 4)
+                
                 Spacer()
             }
-            .padding(.bottom, Design.Padding.bottom * 2)
-        } header: {
-            if showValidationMessage {
-                Text("Item already exists.")
-                    .foregroundStyle(Color.red)
+            .padding(Design.Padding.standard * 2)
+            .background(Material.thick)
+        }
+        .toolbar {
+            ToolbarItemGroup(placement: .keyboard) {
+                CancelToolbarButton {
+                    focusedField = nil
+                }
+                Spacer()
+                ConfirmToolbarButton(action: submitAction)
+                    .disabled(name.isEmpty)
             }
         }
-        .listRowBackground(Color.clear)
         .onChange(of: name) { newName in
             isValidInput = true
             showValidationMessage = false
         }
+        .onAppear {
+            reset()
+            focusedField = .name
+        }
     }
     
     private func addButton() -> some View {
-        Button {
-            validateItem()
-            if isValidInput {
-                addItem()
-                reset()
-                focusedField = .name
-            }
-        } label: {
+        Button(action: submitAction) {
             Label("Add Item", systemImage: "plus")
-                .foregroundStyle(colorScheme == .dark ? .black : .white)
+                .foregroundStyle(name.isEmpty ? Color.secondary : addButtonTextColor)
                 .frame(width: Design.addItemMaxWidth/1.6)
         }
-        .tint(Color.accent)
+        .tint(name.isEmpty ? Color.secondary.opacity(0.7) : Color.accent)
         .buttonStyle(.borderedProminent)
+    }
+    
+    private func cancelButton() -> some View {
+        Button {
+            showAddItem = false
+        } label: {
+            Text("Cancel")
+                .frame(width: Design.addItemMaxWidth/1.6)
+        }
+        .tint(Color.foreground)
+        .buttonStyle(.bordered)
     }
     
     @ViewBuilder
@@ -99,7 +126,10 @@ struct AddItemView: View {
                     .foregroundStyle(isValidInput ? Color.primary : Color.red)
                     .submitLabel(.next)
                     .onSubmit {
-                        focusedField = .price
+                        validateItem()
+                        if isValidInput {
+                            focusedField = .price
+                        }
                     }
                 
                 Divider()
@@ -109,34 +139,26 @@ struct AddItemView: View {
                           format: .currency(code: locale.currency?.identifier ?? "USD"))
                 .keyboardType(.decimalPad)
                 .focused($focusedField, equals: .price)
-            }
-            .toolbar {
-                ToolbarItemGroup(placement: .keyboard) {
-                    CancelToolbarButton {
-                        focusedField = nil
-                    }
-                    Spacer()
-                    ConfirmToolbarButton {
-                        validateItem()
-                        if isValidInput {
-                            addItem()
-                            reset()
-                            focusedField = .name
-                        }
-                    }
-                    .disabled(name.isEmpty)
+                .submitLabel(.done)
+                .onSubmit {
+                    submitAction()
                 }
             }
         }
         .padding(Design.Padding.standard)
         .background {
             RoundedRectangle(cornerRadius: Design.cornerRadius)
-                .fill(Color(.tertiarySystemFill))
+                .fill(Color(.secondarySystemGroupedBackground))
         }
-        .onAppear {
-            if totalItems == 0 {
-                focusedField = .name
-            }
+    }
+    
+    private func submitAction() {
+        validateItem()
+        if isValidInput {
+            addItem()
+            reset()
+            focusedField = .name
+            showAddItem = false
         }
     }
     
@@ -181,14 +203,24 @@ struct AddItemView: View {
 
 #Preview {
     GeometryReader { proxy in
-        List {
-            AddItemView(viewModel: .preview,
-                        cart: .preview,
-                        proxy: proxy
-            )
+        NavigationStack {
+            List {
+                Section {
+                    Text("Item")
+                }
+            }
+            .navigationTitle("Cart Title")
+            .overlay {
+                AddItemView(
+                    viewModel: .preview,
+                    cart: .preview,
+                    proxy: proxy,
+                    showAddItem: .constant(true)
+                )
+            }
+            .environment(\.locale, Locale(identifier: "en-IN"))
+            .environment(\.managedObjectContext,
+                          PersistenceController.preview.container.viewContext)
         }
-        .environment(\.locale, Locale(identifier: "en-IN"))
-        .environment(\.managedObjectContext,
-                      PersistenceController.preview.container.viewContext)
     }
 }

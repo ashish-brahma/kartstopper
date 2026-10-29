@@ -20,6 +20,7 @@ struct ChecklistView: View {
     @ObservedObject var navModel: NavigationModel
     
     @Environment(\.managedObjectContext) private var viewContext
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     
     @Namespace var bottomID
     
@@ -41,6 +42,7 @@ struct ChecklistView: View {
         CDCart.getTotalItems(for: cart, context: viewContext)
     }
     
+    @State private var showAddItem = false
     @State private var showEditItem = false
     @State private var showItemInfo = false
     
@@ -81,15 +83,35 @@ struct ChecklistView: View {
                                 scrollProxy.scrollTo(bottomID)
                             }
                         }
+                        .onChange(of: showAddItem) { newValue in
+                            if !newValue {
+                                withAnimation {
+                                    scrollProxy.scrollTo(bottomID)
+                                }
+                            }
+                        }
                     }
                     .listRowBackground(Color.clear)
-                        
-                    AddItemView(
-                        viewModel: viewModel,
-                        cart: cart,
-                        proxy: geometryProxy
-                    )
-                    .id(bottomID)
+                    
+                    if !showAddItem && viewModel.itemQuery.isEmpty {
+                        Button {
+                            showAddItem = true
+                        } label: {
+                            showAddItemButtonLabel(proxy: geometryProxy)
+                        }
+                        .id(bottomID)
+                        .listRowBackground(Color.clear)
+                    }
+                }
+                .overlay {
+                    if showAddItem {
+                        AddItemView(
+                            viewModel: viewModel,
+                            cart: cart,
+                            proxy: geometryProxy,
+                            showAddItem: $showAddItem
+                        )
+                    }
                 }
                 .overlay {
                     if totalItems != 0 && itemList.isEmpty {
@@ -107,7 +129,6 @@ struct ChecklistView: View {
                 .toolbar {
                     ToolbarItem(placement: .primaryAction) {
                         EditButton()
-                            .disabled(itemList.isEmpty)
                     }
                 }
                 .sheet(isPresented: $showItemInfo) {
@@ -118,6 +139,37 @@ struct ChecklistView: View {
                 }
             }
         }
+    }
+    
+    @ViewBuilder
+    private func showAddItemButtonLabel(proxy: GeometryProxy) -> some View {
+        HStack {
+            Spacer()
+            VStack(alignment: .center) {
+                HStack {
+                    Label("Checkcircle", systemImage: "circle")
+                        .imageScale(.large)
+                        .labelStyle(.iconOnly)
+                        .foregroundStyle(Color.accentColor)
+                        .padding(.trailing, Design.Padding.trailing)
+                    
+                    VStack(alignment: .leading) {
+                        Text("Item Name")
+                        Divider()
+                        Text("Price")
+                    }
+                    .foregroundStyle(.gray)
+                }
+                .padding(Design.Padding.standard)
+                .background {
+                    RoundedRectangle(cornerRadius: Design.cornerRadius)
+                        .fill(Color(.tertiarySystemFill))
+                }
+            }
+            .frame(maxWidth: horizontalSizeClass == .regular ?  Design.addItemMaxWidth : proxy.size.width/1.2)
+            Spacer()
+        }
+        .padding(.bottom, Design.Padding.bottom * 2)
     }
     
     private func deleteItem(at offsets: IndexSet) {
