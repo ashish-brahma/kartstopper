@@ -30,6 +30,7 @@ enum Design {
     static let cornerRadius = CGFloat(21)
     
     static let addItemMaxWidth = CGFloat(300)
+    static let addCartMaxWidth = CGFloat(380)
     
     static let compactCardWidth = CGFloat(360)
     

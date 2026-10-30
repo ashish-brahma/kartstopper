@@ -14,10 +14,13 @@ struct AddCartView: View {
     @ObservedObject var viewModel: ViewModel
     
     @Binding var showAddCart: Bool
+    let proxy: GeometryProxy
     
     let logger = PersistenceController.shared.logger
     
     @Environment(\.managedObjectContext) private var viewContext
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @Environment(\.colorScheme) private var colorScheme
     
     private enum Field: Hashable {
         case name
@@ -30,50 +33,54 @@ struct AddCartView: View {
     @State private var isValidInput = true
     @State private var showValidationMessage = false
     
+    private var addButtonTextColor: Color {
+        colorScheme == .dark ? .black : .white
+    }
+    
     var body: some View {
-        Section {
-            VStack {
-                TextField("Cart Name", text: $name)
-                    .autocorrectionDisabled()
-                    .textInputAutocapitalization(.words)
-                    .focused($focusedField, equals: .name)
-                    .foregroundStyle(isValidInput ? Color.primary : Color.red)
-                    .submitLabel(.next)
-                    .onSubmit {
-                        focusedField = .notes
+        VStack {
+            Spacer()
+            
+            HStack {
+                Spacer()
+                
+                VStack(alignment: .center) {
+                    cell()
+                    
+                    if showValidationMessage {
+                        Text("Cart already exists.")
+                            .foregroundStyle(Color.red)
+                            .font(.callout)
                     }
-                Divider()
-                TextField("Add notes (optional)",
-                          text: $notes,
-                          axis: .vertical)
-                .textInputAutocapitalization(.sentences)
-                .frame(height: Design.descriptionFieldHeight,
-                       alignment: .top)
-                .lineLimit(Design.descriptionFieldLineLimit)
-                .focused($focusedField, equals: .notes)
+                    
+                    buttonToolbar()
+                }
+                .frame(maxWidth: horizontalSizeClass == .regular ?  Design.addCartMaxWidth : proxy.size.width/1.2)
+                
+                Spacer()
             }
-            .toolbar {
-                ToolbarItemGroup(placement: .keyboard) {
-                    CancelToolbarButton {
-                        reset()
-                        showAddCart = false
-                    }
-                    Spacer()
-                    ConfirmToolbarButton {
-                        validateCart()
-                        if isValidInput {
-                            addCart()
-                            reset()
-                            showAddCart = false
-                        }
-                    }
-                    .disabled(name.isEmpty)
+            .padding(Design.Padding.standard * 2)
+            .padding(.bottom, Design.Padding.bottom * 4)
+            .background {
+                if colorScheme == .light {
+                    Rectangle()
+                        .fill(Material.thick)
+                } else {
+                    Rectangle()
+                        .fill(Color(.systemGroupedBackground))
                 }
             }
-        } header: {
-            if showValidationMessage {
-                Text("Cart already exists.")
-                    .foregroundStyle(Color.red)
+            
+            Spacer()
+        }
+        .toolbar {
+            ToolbarItemGroup(placement: .keyboard) {
+                CancelToolbarButton {
+                    focusedField = nil
+                }
+                Spacer()
+                ConfirmToolbarButton(action: submitAction)
+                    .disabled(name.isEmpty)
             }
         }
         .onAppear {
@@ -84,6 +91,69 @@ struct AddCartView: View {
         .onChange(of: name) { newName in
             isValidInput = true
             showValidationMessage = false
+        }
+    }
+    
+    @ViewBuilder
+    private func cell() -> some View {
+        VStack(alignment: .leading) {
+            TextField("Cart Name", text: $name)
+                .autocorrectionDisabled()
+                .textInputAutocapitalization(.words)
+                .focused($focusedField, equals: .name)
+                .foregroundStyle(isValidInput ? Color.primary : Color.red)
+                .submitLabel(.next)
+                .onSubmit {
+                    validateCart()
+                    if isValidInput {
+                        focusedField = .notes
+                    }
+                }
+            
+            Divider()
+            
+            TextField("Add notes (optional)",
+                      text: $notes,
+                      axis: .vertical)
+            .textInputAutocapitalization(.sentences)
+            .frame(height: Design.descriptionFieldHeight,
+                   alignment: .top)
+            .lineLimit(Design.descriptionFieldLineLimit)
+            .focused($focusedField, equals: .notes)
+        }
+        .padding(Design.Padding.standard)
+        .background {
+            RoundedRectangle(cornerRadius: Design.cornerRadius)
+                .fill(Color(.secondarySystemGroupedBackground))
+        }
+        
+    }
+    
+    @ViewBuilder
+    private func buttonToolbar() -> some View {
+        HStack {
+            CancelToolbarButton {
+                showAddCart = false
+                focusedField = nil
+            }
+            .tint(Color.foreground)
+            .buttonStyle(.bordered)
+            
+            Spacer()
+            
+            AddToolbarButton(entityName: "Cart",
+                             action: submitAction)
+                .foregroundStyle(name.isEmpty ? Color.secondary : addButtonTextColor)
+                .tint(name.isEmpty ? Color.secondary.opacity(0.7) : Color.accent)
+        }
+    }
+    
+    private func submitAction() {
+        validateCart()
+        if isValidInput {
+            addCart()
+            reset()
+            showAddCart = false
         }
     }
     
@@ -126,8 +196,21 @@ struct AddCartView: View {
 }
 
 #Preview {
-    NavigationStack {
-        AddCartView(viewModel: .preview,
-                    showAddCart: .constant(true))
+    GeometryReader { proxy in
+        NavigationSplitView {
+            Section {
+                Text("Cart")
+            }
+        } detail: {
+            Text("Cart Detail")
+        }
+        .navigationTitle("Cart Title")
+        .overlay {
+            AddCartView(
+                viewModel: .preview,
+                showAddCart: .constant(true),
+                proxy: proxy
+            )
+        }
     }
 }

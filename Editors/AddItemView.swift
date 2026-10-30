@@ -13,7 +13,7 @@ internal import OSLog
 struct AddItemView: View {
     @ObservedObject var viewModel: ViewModel
     var cart: CDCart
-    var proxy: GeometryProxy
+    let proxy: GeometryProxy
     @Binding var showAddItem: Bool
     
     let logger = PersistenceController.shared.logger
@@ -54,19 +54,26 @@ struct AddItemView: View {
                     if showValidationMessage {
                         Text("Item already exists.")
                             .foregroundStyle(Color.red)
+                            .font(.callout)
                     }
                     
-                    addButton()
-                    
-                    cancelButton()
+                    buttonToolbar()
                 }
                 .frame(maxWidth: horizontalSizeClass == .regular ?  Design.addItemMaxWidth : proxy.size.width/1.2)
-                .padding(.bottom, Design.Padding.bottom * 4)
                 
                 Spacer()
             }
             .padding(Design.Padding.standard * 2)
-            .background(Material.thick)
+            .padding(.bottom, Design.Padding.bottom * 4)
+            .background {
+                if colorScheme == .light {
+                    Rectangle()
+                        .fill(Material.thick)
+                } else {
+                    Rectangle()
+                        .fill(Color(.systemGroupedBackground))
+                }
+            }
         }
         .toolbar {
             ToolbarItemGroup(placement: .keyboard) {
@@ -88,25 +95,23 @@ struct AddItemView: View {
         }
     }
     
-    private func addButton() -> some View {
-        Button(action: submitAction) {
-            Label("Add Item", systemImage: "plus")
+    @ViewBuilder
+    private func buttonToolbar() -> some View {
+        HStack {
+            CancelToolbarButton {
+                showAddItem = false
+                focusedField = nil
+            }
+            .tint(Color.foreground)
+            .buttonStyle(.bordered)
+            
+            Spacer()
+            
+            AddToolbarButton(entityName: "Item",
+                             action: submitAction)
                 .foregroundStyle(name.isEmpty ? Color.secondary : addButtonTextColor)
-                .frame(width: Design.addItemMaxWidth/1.6)
+                .tint(name.isEmpty ? Color.secondary.opacity(0.7) : Color.accent)
         }
-        .tint(name.isEmpty ? Color.secondary.opacity(0.7) : Color.accent)
-        .buttonStyle(.borderedProminent)
-    }
-    
-    private func cancelButton() -> some View {
-        Button {
-            showAddItem = false
-        } label: {
-            Text("Cancel")
-                .frame(width: Design.addItemMaxWidth/1.6)
-        }
-        .tint(Color.foreground)
-        .buttonStyle(.bordered)
     }
     
     @ViewBuilder

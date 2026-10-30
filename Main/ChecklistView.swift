@@ -20,7 +20,6 @@ struct ChecklistView: View {
     @ObservedObject var navModel: NavigationModel
     
     @Environment(\.managedObjectContext) private var viewContext
-    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     
     @Namespace var bottomID
     
@@ -94,11 +93,10 @@ struct ChecklistView: View {
                     .listRowBackground(Color.clear)
                     
                     if !showAddItem && viewModel.itemQuery.isEmpty {
-                        Button {
-                            showAddItem = true
-                        } label: {
-                            showAddItemButtonLabel(proxy: geometryProxy)
-                        }
+                        AddItemEditorButton(
+                            showAddItem: $showAddItem,
+                            proxy: geometryProxy
+                        )
                         .id(bottomID)
                         .listRowBackground(Color.clear)
                     }
@@ -139,37 +137,6 @@ struct ChecklistView: View {
                 }
             }
         }
-    }
-    
-    @ViewBuilder
-    private func showAddItemButtonLabel(proxy: GeometryProxy) -> some View {
-        HStack {
-            Spacer()
-            VStack(alignment: .center) {
-                HStack {
-                    Label("Checkcircle", systemImage: "circle")
-                        .imageScale(.large)
-                        .labelStyle(.iconOnly)
-                        .foregroundStyle(Color.accentColor)
-                        .padding(.trailing, Design.Padding.trailing)
-                    
-                    VStack(alignment: .leading) {
-                        Text("Item Name")
-                        Divider()
-                        Text("Price")
-                    }
-                    .foregroundStyle(.gray)
-                }
-                .padding(Design.Padding.standard)
-                .background {
-                    RoundedRectangle(cornerRadius: Design.cornerRadius)
-                        .fill(Color(.tertiarySystemFill))
-                }
-            }
-            .frame(maxWidth: horizontalSizeClass == .regular ?  Design.addItemMaxWidth : proxy.size.width/1.2)
-            Spacer()
-        }
-        .padding(.bottom, Design.Padding.bottom * 2)
     }
     
     private func deleteItem(at offsets: IndexSet) {

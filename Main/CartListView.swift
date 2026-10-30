@@ -42,6 +42,15 @@ struct CartListView: View {
                 cartsDetail(proxy: proxy)
             }
             .overlay {
+                if showAddCart {
+                    AddCartView(
+                        viewModel: viewModel,
+                        showAddCart: $showAddCart,
+                        proxy: proxy
+                    )
+                }
+            }
+            .overlay {
                 cartsUnavailableOverlay()
             }
             .ignoresSafeArea()
@@ -105,11 +114,6 @@ struct CartListView: View {
                     }
                 }
             }
-            
-            if showAddCart {
-                AddCartView(viewModel: viewModel,
-                            showAddCart: $showAddCart)
-            }
         }
         .overlay {
             if !showAddCart
@@ -125,13 +129,12 @@ struct CartListView: View {
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 EditButton()
-                    .disabled(carts.isEmpty)
             }
             ToolbarItem(placement: .primaryAction) {
                 AddToolbarButton(entityName: "cart") {
                     showAddCart = true
                 }
-                .disabled(showAddCart)
+                .disabled(showAddCart && !viewModel.cartQuery.isEmpty)
             }
         }
         .sheet(isPresented: $showEditCart) {
@@ -145,6 +148,11 @@ struct CartListView: View {
         }
         .onChange(of: viewModel.totalCarts) { newCount in
             selectLatestCart()
+        }
+        .onChange(of: navModel.selectedCart) { cart in
+            if cart == nil {
+                selectLatestCart()
+            }
         }
         .task {
             selectLatestCart()

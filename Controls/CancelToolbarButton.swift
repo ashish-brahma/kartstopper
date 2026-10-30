@@ -15,6 +15,7 @@ struct CancelToolbarButton: View {
         Button(action: action) {
             Label("Cancel", systemImage: "xmark")
         }
+        .buttonBorderShape(.capsule)
     }
 }
 
