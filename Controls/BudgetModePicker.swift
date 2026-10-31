@@ -18,22 +18,12 @@ struct BudgetModePicker: View {
     @Environment(\.managedObjectContext) private var viewContext
     
     var body: some View {
-        Picker(selection: $preferencesModel.selectedMode) {
+        Picker("Select a mode", selection: $preferencesModel.selectedMode) {
             ForEach(BudgetMode.allCases) { mode in
                 Text(mode.rawValue).tag(mode)
             }
-        } label: {
-            LabeledContent {
-                if viewModel.budget.budgetMode == nil {
-                    Text("Select a mode")
-                } else {
-                    EmptyView()
-                }
-            } label: {
-                Label("Tracking Difficulty", systemImage: "barometer")
-            }
         }
-        .pickerStyle(.navigationLink)
+        .pickerStyle(.inline)
         .onChange(of: preferencesModel.selectedMode) { _ in
             updateMode()
         }
@@ -64,12 +54,13 @@ struct BudgetModePicker: View {
 #Preview("Onboarded") {
     let context = PersistenceController.preview.container.viewContext
     let viewModel = ViewModel.preview
+    let preferencesModel = PreferencesModel()
     List {
         BudgetModePicker(viewModel: viewModel,
-                         preferencesModel: PreferencesModel())
+                         preferencesModel: preferencesModel)
     }
     .task {
-        viewModel.budget.budgetMode = .medium
+        preferencesModel.selectedMode = .medium
         viewModel.update(context: context)
     }
 }

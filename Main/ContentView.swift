@@ -87,7 +87,8 @@ struct ContentView: View {
                           showPreferences: $showPreferences)
         case .manage:
             ManageView(viewModel: viewModel,
-                       preferencesModel: preferencesModel)
+                       preferencesModel: preferencesModel,
+                       navModel: navModel)
         }
     }
 }

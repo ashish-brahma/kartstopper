@@ -15,10 +15,10 @@ struct Budget: BudgetProtocol {
     var totalMonthlySpend: Double = 0.00
     
     /// Amount allocated for monthly budget.
-    var budgetAmount: Double? = nil
+    var budgetAmount: Double?
     
     /// Difficulty mode used for budget monitoring.
-    var budgetMode: BudgetMode? = nil
+    var budgetMode: BudgetMode?
     
     /// Flag to lock budget for editing.
     var isLocked: Bool = false

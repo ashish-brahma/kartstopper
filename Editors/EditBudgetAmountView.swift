@@ -38,6 +38,10 @@ struct EditBudgetAmountView: View {
         return "Budget amount would be unlocked for modification on \(nextDate)."
     }
     
+    private var sectionTitle: String {
+        viewModel.budget.isLocked ? "Amount" : "Enter an amount"
+    }
+    
     var body: some View {
         Form {
             Section {
@@ -50,6 +54,8 @@ struct EditBudgetAmountView: View {
                 .keyboardType(.decimalPad)
                 .disabled(viewModel.budget.isLocked)
                 .foregroundStyle(viewModel.budget.isLocked ? .secondary : .primary)
+            } header: {
+                Text(sectionTitle)
             } footer: {
                 budgetAmountFooter()
             }
@@ -140,11 +146,18 @@ extension Date {
 }
 
 #Preview("Onboarded") {
+    let context = PersistenceController.preview.container.viewContext
+    let viewModel = ViewModel.preview
+    let preferencesModel = PreferencesModel()
     NavigationStack {
         EditBudgetAmountView(
-            viewModel: .preview,
-            preferencesModel: PreferencesModel()
+            viewModel: viewModel,
+            preferencesModel: preferencesModel
         )
+    }
+    .task {
+        preferencesModel.budgetAmount = viewModel.budget.budgetAmount
+        viewModel.update(context: context)
     }
 }
 

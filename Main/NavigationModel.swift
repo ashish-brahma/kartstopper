@@ -22,6 +22,9 @@ class NavigationModel: ObservableObject, Codable {
     /// Array of cards pushed on dashboard's navigation stack.
     @Published var presentedCards: [Card] = []
     
+    /// Currently selected preference in Manage View.
+    @Published var selectedPreference: ManageNavigation?
+    
     /// Currently selected time range for Category Details chart.
     @Published var selectedTimeRangeForCategories: TimeRange = .last30days
     
@@ -149,9 +152,12 @@ enum TimeRange: TimeInterval, Hashable, CaseIterable, Codable  {
     case last365days = 365
 }
 
-/// Type that manages form fields in preferences.
-enum ManageField: Int, Hashable, CaseIterable, Identifiable, Codable {
+/// Type that manages navigation links in preferences.
+enum ManageNavigation: Int, Hashable, CaseIterable, Identifiable, Codable {
     case budgetAmount
+    case budgetMode
+    case appInformation
+    case developerInformation
     
     var id: Int { rawValue }
 }
