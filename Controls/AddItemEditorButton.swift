@@ -4,7 +4,7 @@
 //
 //  Created by Ashish Brahma on 30/10/26.
 //
-//  A SwiftUI view that displays an editor cell button in checklist.
+//  A SwiftUI button view that displays add item view in checklist.
 
 import SwiftUI
 
