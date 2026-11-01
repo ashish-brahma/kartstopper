@@ -111,10 +111,20 @@ struct EditBudgetAmountView: View {
             Label(unlockInformation, systemImage: "info.circle")
                 .foregroundStyle(Color.info)
         } else {
-            Label(Constants.Manage.monthlyBudgetWarning, systemImage: "exclamationmark.circle")
-                .foregroundStyle(Color.warning)
+            if #available(iOS 17, *) {
+                if isFocused {
+                    warningLabel()
+                }
+            } else {
+                warningLabel()
+            }
         }
         
+    }
+    
+    private func warningLabel() -> some View {
+        Label(Constants.Manage.monthlyBudgetWarning, systemImage: "exclamationmark.circle")
+            .foregroundStyle(Color.warning)
     }
     
     @ToolbarContentBuilder

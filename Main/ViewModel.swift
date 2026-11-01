@@ -39,7 +39,7 @@ class ViewModel: ObservableObject {
     @Published var hasOnboarded: Bool = false
     
     /// Number of onboarding steps pending.
-    @Published var onboardingSteps: Int = 2
+    @Published var onboardingSteps: Int = 0
     
     init(
         budget: Budget,
@@ -57,10 +57,14 @@ class ViewModel: ObservableObject {
         
         if let amount = preferencesModel.budgetAmount {
             budget.budgetAmount = amount
+        } else {
+            onboardingSteps += 1
         }
         
         if let mode = preferencesModel.selectedMode {
             budget.budgetMode = mode
+        } else {
+            onboardingSteps += 1
         }
     }
     

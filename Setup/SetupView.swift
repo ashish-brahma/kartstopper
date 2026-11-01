@@ -24,7 +24,7 @@ struct SetupView: View {
             
             VStack(alignment: .leading) {
                 HStack(alignment: .top) {
-                    Text("Create Budget")
+                    Text("Set Budget")
                         .font(.headline)
                         .foregroundStyle(Color.foreground)
                     Spacer()

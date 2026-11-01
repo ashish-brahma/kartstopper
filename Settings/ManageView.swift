@@ -21,10 +21,6 @@ struct ManageView: View {
     
     @State private var columnVisibility = NavigationSplitViewVisibility.detailOnly
     
-    private var onboardingSteps: Text {
-        Text("^[\(viewModel.onboardingSteps) step](inflect: true)").bold()
-    }
-    
     private var currencyCode: String {
         locale.currency?.identifier ?? "USD"
     }
@@ -32,60 +28,9 @@ struct ManageView: View {
     var body: some View {
         GeometryReader { proxy in
             NavigationSplitView(columnVisibility: $columnVisibility) {
-                List(selection: $navModel.selectedPreference) {
-                    Section {
-                        NavigationLink(value: ManageNavigation.budgetAmount,
-                                       label: amountLabel)
-                        
-                        NavigationLink(value: ManageNavigation.budgetMode,
-                                       label: modeLabel)
-                    } header: {
-                        Text("Budget")
-                    } footer: {
-                        if !viewModel.hasOnboarded {
-                            Label("You are \(onboardingSteps) away from setting up your budget.", systemImage: "info.circle")
-                                .labelStyle(.titleOnly)
-                                .foregroundStyle(Color.accentColor)
-                        }
-                    }
-                    .listItemTint(Color(.systemIndigo))
-                    
-                    Section {
-                        NavigationLink("KartStopper",
-                                       value: ManageNavigation.appInformation)
-                        
-                        NavigationLink("Developer",
-                                       value: ManageNavigation.developerInformation)
-                    } header: {
-                        Text("About")
-                    }
-                }
-                .navigationTitle("Preferences")
-                .navigationTitleColor(Color.foreground)
+                manageSidebar()
             } detail: {
-                if let selection = navModel.selectedPreference {
-                    switch selection {
-                    case .budgetAmount:
-                        EditBudgetAmountView(viewModel: viewModel,
-                                             preferencesModel: preferencesModel)
-                        
-                    case .budgetMode:
-                        Form {
-                            BudgetModePicker(
-                                viewModel: viewModel,
-                                preferencesModel: preferencesModel
-                            )
-                        }
-                        .navigationTitle("Tracking Difficulty")
-                        .navigationBarTitleDisplayMode(.inline)
-                        
-                    case .appInformation:
-                        AppInformationView()
-                        
-                    case .developerInformation:
-                        DeveloperInformationView()
-                    }
-                }
+                manageDetail()
             }
             .task {
                 columnVisibility = .doubleColumn
@@ -99,6 +44,73 @@ struct ManageView: View {
     }
     
     @ViewBuilder
+    private func manageSidebar() -> some View {
+        List(selection: $navModel.selectedPreference) {
+            Section {
+                NavigationLink(value: ManageNavigation.budgetAmount,
+                               label: amountLabel)
+                
+                NavigationLink(value: ManageNavigation.budgetMode,
+                               label: modeLabel)
+            } header: {
+                Text("Budget")
+            }
+            
+            Section {
+                NavigationLink("KartStopper",
+                               value: ManageNavigation.appInformation)
+                
+                NavigationLink("Developer",
+                               value: ManageNavigation.developerInformation)
+            } header: {
+                Text("About")
+            }
+        }
+        .navigationTitle("Preferences")
+        .navigationTitleColor(Color.foreground)
+    }
+    
+    private func setupIndicator() -> some View {
+        ZStack {
+            Circle()
+                .fill(Color.red)
+            Text("1")
+                .font(.caption.bold())
+                .foregroundStyle(Color.white)
+        }
+        .frame(width: 20)
+    }
+    
+    @ViewBuilder
+    private func manageDetail() -> some View {
+        if let selection = navModel.selectedPreference {
+            switch selection {
+            case .budgetAmount:
+                EditBudgetAmountView(
+                    viewModel: viewModel,
+                    preferencesModel: preferencesModel
+                )
+                
+            case .budgetMode:
+                Form {
+                    BudgetModePicker(
+                        viewModel: viewModel,
+                        preferencesModel: preferencesModel
+                    )
+                }
+                .navigationTitle("Tracking Difficulty")
+                .navigationBarTitleDisplayMode(.inline)
+                
+            case .appInformation:
+                AppInformationView()
+                
+            case .developerInformation:
+                DeveloperInformationView()
+            }
+        }
+    }
+    
+    @ViewBuilder
     private func amountLabel() -> some View {
         LabeledContent {
             if let amount = viewModel.budget.budgetAmount {
@@ -107,7 +119,16 @@ struct ManageView: View {
                 Text("Enter an amount")
             }
         } label: {
-            Label("Amount", systemImage: "number.square")
+            HStack(alignment: .center) {
+                Image(systemName: "number.square")
+                    .foregroundStyle(navModel.selectedPreference == .budgetAmount ? Color.white : Color.accent)
+                Text("Amount")
+                    .foregroundStyle(navModel.selectedPreference == .budgetAmount ? Color.white : Color.primary)
+                
+                if viewModel.budget.budgetAmount == nil {
+                    setupIndicator()
+                }
+            }
         }
     }
     
@@ -120,7 +141,20 @@ struct ManageView: View {
                 Text("Select a mode")
             }
         } label: {
-            Label("Tracking Difficulty", systemImage: "barometer")
+            HStack(alignment: .center) {
+                Image(systemName: "barometer")
+                    .foregroundStyle(navModel.selectedPreference == .budgetMode ? Color.white : Color.accent)
+                
+                Text("Tracking Difficulty")
+                    .frame(width: 80, alignment: .leading)
+                    .foregroundStyle(navModel.selectedPreference == .budgetMode ? Color.white : Color.primary)
+                    .multilineTextAlignment(.leading)
+                    .lineLimit(2)
+                
+                if viewModel.budget.budgetMode == nil {
+                    setupIndicator()
+                }
+            }
         }
     }
 }
@@ -137,6 +171,8 @@ struct ManageView: View {
     .task {
         preferencesModel.budgetAmount = viewModel.budget.budgetAmount
         preferencesModel.selectedMode = viewModel.budget.budgetMode
+        viewModel.onboardingSteps -= 2
+        viewModel.updateOnboardingState()
         viewModel.update(context: context)
     }
 }

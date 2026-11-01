@@ -10,7 +10,7 @@ import Foundation
 
 enum Constants {
     enum Setup {
-        static let purpose = "Budget amount would be used to gauge monthly expenditure."
+        static let purpose = "Budget preferences would be used to gauge monthly expenditure."
     }
     
     enum Manage {
