@@ -100,13 +100,19 @@ struct CartListView: View {
             ForEach(carts) { section in
                 Section(header: Text(section.id)) {
                     ForEach(section) { cart in
-                        CartNavigationButton(
-                            navModel: navModel,
-                            cart: cart,
-                            showEditCart: $showEditCart,
-                            onDelete: { deleteCart(cart) }
-                        )
-                        .listRowBackground(navModel.selectedCart == cart ? Color.blue : Color(.secondarySystemGroupedBackground))
+                        NavigationLink(value: cart) {
+                            CartRowView(cart: cart,
+                                        navModel: navModel)
+                        }
+                        .swipeActions(edge: .trailing) {
+                            DeleteSwipeButton {
+                                deleteCart(cart)
+                            }
+                            EditSwipeButton {
+                                navModel.cartToEdit = cart
+                                showEditCart = true
+                            }
+                        }
                     }
                     .onDelete { indexSet in
                         deleteCart(in: Array(section),
@@ -115,6 +121,7 @@ struct CartListView: View {
                 }
             }
         }
+        .id(viewModel.totalCarts)
         .overlay {
             if !showAddCart
                 && viewModel.totalCarts != 0
@@ -138,7 +145,7 @@ struct CartListView: View {
             }
         }
         .sheet(isPresented: $showEditCart) {
-            if let selection = navModel.selectedCart {
+            if let selection = navModel.cartToEdit {
                 EditCartView(viewModel: viewModel,
                              cart: selection)
             }

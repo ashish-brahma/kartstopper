@@ -24,30 +24,28 @@ struct CartRowView: View {
     }
     
     var body: some View {
-        NavigationLink(value: cart) {
-            VStack(alignment: .leading) {
-                Text(cart.displayDate.formatted(date: .omitted,
-                                                time: .shortened))
-                .font(.subheadline)
-                
-                HStack {
-                    Text(cart.displayName)
-                        .font(.largeTitle)
-                        .foregroundStyle(isSelected ? Color.white : Color.foreground)
-                    Spacer()
-                    Text("\(totalItems)")
-                        .font(.system(size: Design.itemCountFontSize, weight: .semibold))
-                        .padding(.trailing, Design.Padding.trailing)
-                }
-                
-                Text(cart.displayNotes)
-                    .font(.footnote)
-                    .minimumScaleFactor(Design.notesMinScaleFactor)
-                    .frame(alignment: .leading)
-                
+        VStack(alignment: .leading) {
+            Text(cart.displayDate.formatted(date: .omitted,
+                                            time: .shortened))
+            .font(.subheadline)
+            
+            HStack {
+                Text(cart.displayName)
+                    .font(.largeTitle)
+                    .foregroundStyle(isSelected ? Color.white : Color.foreground)
+                Spacer()
+                Text("\(totalItems)")
+                    .font(.system(size: Design.itemCountFontSize, weight: .semibold))
+                    .padding(.trailing, Design.Padding.trailing)
             }
-            .foregroundStyle(isSelected ? Color.white : .secondary)
+            
+            Text(cart.displayNotes)
+                .font(.footnote)
+                .minimumScaleFactor(Design.notesMinScaleFactor)
+                .frame(alignment: .leading)
+            
         }
+        .foregroundStyle(isSelected ? Color.white : .secondary)
     }
 }
 
@@ -68,7 +66,7 @@ struct CartRowView: View {
     GeometryReader { proxy in
         CartRowView(cart: cart,
                     navModel: navModel)
-        .background(.blue)
+        .background(.accent)
         .position(x: proxy.size.width/2, y: proxy.size.height/2)
         .environment(\.managedObjectContext,
                       PersistenceController.preview.container.viewContext)

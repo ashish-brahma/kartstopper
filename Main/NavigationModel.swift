@@ -16,6 +16,9 @@ class NavigationModel: ObservableObject, Codable {
     /// Currently selected cart in carts list.
     @Published var selectedCart: CDCart?
     
+    /// Cart which is being currently edited in carts list.
+    @Published var cartToEdit: CDCart?
+    
     /// Currently selected item in checklist.
     @Published var selectedItem: CDItem?
     
