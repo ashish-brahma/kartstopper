@@ -22,45 +22,61 @@ struct ContentView: View {
     @State private var showPreferences = false
     
     var body: some View {
-        TabView(selection: $navModel.selectedTab) {
-            ForEach(Tabs.allCases) { tab in
-                if tab == .manage {
-                    primitiveTab(tab: tab)
-                        .badge(viewModel.hasOnboarded ? nil : "\(viewModel.onboardingSteps)")
-                } else {
-                    primitiveTab(tab: tab)
+        tabViewContent()
+            .task {
+                viewModel.loadPreferences(preferencesModel: preferencesModel)
+                viewModel.updateOnboardingState()
+                viewModel.update(context: viewContext)
+                
+                // Onboard user if not already done.
+                if !viewModel.hasOnboarded {
+                    navModel.selectedTab = .track
+                }
+                
+                // Restore navigation state.
+                if let data = navData {
+                    navModel.jsonData = data
+                }
+                
+                // Listen for the latest navigation data and store it.
+                for await _ in navModel.objectWillChangeSequence {
+                    navData = navModel.jsonData
                 }
             }
-        }
-        .task {
-            viewModel.loadPreferences(preferencesModel: preferencesModel)
-            viewModel.updateOnboardingState()
-            viewModel.update(context: viewContext)
-            
-            // Onboard user if not already done.
-            if !viewModel.hasOnboarded {
-                navModel.selectedTab = .track
+            .onChange(of: showPreferences) { newValue in
+                if !viewModel.hasOnboarded && newValue {
+                    navModel.selectedTab = .manage
+                }
             }
-            
-            // Restore navigation state.
-            if let data = navData {
-                navModel.jsonData = data
+            .onChange(of: viewModel.hasOnboarded) { boarded in
+                if boarded {
+                    viewModel.objectWillChange.send()
+                    viewModel.updateOnboardingState()
+                }
             }
-            
-            // Listen for the latest navigation data and store it.
-            for await _ in navModel.objectWillChangeSequence {
-                navData = navModel.jsonData
+    }
+    
+    @ViewBuilder
+    private func tabViewContent() -> some View {
+        if #available(iOS 18, *) {
+            TabView(selection: $navModel.selectedTab) {
+                ForEach(Tabs.allCases) { tab in
+                    Tab(tab.localizedName, systemImage: tab.symbol, value: tab) {
+                            tabContent(for: tab)
+                    }
+                    .badge(!viewModel.hasOnboarded && tab == .manage ? Text("\(viewModel.onboardingSteps)") : nil)
+                }
             }
-        }
-        .onChange(of: showPreferences) { newValue in
-            if !viewModel.hasOnboarded && newValue {
-                navModel.selectedTab = .manage
-            }
-        }
-        .onChange(of: viewModel.hasOnboarded) { boarded in
-            if boarded {
-                viewModel.objectWillChange.send()
-                viewModel.updateOnboardingState()
+        } else {
+            TabView(selection: $navModel.selectedTab) {
+                ForEach(Tabs.allCases) { tab in
+                    if tab == .manage {
+                        primitiveTab(tab: tab)
+                            .badge(viewModel.hasOnboarded ? nil : "\(viewModel.onboardingSteps)")
+                    } else {
+                        primitiveTab(tab: tab)
+                    }
+                }
             }
         }
     }
