@@ -86,35 +86,14 @@ struct ManageView: View {
                         DeveloperInformationView()
                     }
                 }
-                
-                preferenceUnavailableView(proxy: proxy)
             }
             .task {
+                columnVisibility = .doubleColumn
+                
                 if horizontalClassSize == .regular
-                    && !viewModel.hasOnboarded {
-                    columnVisibility = NavigationSplitViewVisibility.doubleColumn
+                    && navModel.selectedPreference == nil {
+                    navModel.selectedPreference = .budgetAmount
                 }
-            }
-        }
-    }
-    
-    @ViewBuilder
-    private func preferenceUnavailableView(proxy: GeometryProxy) -> some View {
-        if horizontalClassSize == .regular {
-            if navModel.selectedPreference == nil {
-                VStack {
-                    ManageView.unavailableView(
-                        label: "No selection",
-                        symbolName: "filemenu.and.selection",
-                        description: "Select a preference to view details."
-                    )
-                    
-                    Button("Show preferences") {
-                        columnVisibility = NavigationSplitViewVisibility.doubleColumn
-                    }
-                    .buttonStyle(.bordered)
-                }
-                .frame(maxHeight: proxy.size.height/2)
             }
         }
     }

@@ -50,9 +50,6 @@ struct CartListView: View {
                     )
                 }
             }
-            .overlay {
-                cartsUnavailableOverlay()
-            }
             .ignoresSafeArea()
         }
     }
@@ -88,8 +85,30 @@ struct CartListView: View {
                               navModel: navModel)
             }
             
-            cartsUnavailableDetail(proxy: proxy)
+            if !showAddCart && viewModel.totalCarts == 0 {
+                if horizontalSizeClass == .regular {
+                    cartsUnavailableDetail(proxy: proxy)
+                }
+            }
         }
+    }
+    
+    @ViewBuilder
+    private func cartsUnavailableDetail(proxy: GeometryProxy) -> some View {
+        VStack {
+            CartListView.unavailableView(
+                label: "No Carts",
+                symbolName: "cart.badge.plus",
+                description: "New carts you add will group items."
+            )
+            .padding(.bottom, Design.Padding.bottom)
+            
+            Button("Let's  start") {
+                columnVisibility = NavigationSplitViewVisibility.doubleColumn
+            }
+            .buttonStyle(.bordered)
+        }
+        .frame(maxHeight: proxy.size.height/2)
     }
     
     // MARK: - List view
@@ -123,10 +142,22 @@ struct CartListView: View {
         }
         .id(viewModel.totalCarts)
         .overlay {
-            if !showAddCart
-                && viewModel.totalCarts != 0
-                && carts.isEmpty {
-                ContentView.searchUnavailableView
+            if !showAddCart {
+                if viewModel.totalCarts == 0 {
+                    
+                    if horizontalSizeClass == .compact
+                        && verticalSizeClass == .regular {
+                        
+                        CartListView.unavailableView(
+                            label: "No Carts",
+                            symbolName: "cart.badge.plus",
+                            description: "New carts you add will appear here."
+                        )
+                    }
+                    
+                } else if carts.isEmpty {
+                    ContentView.searchUnavailableView
+                }
             }
         }
         .searchable(text: $viewModel.cartQuery, placement: .navigationBarDrawer)
@@ -162,7 +193,9 @@ struct CartListView: View {
             }
         }
         .task {
-            selectLatestCart()
+            if navModel.selectedCart == nil {
+                selectLatestCart()
+            }
         }
     }
     
@@ -171,46 +204,6 @@ struct CartListView: View {
             if let section = carts.first,
                let cart = section.first {
                 navModel.selectedCart = cart
-            }
-        }
-    }
-    
-    // MARK: - Content unavailable views
-    
-    @ViewBuilder
-    private func cartsUnavailableDetail(proxy: GeometryProxy) -> some View {
-        if horizontalSizeClass == .regular {
-            
-            if !showAddCart && viewModel.totalCarts == 0 {
-                VStack {
-                    CartListView.unavailableView(
-                        label: "No Carts",
-                        symbolName: "cart.badge.plus",
-                        description: "New carts you add will group items."
-                    )
-                    .padding(.bottom, Design.Padding.bottom)
-                    
-                    Button("Let's  start") {
-                        columnVisibility = NavigationSplitViewVisibility.doubleColumn
-                    }
-                    .buttonStyle(.bordered)
-                }
-                .frame(maxHeight: proxy.size.height/2)
-            }
-        }
-    }
-    
-    @ViewBuilder
-    private func cartsUnavailableOverlay() -> some View {
-        if horizontalSizeClass == .compact
-            && verticalSizeClass == .regular {
-            
-            if !showAddCart && viewModel.totalCarts == 0 {
-                CartListView.unavailableView(
-                    label: "No Carts",
-                    symbolName: "cart.badge.plus",
-                    description: "New carts you add will appear here."
-                )
             }
         }
     }
