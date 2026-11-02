@@ -81,7 +81,7 @@ struct CategoriesOverview : View {
     
     var body: some View {
         VStack(alignment: .leading) {
-            HStack {
+            HStack(alignment: .top) {
                 Text("Most Expensive Cart")
                     .font(.callout)
                     .foregroundStyle(.secondary)
@@ -90,6 +90,12 @@ struct CategoriesOverview : View {
                     Image(systemName: "exclamationmark.circle")
                         .foregroundStyle(Color.warning)
                 }
+                
+                Spacer()
+                
+                Image(systemName: "chevron.right.circle.fill")
+                    .imageScale(.large)
+                    .foregroundStyle(.secondary)
             }
                 
             if !data.isEmpty {

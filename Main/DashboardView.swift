@@ -37,35 +37,47 @@ struct DashboardView: View {
                     VStack {
                         if !viewModel.hasOnboarded && !dismissSetup {
                             Section {
-                                SetupView(
-                                    showPreferences: $showPreferences,
-                                    dismiss: $dismissSetup
-                                )
-                                .padding(Design.Padding.card)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .background(Rectangle().fill(Material.thick))
-                                .clipShape(.rect(cornerRadius: Design.cornerRadius))
-                                .padding(Design.Padding.standard)
+                                cardView(backgroundFill: Material.thick) {
+                                    SetupView(
+                                        showPreferences: $showPreferences,
+                                        dismiss: $dismissSetup
+                                    )
+                                }
                             }
                         }
                         
                         LazyVGrid(
                             columns: columns,
+                            alignment: .leading,
                             spacing: Design.Spacing.listRow
                         ) {
-                            ForEach(Card.allCases) { card in
-                                VStack(spacing: Design.Spacing.listRow) {
-                                    Section {
-                                        statCard(for: card,
-                                                 proxy: proxy)
-                                        .padding(Design.Padding.card)
-                                        .frame(maxWidth: .infinity,
-                                               alignment: .leading)
-                                        .background(Color(.secondarySystemGroupedBackground))
-                                        .clipShape(.rect(cornerRadius: Design.cornerRadius))
-                                    }
-                                }
-                                .padding(Design.Padding.standard)
+                            Section {
+                                statCard(for: Card.status,
+                                         proxy: proxy)
+                            } header: {
+                                headerText(text: viewModel.dynamicTitle,
+                                           color: viewModel.fontColor)
+                            }
+                            
+                            Spacer()
+                            
+                            Section {
+                                statCard(for: Card.topCarts,
+                                         proxy: proxy)
+                            } header: {
+                                headerText(text: "Most Frequent")
+                            }
+                            
+                            Spacer()
+                            
+                            Section {
+                                statCard(for: Card.expenses,
+                                         proxy: proxy)
+                                
+                                statCard(for: Card.categories,
+                                         proxy: proxy)
+                            } header: {
+                                headerText(text: "How You Spent")
                             }
                         }
                     }
@@ -91,53 +103,63 @@ struct DashboardView: View {
         }
     }
     
+    private func headerText(
+        text: String,
+        color: Color = Color.foreground
+    ) -> some View {
+        Text(text)
+            .font(.title2.bold())
+            .foregroundStyle(color)
+            .padding(.horizontal)
+    }
+    
+    private func cardView(
+        backgroundFill: some ShapeStyle = Color(.secondarySystemGroupedBackground),
+        content: () -> some View
+    ) -> some View {
+        content()
+            .padding(Design.Padding.card)
+            .frame(maxWidth: .infinity,
+                   alignment: .leading)
+            .background(Rectangle().fill(backgroundFill))
+            .clipShape(.rect(cornerRadius: Design.cornerRadius))
+            .padding(Design.Padding.horizontal)
+    }
+    
     @ViewBuilder
     private func statCard(
         for card: Card,
         proxy: GeometryProxy
     ) -> some View {
-        switch card {
-        case .topCarts:
-            TopFrequentCarts(proxy: proxy)
-            
-        case .status:
-            VStack(alignment: .leading) {
-                Text(viewModel.dynamicTitle)
-                    .font(.title2.bold())
-                    .foregroundStyle(viewModel.fontColor)
-                
-                Spacer()
-                
-                StatusCardView(viewModel: viewModel)
-                
-                Spacer()
-            }
-            
-        case .expenses:
-                navigationButton(value: Card.expenses) {
-                    ExpenditureOverview(proxy: proxy)
-                }
-            
-        case .categories:
-                navigationButton(value: Card.categories) {
-                    CategoriesOverview(proxy: proxy)
-                }
+        cardView {
+            statCardContent(for: card, proxy: proxy)
         }
     }
     
-    private func navigationButton(
-        value: Card,
-        label: () -> some View
+    @ViewBuilder
+    private func statCardContent(
+        for card: Card,
+        proxy: GeometryProxy
     ) -> some View {
-        NavigationLink(value: value) {
-            HStack {
-                label()
-                Spacer()
-                Image(systemName: "chevron.right")
-                    .foregroundStyle(.secondary)
+        switch card {
+        case .status:
+            StatusCardView(viewModel: viewModel)
+            
+        case .topCarts:
+            TopFrequentCarts(proxy: proxy)
+            
+        case .expenses:
+            NavigationLink(value: Card.expenses) {
+                ExpenditureOverview(proxy: proxy)
             }
+            .foregroundStyle(Color.primary)
+            
+        case .categories:
+            NavigationLink(value: Card.categories) {
+                CategoriesOverview(proxy: proxy)
+            }
+            .foregroundStyle(Color.primary)
         }
-        .foregroundStyle(Color.primary)
     }
 }
 

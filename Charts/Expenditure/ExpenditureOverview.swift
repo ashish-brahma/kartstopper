@@ -49,7 +49,7 @@ struct ExpenditureOverview: View {
     
     var body: some View {
         VStack(alignment: .leading) {
-            HStack {
+            HStack(alignment: .top) {
                 Text("Total Expenditure")
                     .font(.callout)
                     .foregroundStyle(.secondary)
@@ -58,6 +58,12 @@ struct ExpenditureOverview: View {
                     Image(systemName: "exclamationmark.circle")
                         .foregroundStyle(Color.warning)
                 }
+                
+                Spacer()
+                
+                Image(systemName: "chevron.right.circle.fill")
+                    .imageScale(.large)
+                    .foregroundStyle(.secondary)
             }
             
             if !data.isEmpty {
