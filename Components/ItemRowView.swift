@@ -13,80 +13,81 @@ internal import Combine
 struct ItemRowView: View {
     @ObservedObject var viewModel: ViewModel
     @ObservedObject var navModel: NavigationModel
+    @ObservedObject var item: CDItem
+    
+    @Binding var showItemInfo: Bool
+    
+    let proxy: GeometryProxy
     
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.editMode) private var editMode
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     
-    @ObservedObject var item: CDItem
-    @Binding var showItemInfo: Bool
-    let proxy: GeometryProxy
-    let deleteAction: () -> Void
+    private var isEditing: Bool {
+        editMode?.wrappedValue.isEditing ?? true
+    }
+    
+    private var stepperWidth: CGFloat {
+        horizontalSizeClass == .compact ? proxy.size.width/1.33 : Design.quantityStepperWidth
+    }
     
     var body: some View {
         VStack(alignment: .leading) {
-            rowLabel(isEditing: editMode?.wrappedValue.isEditing ?? true)
+            rowLabel()
+                .frame(height: 120)
+                .padding(.bottom, Design.Padding.bottom/2)
+            
+            stepperRow()
+                .padding(.bottom, Design.Padding.bottom/2)
+            
         }
-        .opacity(editMode?.wrappedValue.isEditing ?? true ? 0.5 : 1)
-        .swipeActions(edge: .trailing) {
-            DeleteSwipeButton(action: deleteAction)
-        }
-        .swipeActions(edge: .trailing) {
-            EditSwipeButton {
-                navModel.selectedItem = item
-                showItemInfo = true
-            }
-        }
+        .opacity(isEditing ? 0.5 : 1)
     }
     
     @ViewBuilder
-    private func rowLabel(isEditing: Bool) -> some View {
-        HStack {
+    private func rowLabel() -> some View {
+        HStack(alignment: .top) {
             if !isEditing {
                 Checkcircle(viewModel: viewModel,
                             item: item)
+                .padding(.top, Design.Padding.top)
+                .padding(.trailing, 3)
             }
             
-            columnLabel()
+            ItemOverviewLabel(
+                imageURL: item.imageURL,
+                name: item.displayName,
+                price: item.price,
+                details: item.displayNotes,
+                itemColor: item.itemColor,
+                proxy: proxy
+            )
+            .padding(.horizontal, Design.Padding.horizontal)
+            .frame(alignment: .leading)
+            
             Spacer()
             
             if !isEditing {
                 InformationButton(navModel: navModel,
                                   item: item,
                                   showItemInfo: $showItemInfo)
+                .padding(.top, Design.Padding.top)
+                .padding(.leading, 3)
             }
         }
     }
     
-    private func columnLabel() -> some View {
-        VStack {
-            HStack {
-                VStack(alignment: .leading) {
-                    ItemOverviewLabel(
-                        imageURL: item.imageURL,
-                        name: item.displayName,
-                        price: item.price,
-                        itemColor: item.itemColor,
-                        proxy: proxy
-                    )
-                    .padding(.horizontal, Design.Padding.horizontal)
-                }
-                .frame(width: proxy.size.width/2,
-                       height: proxy.size.height/9)
-                
-                Spacer()
-            }
+    private func stepperRow() -> some View {
+        HStack(alignment: .bottom) {
+            Spacer()
             
-            HStack(alignment: .bottom) {
+            VStack(alignment: .trailing) {
                 Spacer()
-                
-                VStack(alignment: .trailing) {
-                    Spacer()
-                    QuantityStepper(viewModel: viewModel,
-                                    item: item)
-                    .padding(.horizontal, Design.Padding.horizontal)
-                }
-                .frame(width: Design.quantityStepperWidth)
+                QuantityStepper(viewModel: viewModel,
+                                item: item)
+                .padding(.horizontal, Design.Padding.horizontal)
             }
+            .frame(width: stepperWidth)
         }
     }
 }
@@ -98,8 +99,7 @@ struct ItemRowView: View {
                         navModel: NavigationModel(),
                         item: .preview,
                         showItemInfo: .constant(false),
-                        proxy: proxy,
-                        deleteAction: { })
+                        proxy: proxy)
         }
         .environment(\.managedObjectContext,
                       PersistenceController.preview.container.viewContext)

@@ -71,9 +71,18 @@ struct ChecklistView: View {
                                 navModel: navModel,
                                 item: item,
                                 showItemInfo: $showItemInfo,
-                                proxy: geometryProxy,
-                                deleteAction: { deleteItem(item) }
+                                proxy: geometryProxy
                             )
+                            .swipeActions(edge: .trailing) {
+                                DeleteSwipeButton {
+                                    deleteItem(item)
+                                }
+                                
+                                EditSwipeButton {
+                                    navModel.selectedItem = item
+                                    showItemInfo = true
+                                }
+                            }
                         }
                         .onDelete(perform: deleteItem(at:))
                         .onMove(perform: move)

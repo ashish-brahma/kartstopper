@@ -14,9 +14,10 @@ enum Design {
     static let contentUnavailableImageFontSize = CGFloat(36)
     static let setupImageFontSize = CGFloat(32)
     
+    static let displayNotesLineLimit = 4
     static let descriptionFieldLineLimit = 5
     static let descriptionFieldHeight = CGFloat(150.0)
-    static let notesMinScaleFactor = 0.6
+    static let notesMinScaleFactor = 0.8
     
     static let avatarCornerRadius = CGFloat(8)
     static let avatarTextFontSize = CGFloat(48)
@@ -51,7 +52,6 @@ enum Design {
     }
 }
 
-// Design Constants
 extension Color {
     static let affirmative = Color("Gray700")
     static let edit = Color("Sanskrit")

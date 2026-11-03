@@ -13,6 +13,7 @@ struct ItemOverviewLabel: View {
     let imageURL: URL?
     let name: String
     let price: Double
+    let details: String
     let itemColor: Color
     let proxy: GeometryProxy
     
@@ -33,11 +34,19 @@ struct ItemOverviewLabel: View {
         VStack(alignment: .leading) {
             Text(name)
                 .foregroundStyle(Color.foreground)
-                .multilineTextAlignment(.leading)
                 .font(.system(size: Design.itemNameFontSize, weight: .medium))
+                .multilineTextAlignment(.leading)
             
             Text(price.formatted(.currency(code: Locale.current.currency?.identifier ?? "USD")))
-                .font(.title2)
+                .font(.subheadline)
+                .fontWeight(.medium)
+                .padding(.bottom, 1)
+            
+            Text(details)
+                .font(.footnote)
+                .multilineTextAlignment(.leading)
+                .lineLimit(Design.displayNotesLineLimit)
+                .minimumScaleFactor(Design.notesMinScaleFactor)
         }
         .foregroundStyle(.secondary)
     }
@@ -81,6 +90,7 @@ struct ItemOverviewLabel: View {
         ItemOverviewLabel(imageURL: nil,
                           name: item.displayName,
                           price: item.price,
+                          details: item.displayNotes,
                           itemColor: item.itemColor,
                           proxy: proxy)
         .position(x: proxy.size.width/2,

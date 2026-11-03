@@ -25,7 +25,6 @@ struct Checkcircle: View {
             .imageScale(.large)
             .labelStyle(.iconOnly)
             .foregroundStyle(Color.accentColor)
-            .padding(.trailing, Design.Padding.trailing)
             .onTapGesture {
                 toggleStatus()
             }

@@ -42,8 +42,8 @@ struct CartRowView: View {
             Text(cart.displayNotes)
                 .font(.footnote)
                 .minimumScaleFactor(Design.notesMinScaleFactor)
-                .frame(alignment: .leading)
-            
+                .multilineTextAlignment(.leading)
+                .lineLimit(Design.displayNotesLineLimit)
         }
         .foregroundStyle(isSelected ? Color.white : .secondary)
     }
