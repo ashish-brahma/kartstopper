@@ -14,13 +14,14 @@ struct CartRowView: View {
     @ObservedObject var navModel: NavigationModel
     
     @Environment(\.managedObjectContext) private var viewContext
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     
     private var totalItems: Int {
         CDCart.getTotalItems(for: cart, context: viewContext)
     }
     
     private var isSelected: Bool {
-        navModel.selectedCart == cart
+        navModel.selectedCart == cart && horizontalSizeClass == .regular
     }
     
     var body: some View {

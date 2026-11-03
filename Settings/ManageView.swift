@@ -16,7 +16,7 @@ struct ManageView: View {
     @ObservedObject var navModel: NavigationModel
     
     @Environment(\.managedObjectContext) private var viewContext
-    @Environment(\.horizontalSizeClass) private var horizontalClassSize
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(\.locale) private var locale
     
     @State private var columnVisibility = NavigationSplitViewVisibility.detailOnly
@@ -25,42 +25,61 @@ struct ManageView: View {
         locale.currency?.identifier ?? "USD"
     }
     
+    private var isWide: Bool {
+        horizontalSizeClass == .regular
+    }
+    
+    private var isCompact: Bool {
+        horizontalSizeClass == .compact
+    }
+    
     var body: some View {
         GeometryReader { proxy in
             NavigationSplitView(columnVisibility: $columnVisibility) {
-                manageSidebar()
+                manageSidebar(proxy: proxy)
             } detail: {
                 manageDetail()
             }
             .task {
                 columnVisibility = .doubleColumn
                 
-                if horizontalClassSize == .regular
-                    && navModel.selectedPreference == nil {
+                if isWide && navModel.selectedPreference == nil {
                     navModel.selectedPreference = .budgetAmount
                 }
             }
+            .ignoresSafeArea()
         }
     }
     
     @ViewBuilder
-    private func manageSidebar() -> some View {
+    private func manageSidebar(proxy: GeometryProxy) -> some View {
         List(selection: $navModel.selectedPreference) {
             Section {
-                NavigationLink(value: ManageNavigation.budgetAmount,
-                               label: amountLabel)
+                NavigationLink(value: ManageNavigation.budgetAmount) {
+                    amountLabel(
+                        text: viewModel.budget.budgetAmount?.formatted(
+                            .currency(code: currencyCode)
+                        ) ?? "Enter an amount",
+                        isSelected: navModel.selectedPreference == .budgetAmount
+                    )
+                }
                 
-                NavigationLink(value: ManageNavigation.budgetMode,
-                               label: modeLabel)
+                NavigationLink(value: ManageNavigation.budgetMode) {
+                    modeLabel(
+                        text: viewModel.budget.budgetMode?.rawValue ?? "Select a mode",
+                        isSelected: navModel.selectedPreference == .budgetMode,
+                        proxy: proxy
+                    )
+                }
             } header: {
                 Text("Budget")
             }
             
             Section {
-                NavigationLink("KartStopper",
+                NavigationLink(ManageNavigation.appInformation.name,
                                value: ManageNavigation.appInformation)
                 
-                NavigationLink("Developer",
+                NavigationLink(ManageNavigation.developerInformation.name,
                                value: ManageNavigation.developerInformation)
             } header: {
                 Text("About")
@@ -111,49 +130,62 @@ struct ManageView: View {
     }
     
     @ViewBuilder
-    private func amountLabel() -> some View {
+    private func amountLabel(
+        text: String,
+        isSelected: Bool
+    ) -> some View {
         LabeledContent {
-            if let amount = viewModel.budget.budgetAmount {
-                Text(amount.formatted(.currency(code: currencyCode)))
-            } else {
-                Text("Enter an amount")
-            }
+            Text(text)
+                .foregroundStyle(isSelected && isWide ? Color.white : Color.secondary)
         } label: {
-            HStack(alignment: .center) {
-                Image(systemName: "number.square")
-                    .foregroundStyle(navModel.selectedPreference == .budgetAmount ? Color.white : Color.accent)
-                Text("Amount")
-                    .foregroundStyle(navModel.selectedPreference == .budgetAmount ? Color.white : Color.primary)
-                
-                if viewModel.budget.budgetAmount == nil {
-                    setupIndicator()
-                }
-            }
+            labeledContentLabel(
+                isSelected: isSelected,
+                symbol: ManageNavigation.budgetAmount.symbol,
+                fieldName: ManageNavigation.budgetAmount.name,
+                isEmpty: viewModel.budget.budgetAmount == nil
+            )
         }
     }
     
     @ViewBuilder
-    private func modeLabel() -> some View {
+    private func modeLabel(
+        text: String,
+        isSelected: Bool,
+        proxy: GeometryProxy
+    ) -> some View {
         LabeledContent {
-            if let mode = viewModel.budget.budgetMode {
-                Text(mode.rawValue)
-            } else {
-                Text("Select a mode")
-            }
+            Text(text)
+                .foregroundStyle(isSelected && isWide ? Color.white : Color.secondary)
         } label: {
-            HStack(alignment: .center) {
-                Image(systemName: "barometer")
-                    .foregroundStyle(navModel.selectedPreference == .budgetMode ? Color.white : Color.accent)
-                
-                Text("Tracking Difficulty")
-                    .frame(width: 80, alignment: .leading)
-                    .foregroundStyle(navModel.selectedPreference == .budgetMode ? Color.white : Color.primary)
-                    .multilineTextAlignment(.leading)
-                    .lineLimit(2)
-                
-                if viewModel.budget.budgetMode == nil {
-                    setupIndicator()
-                }
+            labeledContentLabel(
+                isSelected: isSelected,
+                symbol: ManageNavigation.budgetMode.symbol,
+                fieldName: ManageNavigation.budgetMode.name,
+                isEmpty: viewModel.budget.budgetMode == nil
+            )
+            .frame(
+                width: isCompact ? proxy.size.width/2.2 : 130,
+                alignment: .leading
+            )
+        }
+    }
+    
+    @ViewBuilder
+    private func labeledContentLabel(
+        isSelected: Bool,
+        symbol: String,
+        fieldName: String,
+        isEmpty: Bool
+    ) -> some View {
+        HStack(alignment: .center) {
+            Image(systemName: symbol)
+                .foregroundStyle(isSelected && isWide ? Color.white : Color.accent)
+            
+            Text(fieldName)
+                .foregroundStyle(isSelected && isWide ? Color.white : Color.primary)
+            
+            if isEmpty {
+                setupIndicator()
             }
         }
     }

@@ -163,4 +163,28 @@ enum ManageNavigation: Int, Hashable, CaseIterable, Identifiable, Codable {
     case developerInformation
     
     var id: Int { rawValue }
+    
+    var name: String {
+        switch self {
+        case .budgetAmount:
+            "Amount"
+        case .budgetMode:
+            "Tracking Difficulty"
+        case .appInformation:
+            "KartStopper"
+        case .developerInformation:
+            "Developer"
+        }
+    }
+    
+    var symbol: String {
+        switch self {
+        case .budgetAmount:
+            "number.square"
+        case .budgetMode:
+            "barometer"
+        default:
+            ""
+        }
+    }
 }
