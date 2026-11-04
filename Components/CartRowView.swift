@@ -13,15 +13,16 @@ struct CartRowView: View {
     @ObservedObject var cart: CDCart
     @ObservedObject var navModel: NavigationModel
     
+    var isSidebarAvailable: Bool
+    
     @Environment(\.managedObjectContext) private var viewContext
-    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     
     private var totalItems: Int {
         CDCart.getTotalItems(for: cart, context: viewContext)
     }
     
     private var isSelected: Bool {
-        navModel.selectedCart == cart && horizontalSizeClass == .regular
+        navModel.selectedCart == cart
     }
     
     var body: some View {
@@ -33,7 +34,7 @@ struct CartRowView: View {
             HStack {
                 Text(cart.displayName)
                     .font(.largeTitle)
-                    .foregroundStyle(isSelected ? Color.white : Color.foreground)
+                    .foregroundStyle(getColor(for: .foreground))
                 Spacer()
                 Text("\(totalItems)")
                     .font(.system(size: Design.itemCountFontSize, weight: .semibold))
@@ -46,33 +47,63 @@ struct CartRowView: View {
                 .multilineTextAlignment(.leading)
                 .lineLimit(Design.displayNotesLineLimit)
         }
-        .foregroundStyle(isSelected ? Color.white : .secondary)
+        .foregroundStyle(getColor(for: .secondary))
+    }
+    
+    private func getColor(for color: Color) -> Color {
+        var selectionColor: Color
+        
+        if #available(iOS 17, *) {
+            selectionColor = color
+        } else {
+            selectionColor = .white
+        }
+        
+        return isSelected && isSidebarAvailable ? selectionColor : color
     }
 }
 
 #Preview("Not Selected") {
-    GeometryReader { proxy in
-        CartRowView(cart: .preview,
-                    navModel: NavigationModel())
-        .position(x: proxy.size.width/2, y: proxy.size.height/2)
-        .environment(\.managedObjectContext,
-                      PersistenceController.preview.container.viewContext)
+    @ObservedObject var navModel = NavigationModel()
+    let cart = CDCart.preview
+    
+    NavigationSplitView(columnVisibility: .constant(.doubleColumn)) {
+        List {
+            NavigationLink(value: cart) {
+                CartRowView(
+                    cart: cart,
+                    navModel: navModel,
+                    isSidebarAvailable: true
+                )
+            }
+        }
+    } detail: {
+        
     }
+    .environment(\.managedObjectContext,
+                  PersistenceController.preview.container.viewContext)
 }
 
 #Preview("Selected") {
-    let navModel = NavigationModel()
+    @ObservedObject var navModel = NavigationModel()
     let cart = CDCart.preview
     
-    GeometryReader { proxy in
-        CartRowView(cart: cart,
-                    navModel: navModel)
-        .background(.accent)
-        .position(x: proxy.size.width/2, y: proxy.size.height/2)
-        .environment(\.managedObjectContext,
-                      PersistenceController.preview.container.viewContext)
-        .task {
-            navModel.selectedCart = cart
+    NavigationSplitView(columnVisibility: .constant(.doubleColumn)) {
+        List(selection: $navModel.selectedCart) {
+            NavigationLink(value: cart) {
+                CartRowView(
+                    cart: cart,
+                    navModel: navModel,
+                    isSidebarAvailable: true
+                )
+            }
         }
+    } detail: {
+        
+    }
+    .environment(\.managedObjectContext,
+                  PersistenceController.preview.container.viewContext)
+    .task {
+        navModel.selectedCart = cart
     }
 }

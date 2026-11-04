@@ -19,7 +19,6 @@ struct CartListView: View {
     
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
-    @Environment(\.verticalSizeClass) private var verticalSizeClass
     @Environment(\.colorScheme) private var colorScheme
     
     @SectionedFetchRequest<String, CDCart>(
@@ -31,6 +30,14 @@ struct CartListView: View {
     @State private var showAddCart = false
     @State private var showEditCart = false
     @State private var columnVisibility = NavigationSplitViewVisibility.detailOnly
+    
+    private var isWide: Bool {
+        horizontalSizeClass == .regular
+    }
+    
+    private var isCompact: Bool {
+        horizontalSizeClass == .compact
+    }
     
     // MARK: - Navigation split view
     
@@ -85,17 +92,17 @@ struct CartListView: View {
                               navModel: navModel)
             }
             
-            if !showAddCart && viewModel.totalCarts == 0 {
-                if horizontalSizeClass == .regular {
+            if !showAddCart
+                && viewModel.totalCarts == 0
+                && isWide {
                     cartsUnavailableDetail(proxy: proxy)
-                }
             }
         }
     }
     
     @ViewBuilder
     private func cartsUnavailableDetail(proxy: GeometryProxy) -> some View {
-        VStack {
+        VStack(alignment: .center) {
             CartListView.unavailableView(
                 label: "No Carts",
                 symbolName: "cart.badge.plus",
@@ -103,10 +110,16 @@ struct CartListView: View {
             )
             .padding(.bottom, Design.Padding.bottom)
             
-            Button("Let's  start") {
-                columnVisibility = NavigationSplitViewVisibility.doubleColumn
+            if columnVisibility == .detailOnly {
+                Button("Let's  start") {
+                    columnVisibility = .doubleColumn
+                }
+                .buttonStyle(.bordered)
+            } else {
+                Text("Tap on plus button.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
-            .buttonStyle(.bordered)
         }
         .frame(maxHeight: proxy.size.height/2)
     }
@@ -120,8 +133,11 @@ struct CartListView: View {
                 Section(header: Text(section.id)) {
                     ForEach(section) { cart in
                         NavigationLink(value: cart) {
-                            CartRowView(cart: cart,
-                                        navModel: navModel)
+                            CartRowView(
+                                cart: cart,
+                                navModel: navModel,
+                                isSidebarAvailable: isWide
+                            )
                         }
                         .swipeActions(edge: .trailing) {
                             DeleteSwipeButton {
@@ -144,17 +160,13 @@ struct CartListView: View {
         .overlay {
             if !showAddCart {
                 if viewModel.totalCarts == 0 {
-                    
-                    if horizontalSizeClass == .compact
-                        && verticalSizeClass == .regular {
-                        
+                    if isCompact {
                         CartListView.unavailableView(
                             label: "No Carts",
                             symbolName: "cart.badge.plus",
                             description: "New carts you add will appear here."
                         )
                     }
-                    
                 } else if carts.isEmpty {
                     ContentView.searchUnavailableView
                 }
@@ -200,7 +212,7 @@ struct CartListView: View {
     }
     
     private func selectLatestCart() {
-        if horizontalSizeClass == .regular {
+        if isWide {
             if let section = carts.first,
                let cart = section.first {
                 navModel.selectedCart = cart

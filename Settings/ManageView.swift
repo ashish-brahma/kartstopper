@@ -29,9 +29,7 @@ struct ManageView: View {
         horizontalSizeClass == .regular
     }
     
-    private var isCompact: Bool {
-        horizontalSizeClass == .compact
-    }
+    // MARK: - Navigation split view
     
     var body: some View {
         GeometryReader { proxy in
@@ -56,18 +54,23 @@ struct ManageView: View {
         List(selection: $navModel.selectedPreference) {
             Section {
                 NavigationLink(value: ManageNavigation.budgetAmount) {
-                    amountLabel(
+                    labelView(
                         text: viewModel.budget.budgetAmount?.formatted(
                             .currency(code: currencyCode)
                         ) ?? "Enter an amount",
-                        isSelected: navModel.selectedPreference == .budgetAmount
+                        isSelected: navModel.selectedPreference == .budgetAmount,
+                        navigation: ManageNavigation.budgetAmount,
+                        isEmpty: viewModel.budget.budgetAmount == nil,
+                        proxy: proxy
                     )
                 }
                 
                 NavigationLink(value: ManageNavigation.budgetMode) {
-                    modeLabel(
+                    labelView(
                         text: viewModel.budget.budgetMode?.rawValue ?? "Select a mode",
                         isSelected: navModel.selectedPreference == .budgetMode,
+                        navigation: ManageNavigation.budgetMode,
+                        isEmpty: viewModel.budget.budgetMode == nil,
                         proxy: proxy
                     )
                 }
@@ -87,17 +90,6 @@ struct ManageView: View {
         }
         .navigationTitle("Preferences")
         .navigationTitleColor(Color.foreground)
-    }
-    
-    private func setupIndicator() -> some View {
-        ZStack {
-            Circle()
-                .fill(Color.red)
-            Text("1")
-                .font(.caption.bold())
-                .foregroundStyle(Color.white)
-        }
-        .frame(width: 20)
     }
     
     @ViewBuilder
@@ -129,45 +121,50 @@ struct ManageView: View {
         }
     }
     
+    // MARK: - Label subviews.
+    
     @ViewBuilder
-    private func amountLabel(
+    private func labelView(
         text: String,
-        isSelected: Bool
+        isSelected: Bool,
+        navigation: ManageNavigation,
+        isEmpty: Bool,
+        proxy: GeometryProxy
     ) -> some View {
         LabeledContent {
-            Text(text)
-                .foregroundStyle(isSelected && isWide ? Color.white : Color.secondary)
+            HStack {
+                if !isEmpty {
+                    Text(text)
+                        .foregroundStyle(
+                            getColor(isSelected: isSelected, for: .secondary)
+                        )
+                }
+                
+                if isEmpty {
+                    setupIndicator()
+                }
+            }
         } label: {
             labeledContentLabel(
                 isSelected: isSelected,
-                symbol: ManageNavigation.budgetAmount.symbol,
-                fieldName: ManageNavigation.budgetAmount.name,
-                isEmpty: viewModel.budget.budgetAmount == nil
+                symbol: navigation.symbol,
+                fieldName: navigation.name,
+                text: text,
+                isEmpty: isEmpty,
+                proxy: proxy
             )
         }
     }
     
-    @ViewBuilder
-    private func modeLabel(
-        text: String,
-        isSelected: Bool,
-        proxy: GeometryProxy
-    ) -> some View {
-        LabeledContent {
-            Text(text)
-                .foregroundStyle(isSelected && isWide ? Color.white : Color.secondary)
-        } label: {
-            labeledContentLabel(
-                isSelected: isSelected,
-                symbol: ManageNavigation.budgetMode.symbol,
-                fieldName: ManageNavigation.budgetMode.name,
-                isEmpty: viewModel.budget.budgetMode == nil
-            )
-            .frame(
-                width: isCompact ? proxy.size.width/2.2 : 130,
-                alignment: .leading
-            )
+    private func setupIndicator() -> some View {
+        ZStack {
+            Circle()
+                .fill(Color.red)
+            Text("1")
+                .font(.caption.bold())
+                .foregroundStyle(Color.white)
         }
+        .frame(width: 20)
     }
     
     @ViewBuilder
@@ -175,19 +172,47 @@ struct ManageView: View {
         isSelected: Bool,
         symbol: String,
         fieldName: String,
-        isEmpty: Bool
+        text: String,
+        isEmpty: Bool,
+        proxy: GeometryProxy
     ) -> some View {
         HStack(alignment: .center) {
             Image(systemName: symbol)
-                .foregroundStyle(isSelected && isWide ? Color.white : Color.accent)
+                .imageScale(isEmpty ? .large : .medium )
+                .foregroundStyle(
+                    getColor(isSelected: isSelected, for: .accent)
+                )
             
-            Text(fieldName)
-                .foregroundStyle(isSelected && isWide ? Color.white : Color.primary)
-            
-            if isEmpty {
-                setupIndicator()
+            VStack(alignment: .leading) {
+                Text(fieldName)
+                    .foregroundStyle(
+                        getColor(isSelected: isSelected, for: .primary)
+                    )
+                
+                if isEmpty {
+                    Text(text)
+                        .font(.subheadline)
+                        .foregroundStyle(
+                            getColor(isSelected: isSelected, for: .secondary)
+                        )
+                }
             }
         }
+    }
+    
+    private func getColor(
+        isSelected: Bool,
+        for color: Color
+    ) -> Color {
+        var selectionColor: Color
+        
+        if #available(iOS 17, *) {
+            selectionColor = color
+        } else {
+            selectionColor = .white
+        }
+        
+        return isSelected && isWide ? selectionColor : color
     }
 }
 
