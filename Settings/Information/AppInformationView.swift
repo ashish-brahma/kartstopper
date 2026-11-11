@@ -9,6 +9,8 @@
 import SwiftUI
 
 struct AppInformationView: View {
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    
     private var version: String {
         Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown"
     }
@@ -24,6 +26,10 @@ struct AppInformationView: View {
     }
     
     private let copyright: Image = Image(systemName: "c.circle")
+    
+    private var isCompact: Bool {
+        horizontalSizeClass == .compact
+    }
     
     var body: some View {
         GeometryReader { proxy in
@@ -76,11 +82,10 @@ struct AppInformationView: View {
                     .foregroundStyle(.secondary)
                     .padding(.bottom, Design.Padding.bottom)
                 
-                Text("Create shopping lists with price and notes.\n\nTrack how you spend your monthly budget and more.")
+                Text("Create shopping lists with price and notes.\nTrack how you spend your monthly budget and more.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
-                .multilineTextAlignment(.leading)
-                .frame(width: proxy.size.width/1.65)
+                .multilineTextAlignment(.center)
                 .padding(.bottom, Design.Padding.bottom)
                 
                 Text("Copyright \(copyright) 2026 Ashish Brahma")
@@ -89,6 +94,7 @@ struct AppInformationView: View {
                     .labelStyle(.titleAndIcon)
                     .padding(Design.Padding.standard)
             }
+            .frame(width: isCompact ? Design.compactCardWidth : proxy.size.width/2)
         }
     }
     
