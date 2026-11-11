@@ -20,14 +20,14 @@ struct DashboardView: View {
     
     @State private var dismissSetup: Bool = false
     
-    private var columns: [GridItem] {
-        let gridItem = GridItem(.flexible())
-        let count = horizontalSizeClass == .compact ? 1 : 2
-        return [GridItem](repeating: gridItem, count: count)
-    }
-    
     private var isCompact: Bool {
         horizontalSizeClass == .compact
+    }
+    
+    private var columns: [GridItem] {
+        let gridItem = GridItem(.flexible())
+        let count = isCompact ? 1 : 2
+        return [GridItem](repeating: gridItem, count: count)
     }
     
     var body: some View {
