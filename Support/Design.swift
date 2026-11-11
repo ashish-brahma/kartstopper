@@ -24,7 +24,7 @@ enum Design {
     static let avatarDetailCornerRadius = CGFloat(41)
     static let avatarDetailTextFontSize = CGFloat(144)
     
-    static let quantityStepperWidth = CGFloat(256)
+    static let quantityStepperWidth = CGFloat(210)
     
     static let iconRadius = CGFloat(36)
     

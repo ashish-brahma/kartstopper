@@ -64,50 +64,50 @@ struct ChecklistView: View {
         GeometryReader { geometryProxy in
             ScrollViewReader { scrollProxy in
                 List(selection: $navModel.selectedItem) {
-                    Section {
-                        ForEach(itemList) { item in
-                            ItemRowView(
-                                viewModel: viewModel,
-                                navModel: navModel,
-                                item: item,
-                                showItemInfo: $showItemInfo,
-                                proxy: geometryProxy
-                            )
-                            .swipeActions(edge: .trailing) {
-                                DeleteSwipeButton {
-                                    deleteItem(item)
-                                }
-                                
-                                EditSwipeButton {
-                                    navModel.selectedItem = item
-                                    showItemInfo = true
-                                }
+                    ForEach(itemList) { item in
+                        ItemRowView(
+                            viewModel: viewModel,
+                            navModel: navModel,
+                            item: item,
+                            showItemInfo: $showItemInfo,
+                            proxy: geometryProxy
+                        )
+                        .listRowBackground(Color.clear)
+                        .swipeActions(edge: .trailing) {
+                            DeleteSwipeButton {
+                                deleteItem(item)
+                            }
+                            
+                            EditSwipeButton {
+                                navModel.selectedItem = item
+                                showItemInfo = true
                             }
                         }
-                        .onDelete(perform: deleteItem(at:))
-                        .onMove(perform: move)
-                        .task {
+                    }
+                    .onDelete(perform: deleteItem(at:))
+                    .onMove(perform: move)
+                    .task {
+                        withAnimation {
+                            scrollProxy.scrollTo(bottomID)
+                        }
+                    }
+                    .onChange(of: showAddItem) { newValue in
+                        if !newValue {
                             withAnimation {
                                 scrollProxy.scrollTo(bottomID)
                             }
                         }
-                        .onChange(of: showAddItem) { newValue in
-                            if !newValue {
-                                withAnimation {
-                                    scrollProxy.scrollTo(bottomID)
-                                }
-                            }
-                        }
                     }
-                    .listRowBackground(Color.clear)
                     
                     if !showAddItem && viewModel.itemQuery.isEmpty {
-                        AddItemEditorButton(
-                            showAddItem: $showAddItem,
-                            proxy: geometryProxy
-                        )
-                        .id(bottomID)
-                        .listRowBackground(Color.clear)
+                        Section {
+                            AddItemEditorButton(
+                                showAddItem: $showAddItem,
+                                proxy: geometryProxy
+                            )
+                            .id(bottomID)
+                            .listRowBackground(Color.clear)
+                        }
                     }
                 }
                 .overlay {

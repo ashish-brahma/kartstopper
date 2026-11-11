@@ -27,79 +27,77 @@ struct ItemRowView: View {
         editMode?.wrappedValue.isEditing ?? true
     }
     
-    private var stepperWidth: CGFloat {
-        horizontalSizeClass == .compact ? proxy.size.width/1.33 : Design.quantityStepperWidth
+    private var isWide: Bool {
+        horizontalSizeClass == .regular
     }
     
     var body: some View {
         VStack(alignment: .leading) {
-            rowLabel()
-                .frame(height: 120)
-                .padding(.bottom, Design.Padding.bottom/2)
-            
-            stepperRow()
-                .padding(.bottom, Design.Padding.bottom/2)
-            
-        }
-        .opacity(isEditing ? 0.5 : 1)
-    }
-    
-    @ViewBuilder
-    private func rowLabel() -> some View {
-        HStack(alignment: .top) {
-            if !isEditing {
-                Checkcircle(viewModel: viewModel,
-                            item: item)
-                .padding(.top, Design.Padding.top)
-                .padding(.trailing, 3)
-            }
-            
-            ItemOverviewLabel(
-                imageURL: item.imageURL,
-                name: item.displayName,
-                price: item.price,
-                details: item.displayNotes,
-                itemColor: item.itemColor,
-                proxy: proxy
-            )
-            .padding(.horizontal, Design.Padding.horizontal)
-            .frame(alignment: .leading)
-            
-            Spacer()
-            
-            if !isEditing {
-                InformationButton(navModel: navModel,
-                                  item: item,
-                                  showItemInfo: $showItemInfo)
-                .padding(.top, Design.Padding.top)
-                .padding(.leading, 3)
-            }
-        }
-    }
-    
-    private func stepperRow() -> some View {
-        HStack(alignment: .bottom) {
-            Spacer()
-            
-            VStack(alignment: .trailing) {
-                Spacer()
-                QuantityStepper(viewModel: viewModel,
+            HStack(alignment: .top) {
+                if !isEditing {
+                    Checkcircle(viewModel: viewModel,
                                 item: item)
+                    .padding(.top, Design.Padding.top)
+                    .padding(.trailing, 3)
+                }
+                
+                ItemOverviewLabel(
+                    imageURL: item.imageURL,
+                    name: item.displayName,
+                    price: item.price,
+                    details: item.displayNotes,
+                    itemColor: item.itemColor,
+                    proxy: proxy
+                )
+                .frame(height: 100, alignment: .leading)
                 .padding(.horizontal, Design.Padding.horizontal)
+                
+                Spacer()
+                
+                if !isEditing {
+                    InformationButton(
+                        navModel: navModel,
+                        item: item,
+                        showItemInfo: $showItemInfo
+                    )
+                    .padding(.top, Design.Padding.top)
+                    .padding(.leading, 3)
+                }
             }
-            .frame(width: stepperWidth)
+            
+            if !isEditing {
+                HStack(alignment: .bottom) {
+                    Spacer()
+                    QuantityStepper(
+                        viewModel: viewModel,
+                        item: item
+                    )
+                    .frame(width: Design.quantityStepperWidth)
+                    .padding(.horizontal, Design.Padding.horizontal)
+                }
+                .padding(.vertical, Design.Padding.vertical)
+            }
         }
+        .frame(height: isEditing ? 100 : 132)
     }
 }
 
-#Preview() {
+#Preview {
     GeometryReader { proxy in
-        List {
-            ItemRowView(viewModel: .preview,
-                        navModel: NavigationModel(),
-                        item: .preview,
-                        showItemInfo: .constant(false),
-                        proxy: proxy)
+        NavigationStack {
+            List {
+                ItemRowView(viewModel: .preview,
+                            navModel: NavigationModel(),
+                            item: .preview,
+                            showItemInfo: .constant(false),
+                            proxy: proxy)
+            }
+            .navigationTitle("Checklist")
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    EditButton()
+                }
+            }
         }
         .environment(\.managedObjectContext,
                       PersistenceController.preview.container.viewContext)

@@ -47,6 +47,8 @@ struct ItemOverviewLabel: View {
                 .multilineTextAlignment(.leading)
                 .lineLimit(Design.displayNotesLineLimit)
                 .minimumScaleFactor(Design.notesMinScaleFactor)
+            
+            Spacer()
         }
         .foregroundStyle(.secondary)
     }
@@ -87,13 +89,15 @@ struct ItemOverviewLabel: View {
 #Preview {
     let item = CDItem.preview
     GeometryReader { proxy in
-        ItemOverviewLabel(imageURL: nil,
-                          name: item.displayName,
-                          price: item.price,
-                          details: item.displayNotes,
-                          itemColor: item.itemColor,
-                          proxy: proxy)
-        .position(x: proxy.size.width/2,
-                  y: proxy.size.height/2)
+        List {
+            ItemOverviewLabel(
+                imageURL: nil,
+                name: item.displayName,
+                price: item.price,
+                details: item.displayNotes,
+                itemColor: item.itemColor,
+                proxy: proxy
+            )
+        }
     }
 }

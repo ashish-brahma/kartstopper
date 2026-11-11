@@ -22,8 +22,24 @@ struct QuantityStepper: View {
     
     var body: some View {
         Stepper {
-            Text("Quantity: \(item.quantity)")
-                .foregroundStyle(.secondary)
+            HStack(alignment: .firstTextBaseline) {
+                Text("x")
+                    .font(.callout)
+                    .fontWeight(.medium)
+                    .foregroundStyle(.secondary)
+                    .padding(.trailing, -3)
+                
+                Text("\(item.quantity)")
+                    .font(.callout.bold())
+                    .foregroundStyle(Color.foreground)
+            }
+            .frame(width: 60, height: 25, alignment: .center)
+            .background(Color.highlight)
+            .clipShape(.capsule)
+            .overlay {
+                RoundedRectangle(cornerRadius: Design.cornerRadius)
+                    .stroke(.accent, lineWidth: 2)
+            }
         } onIncrement: {
             viewModel.objectWillChange.send()
             item.quantity += 1
