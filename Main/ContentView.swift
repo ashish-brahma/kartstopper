@@ -62,7 +62,7 @@ struct ContentView: View {
             TabView(selection: $navModel.selectedTab) {
                 ForEach(Tabs.allCases) { tab in
                     Tab(tab.localizedName, systemImage: tab.symbol, value: tab) {
-                            tabContent(for: tab)
+                        tabContent(for: tab)
                     }
                     .badge(!viewModel.hasOnboarded && tab == .manage ? Text("\(viewModel.onboardingSteps)") : nil)
                 }
@@ -70,25 +70,15 @@ struct ContentView: View {
         } else {
             TabView(selection: $navModel.selectedTab) {
                 ForEach(Tabs.allCases) { tab in
-                    if tab == .manage {
-                        primitiveTab(tab: tab)
-                            .badge(viewModel.hasOnboarded ? nil : "\(viewModel.onboardingSteps)")
-                    } else {
-                        primitiveTab(tab: tab)
-                    }
+                    tabContent(for: tab)
+                        .tabItem {
+                            Label(tab.localizedName, systemImage: tab.symbol)
+                        }
+                        .tag(tab)
+                        .badge(!viewModel.hasOnboarded && tab == .manage ? Text("\(viewModel.onboardingSteps)") : nil)
                 }
             }
         }
-    }
-    
-    @ViewBuilder
-    private func primitiveTab(tab: Tabs) -> some View {
-        tabContent(for: tab)
-            .tabItem {
-                Label(tab.localizedName,
-                      systemImage: tab.symbol)
-            }
-            .tag(tab)
     }
     
     @ViewBuilder
