@@ -16,6 +16,7 @@ struct CartListView: View {
     
     @ObservedObject var viewModel: ViewModel
     @ObservedObject var navModel: NavigationModel
+    @StateObject var validator = ValidatorModel()
     
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
@@ -89,7 +90,8 @@ struct CartListView: View {
             if let cart = navModel.selectedCart {
                 ChecklistView(cart: cart,
                               viewModel: viewModel,
-                              navModel: navModel)
+                              navModel: navModel,
+                              validator: validator)
             }
             
             if !showAddCart
@@ -255,8 +257,10 @@ struct CartListView: View {
     let viewContext = result.container.viewContext
     let model: ViewModel = .preview
     
-    CartListView(viewModel: model,
-                 navModel: NavigationModel())
+    CartListView(
+        viewModel: model,
+        navModel: NavigationModel()
+    )
     .task {
         model.update(context: viewContext)
     }

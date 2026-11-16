@@ -12,11 +12,10 @@ internal import OSLog
 
 struct AddItemView: View {
     @ObservedObject var viewModel: ViewModel
+    @ObservedObject var validator: ValidatorModel
     var cart: CDCart
     let proxy: GeometryProxy
     @Binding var showAddItem: Bool
-    
-    let logger = PersistenceController.shared.logger
     
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.locale) private var locale
@@ -31,8 +30,6 @@ struct AddItemView: View {
     
     @State private var name: String = ""
     @State private var price: Double?
-    @State private var isValidInput = true
-    @State private var showValidationMessage = false
     
     private var totalItems: Int {
         CDCart.getTotalItems(for: cart, context: viewContext)
@@ -40,6 +37,19 @@ struct AddItemView: View {
     
     private var addButtonTextColor: Color {
         colorScheme == .dark ? .black : .white
+    }
+    
+    private var isValidName: Bool {
+        switch validator.error {
+        case .nameIsEmpty, .containsInvalidCharacters, .itemExists:
+            false
+        default:
+            true
+        }
+    }
+    
+    private var currencyCode: String {
+        locale.currency?.identifier ?? "USD"
     }
     
     var body: some View {
@@ -51,8 +61,8 @@ struct AddItemView: View {
                 VStack(alignment: .center) {
                     cell()
                     
-                    if showValidationMessage {
-                        Text("Item already exists.")
+                    if let message = validator.error?.message {
+                        Text("\(message)")
                             .foregroundStyle(Color.red)
                             .font(.callout)
                     }
@@ -85,9 +95,8 @@ struct AddItemView: View {
                     .disabled(name.isEmpty)
             }
         }
-        .onChange(of: name) { newName in
-            isValidInput = true
-            showValidationMessage = false
+        .onChange(of: name) { _ in
+            validator.error = nil
         }
         .onAppear {
             reset()
@@ -111,6 +120,7 @@ struct AddItemView: View {
                              action: submitAction)
                 .foregroundStyle(name.isEmpty ? Color.secondary : addButtonTextColor)
                 .tint(name.isEmpty ? Color.secondary.opacity(0.7) : Color.accent)
+                .disabled(name.isEmpty)
         }
     }
     
@@ -128,20 +138,20 @@ struct AddItemView: View {
                     .autocorrectionDisabled()
                     .textInputAutocapitalization(.words)
                     .focused($focusedField, equals: .name)
-                    .foregroundStyle(isValidInput ? Color.primary : Color.red)
+                    .foregroundStyle(isValidName ? Color.primary : Color.red)
                     .submitLabel(.next)
                     .onSubmit {
-                        validateItem()
-                        if isValidInput {
+                        validateInput()
+                        if isValidName {
                             focusedField = .price
                         }
                     }
                 
                 Divider()
                 
-                TextField("Price",
+                TextField("Price (\(currencyCode))",
                           value: $price,
-                          format: .currency(code: locale.currency?.identifier ?? "USD"))
+                          format: .currency(code: currencyCode))
                 .keyboardType(.decimalPad)
                 .focused($focusedField, equals: .price)
                 .submitLabel(.done)
@@ -158,8 +168,8 @@ struct AddItemView: View {
     }
     
     private func submitAction() {
-        validateItem()
-        if isValidInput {
+        validateInput()
+        if validator.error == nil {
             addItem()
             reset()
             focusedField = .name
@@ -171,6 +181,7 @@ struct AddItemView: View {
         do {
             try viewContext.save()
         } catch {
+            let logger = PersistenceController.shared.logger
             logger.error("Failed to insert new item.\(error.localizedDescription)")
         }
     }
@@ -188,21 +199,25 @@ struct AddItemView: View {
         }
     }
     
-    private func validateItem() {
-        let existingItemCount = CDItem.findItems(by: name,
-                                                 context: viewContext)
-        
-        isValidInput = !name.isEmpty && existingItemCount == 0
-        
-        if existingItemCount != 0 {
-            showValidationMessage = true
+    private func validateInput() {
+        do {
+            validator.itemName = name
+            validator.cartName = cart.displayName
+            try validator.validateItem(context: viewContext)
+        } catch {
+            if let err = error as? ValidationError {
+                validator.error = err
+            } else {
+                let logger = validator.logger
+                logger.error("Failed to validate item.\(error.localizedDescription)")
+            }
         }
     }
     
     private func reset() {
         name = ""
         price = nil
-        showValidationMessage = false
+        validator.reset()
     }
 }
 
@@ -218,6 +233,7 @@ struct AddItemView: View {
             .overlay {
                 AddItemView(
                     viewModel: .preview,
+                    validator: ValidatorModel(),
                     cart: .preview,
                     proxy: proxy,
                     showAddItem: .constant(true)

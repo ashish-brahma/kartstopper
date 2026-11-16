@@ -18,6 +18,7 @@ struct ChecklistView: View {
     
     @ObservedObject var viewModel: ViewModel
     @ObservedObject var navModel: NavigationModel
+    @ObservedObject var validator: ValidatorModel
     
     @Environment(\.managedObjectContext) private var viewContext
     
@@ -48,11 +49,13 @@ struct ChecklistView: View {
     init(
         cart: CDCart,
         viewModel: ViewModel,
-        navModel: NavigationModel
+        navModel: NavigationModel,
+        validator: ValidatorModel
     ) {
         self.cart = cart
         self.viewModel = viewModel
         self.navModel = navModel
+        self.validator = validator
         
         self._itemList = FetchRequest<CDItem>(
             sortDescriptors: [NSSortDescriptor(keyPath: \CDItem.id, ascending: true)],
@@ -114,6 +117,7 @@ struct ChecklistView: View {
                     if showAddItem {
                         AddItemView(
                             viewModel: viewModel,
+                            validator: validator,
                             cart: cart,
                             proxy: geometryProxy,
                             showAddItem: $showAddItem
@@ -140,8 +144,12 @@ struct ChecklistView: View {
                 }
                 .sheet(isPresented: $showItemInfo) {
                     if let selection = navModel.selectedItem {
-                        EditItemView(viewModel: viewModel,
-                                     item: selection)
+                        EditItemView(
+                            viewModel: viewModel,
+                            validator: validator,
+                            cart: cart,
+                            item: selection
+                        )
                     }
                 }
             }
@@ -201,9 +209,11 @@ struct ChecklistView: View {
     let cart = try! viewContext.fetch(request).first { $0.id == 0 }
     
     NavigationStack {
-        ChecklistView(cart: cart!,
-                      viewModel: .preview,
-                      navModel: NavigationModel())
+        ChecklistView(
+            cart: cart!,
+            viewModel: .preview,
+            navModel: NavigationModel(),
+            validator: ValidatorModel())
     }
     .environment(\.managedObjectContext, viewContext)
 }

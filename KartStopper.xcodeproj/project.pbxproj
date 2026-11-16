@@ -43,6 +43,7 @@
 				EditBudgetAmountView.swift,
 				EditCartView.swift,
 				EditItemView.swift,
+				ValidatorModel.swift,
 			);
 			target = 6D6106132E79697500A11C91 /* KartStopper */;
 		};
@@ -111,6 +112,11 @@
 			path = Preview;
 			sourceTree = "<group>";
 		};
+		6DC0720E30A7181500634269 /* Playgrounds */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Playgrounds;
+			sourceTree = "<group>";
+		};
 		6DCADE572EDD9D6300CD61F2 /* Settings */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -156,6 +162,7 @@
 				6D71AC092EBDF5470009182F /* Persistence */,
 				6D71AC0B2EBDF8250009182F /* Resources */,
 				6D71AC3C2EBE0B720009182F /* Preview */,
+				6DC0720E30A7181500634269 /* Playgrounds */,
 				6D977A7A2EE3177500D922E9 /* KartStopper.app */,
 				6D058F642EE066BE00DCDACF /* KartStopperTests.xctest */,
 				6D0590252EE0712800DCDACF /* KSTestPlan.xctestplan */,

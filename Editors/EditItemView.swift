@@ -12,9 +12,9 @@ internal import OSLog
 
 struct EditItemView: View {
     @ObservedObject var viewModel: ViewModel
+    @ObservedObject var validator: ValidatorModel
+    var cart: CDCart
     var item: CDItem
-    
-    let logger = PersistenceController.shared.logger
     
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.dismiss) private var dismiss
@@ -23,8 +23,6 @@ struct EditItemView: View {
     @State private var name = ""
     @State private var notes = ""
     @State private var price: Double = 0.00
-    @State private var isValidInput = true
-    @State private var showValidationMessage = false
     
     private enum Field: Hashable {
         case name
@@ -32,6 +30,19 @@ struct EditItemView: View {
         case notes
     }
     @FocusState private var focusedField: Field?
+    
+    private var isValidName: Bool {
+        switch validator.error {
+        case .nameIsEmpty, .containsInvalidCharacters:
+            false
+        default:
+            true
+        }
+    }
+    
+    private var currencyCode: String {
+        locale.currency?.identifier ?? "USD"
+    }
     
     var body: some View {
         GeometryReader { proxy in
@@ -58,24 +69,30 @@ struct EditItemView: View {
                             .autocorrectionDisabled()
                             .textInputAutocapitalization(.words)
                             .focused($focusedField, equals: .name)
-                            .foregroundStyle(isValidInput ? Color.primary : Color.red)
+                            .foregroundStyle(isValidName ? Color.primary : Color.red)
                             .submitLabel(.next)
                             .onSubmit {
+                                validateInput()
                                 focusedField = .price
                             }
                     } header: {
                         Text("Item Name")
                     } footer: {
-                        if showValidationMessage {
-                            Text("Item already exists.")
-                                .foregroundStyle(Color.red)
+                        if let error = validator.error {
+                            if error == .itemExists {
+                                Text("Name remains unchanged.")
+                                    .foregroundStyle(Color.info)
+                            } else if !isValidName {
+                                Text(error.message)
+                                    .foregroundStyle(Color.red)
+                            }
                         }
                     }
                     
                     Section(header: Text("Price")) {
-                        TextField("Price",
+                        TextField("Enter price (\(currencyCode))",
                                   value: $price,
-                                  format: .currency(code: locale.currency?.identifier ?? "USD"))
+                                  format: .currency(code: currencyCode))
                         .keyboardType(.decimalPad)
                         .focused($focusedField, equals: .price)
                     }
@@ -99,12 +116,14 @@ struct EditItemView: View {
                     }
                     ToolbarItem(placement: .confirmationAction) {
                         ConfirmToolbarButton {
-                            validateItem()
-                            if isValidInput {
+                            validateInput()
+                            if validator.error == nil {
                                 updateItem()
+                                validator.reset()
                                 dismiss()
                             }
                         }
+                        .disabled(name.isEmpty)
                     }
                     if focusedField == .price {
                         ToolbarItemGroup(placement: .keyboard) {
@@ -121,10 +140,10 @@ struct EditItemView: View {
                 notes = item.notes ?? ""
                 price = item.price
                 focusedField = .name
+                validator.reset()
             }
-            .onChange(of: name) { newName in
-                isValidInput = true
-                showValidationMessage = false
+            .onChange(of: name) { _ in
+                validator.error = nil
             }
         }
     }
@@ -176,25 +195,32 @@ struct EditItemView: View {
         do {
             try viewContext.save()
         } catch {
+            let logger = PersistenceController.shared.logger
             logger.error("Failed to update item. \(error.localizedDescription)")
         }
     }
     
-    private func validateItem() {
+    private func validateInput() {
         if name == item.displayName { return }
         
-        let existingItemCount = CDItem.findItems(by: name,
-                                                 context: viewContext)
-        
-        isValidInput = !name.isEmpty && existingItemCount == 0
-        
-        if existingItemCount != 0 {
-            showValidationMessage = true
+        do {
+            validator.itemName = name
+            validator.cartName = cart.displayName
+            try validator.validateItem(context: viewContext)
+        } catch {
+            if let err = error as? ValidationError {
+                validator.error = err
+            } else {
+                let logger = validator.logger
+                logger.error("Failed to validate item.\(error.localizedDescription)")
+            }
         }
     }
 }
 
 #Preview {
     EditItemView(viewModel: .preview,
+                 validator: ValidatorModel(),
+                 cart: .preview,
                  item: .preview)
 }
