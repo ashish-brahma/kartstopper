@@ -44,6 +44,30 @@ class ValidatorModel: ObservableObject {
         }
     }
     
+    /// Checks if the new inputs for the cart being edited are valid.
+    func validateCart(
+        editorKind: EditorKind,
+        context: NSManagedObjectContext
+    ) throws {
+        if cartName.isEmpty {
+            throw ValidationError.nameIsEmpty
+        }
+        
+        let trimmedName = cartName.trimSpaces()
+        if !trimmedName.hasValidCharacters(from: .validNameSet) {
+            throw ValidationError.containsInvalidCharacters
+        }
+        
+        let existingCartCount = CDCart.findCarts(
+            by: trimmedName,
+            context: context
+        )
+        
+        if existingCartCount > 0 {
+            throw ValidationError.cartExists(editorKind: editorKind)
+        }
+    }
+    
     /// Remove any stored values and set to defaults.
     func reset() {
         itemName = ""
@@ -57,6 +81,7 @@ enum ValidationError: Error, Hashable {
     case nameIsEmpty
     case containsInvalidCharacters
     case itemExists
+    case cartExists(editorKind: EditorKind)
     
     var message: String {
         switch self {
@@ -66,8 +91,18 @@ enum ValidationError: Error, Hashable {
             "Name must contain alphabets(A-Z), numbers(0-9), and spaces only."
         case .itemExists:
             "Item may already exist."
+        case .cartExists(let editorKind):
+            editorKind == .edit ? "Cart may already exist or name entered is same as before." : "Cart already exists."
         }
     }
+}
+
+/// Type that defines the kind of editor based on action performed.
+enum EditorKind: Int, Hashable, Identifiable {
+    case add
+    case edit
+    
+    var id: Int { rawValue }
 }
 
 extension String {

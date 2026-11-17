@@ -53,6 +53,7 @@ struct CartListView: View {
                 if showAddCart {
                     AddCartView(
                         viewModel: viewModel,
+                        validator: validator,
                         showAddCart: $showAddCart,
                         proxy: proxy
                     )
@@ -192,6 +193,7 @@ struct CartListView: View {
         .sheet(isPresented: $showEditCart) {
             if let selection = navModel.cartToEdit {
                 EditCartView(viewModel: viewModel,
+                             validator: validator,
                              cart: selection)
             }
         }

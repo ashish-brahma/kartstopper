@@ -12,9 +12,8 @@ internal import OSLog
 
 struct EditCartView: View {
     @ObservedObject var viewModel: ViewModel
+    @ObservedObject var validator: ValidatorModel
     var cart: CDCart
-    
-    let logger = PersistenceController.shared.logger
     
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.dismiss) private var dismiss
@@ -28,8 +27,14 @@ struct EditCartView: View {
     }
     @FocusState private var focusedField: Field?
     
-    @State private var isValidInput = true
-    @State private var showValidationMessage = false
+    private var isValidName: Bool {
+        switch validator.error {
+        case .nameIsEmpty, .containsInvalidCharacters:
+            false
+        default:
+            true
+        }
+    }
     
     var body: some View {
         NavigationStack {
@@ -47,17 +52,18 @@ struct EditCartView: View {
                             .autocorrectionDisabled()
                             .textInputAutocapitalization(.words)
                             .focused($focusedField, equals: .name)
-                            .foregroundStyle(isValidInput ? Color.primary : Color.red)
+                            .foregroundStyle(isValidName ? Color.primary : Color.red)
                             .submitLabel(.next)
                             .onSubmit {
+                                validateInput()
                                 focusedField = .notes
                             }
                     }
                 } header: {
                     Text("Cart Name")
                 } footer: {
-                    if showValidationMessage {
-                        Text("Cart already exists.")
+                    if let error = validator.error {
+                        Text("\(error.message)")
                             .foregroundStyle(Color.red)
                     }
                 }
@@ -84,12 +90,14 @@ struct EditCartView: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     ConfirmToolbarButton {
-                        validateCart()
-                        if isValidInput {
+                        validateInput()
+                        if validator.error == nil {
                             updateCart()
+                            validator.reset()
                             dismiss()
                         }
                     }
+                    .disabled(name.isEmpty)
                 }
             }
         }
@@ -97,10 +105,10 @@ struct EditCartView: View {
             name = cart.name ?? ""
             notes = cart.notes ?? ""
             focusedField = .name
+            validator.reset()
         }
-        .onChange(of: name) { newName in
-            isValidInput = true
-            showValidationMessage = false
+        .onChange(of: name) { _ in
+            validator.error = nil
         }
     }
     
@@ -122,25 +130,33 @@ struct EditCartView: View {
         do {
             try viewContext.save()
         } catch {
+            let logger = PersistenceController.shared.logger
             logger.error("Failed to update cart. \(error.localizedDescription)")
         }
     }
     
-    private func validateCart() {
+    private func validateInput() {
         if name == cart.displayName { return }
         
-        let existingCartCount = CDCart.findCarts(by: name,
-                                                 context: viewContext)
-        
-        isValidInput = !name.isEmpty && existingCartCount == 0
-        
-        if existingCartCount != 0 {
-            showValidationMessage = true
+        do {
+            validator.cartName = name
+            try validator.validateCart(
+                editorKind: .edit,
+                context: viewContext
+            )
+        } catch {
+            if let err = error as? ValidationError {
+                validator.error = err
+            } else {
+                let logger = validator.logger
+                logger.error("Failed to validate cart.\(error.localizedDescription)")
+            }
         }
     }
 }
 
 #Preview {
     EditCartView(viewModel: .preview,
+                 validator: ValidatorModel(),
                  cart: .preview)
 }

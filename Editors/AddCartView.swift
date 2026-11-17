@@ -12,11 +12,10 @@ internal import OSLog
 
 struct AddCartView: View {
     @ObservedObject var viewModel: ViewModel
+    @ObservedObject var validator: ValidatorModel
     
     @Binding var showAddCart: Bool
     let proxy: GeometryProxy
-    
-    let logger = PersistenceController.shared.logger
     
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
@@ -30,11 +29,18 @@ struct AddCartView: View {
     
     @State private var name = ""
     @State private var notes = ""
-    @State private var isValidInput = true
-    @State private var showValidationMessage = false
     
     private var addButtonTextColor: Color {
         colorScheme == .dark ? .black : .white
+    }
+    
+    private var isValidName: Bool {
+        switch validator.error {
+        case .nameIsEmpty, .containsInvalidCharacters, .cartExists:
+            false
+        default:
+            true
+        }
     }
     
     var body: some View {
@@ -47,8 +53,8 @@ struct AddCartView: View {
                 VStack(alignment: .center) {
                     cell()
                     
-                    if showValidationMessage {
-                        Text("Cart already exists.")
+                    if let message = validator.error?.message  {
+                        Text("\(message)")
                             .foregroundStyle(Color.red)
                             .font(.callout)
                     }
@@ -83,14 +89,12 @@ struct AddCartView: View {
                     .disabled(name.isEmpty)
             }
         }
-        .onAppear {
-            name = ""
-            notes = ""
-            focusedField = .name
+        .onChange(of: name) { _ in
+            validator.error = nil
         }
-        .onChange(of: name) { newName in
-            isValidInput = true
-            showValidationMessage = false
+        .onAppear {
+            reset()
+            focusedField = .name
         }
     }
     
@@ -101,11 +105,11 @@ struct AddCartView: View {
                 .autocorrectionDisabled()
                 .textInputAutocapitalization(.words)
                 .focused($focusedField, equals: .name)
-                .foregroundStyle(isValidInput ? Color.primary : Color.red)
+                .foregroundStyle(isValidName ? Color.primary : Color.red)
                 .submitLabel(.next)
                 .onSubmit {
-                    validateCart()
-                    if isValidInput {
+                    validateInput()
+                    if isValidName {
                         focusedField = .notes
                     }
                 }
@@ -144,13 +148,13 @@ struct AddCartView: View {
             AddToolbarButton(entityName: "Cart",
                              action: submitAction)
                 .foregroundStyle(name.isEmpty ? Color.secondary : addButtonTextColor)
-                .tint(name.isEmpty ? Color.secondary.opacity(0.7) : Color.accent)
+                .disabled(name.isEmpty)
         }
     }
     
     private func submitAction() {
-        validateCart()
-        if isValidInput {
+        validateInput()
+        if validator.error == nil {
             addCart()
             reset()
             showAddCart = false
@@ -161,6 +165,7 @@ struct AddCartView: View {
         do {
             try viewContext.save()
         } catch {
+            let logger = PersistenceController.shared.logger
             logger.error("Failed to insert new cart. \(error.localizedDescription)")
         }
     }
@@ -177,21 +182,27 @@ struct AddCartView: View {
         }
     }
     
-    private func validateCart() {
-        let existingCartCount = CDCart.findCarts(by: name,
-                                                 context: viewContext)
-        
-        isValidInput = !name.isEmpty && existingCartCount == 0
-        
-        if existingCartCount != 0 {
-            showValidationMessage = true
+    private func validateInput() {
+        do {
+            validator.cartName = name
+            try validator.validateCart(
+                editorKind: .add,
+                context: viewContext
+            )
+        } catch {
+            if let err = error as? ValidationError {
+                validator.error = err
+            } else {
+                let logger = validator.logger
+                logger.error("Failed to validate cart.\(error.localizedDescription)")
+            }
         }
     }
     
     private func reset() {
         name = ""
         notes = ""
-        showValidationMessage = false
+        validator.reset()
     }
 }
 
@@ -208,6 +219,7 @@ struct AddCartView: View {
         .overlay {
             AddCartView(
                 viewModel: .preview,
+                validator: ValidatorModel(),
                 showAddCart: .constant(true),
                 proxy: proxy
             )
