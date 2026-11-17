@@ -41,7 +41,7 @@ struct AddItemView: View {
     
     private var isValidName: Bool {
         switch validator.error {
-        case .nameIsEmpty, .containsInvalidCharacters, .itemExists:
+        case .nameIsEmpty, .containsInvalidCharacters, .itemExists(editorKind: .add):
             false
         default:
             true
@@ -61,8 +61,8 @@ struct AddItemView: View {
                 VStack(alignment: .center) {
                     cell()
                     
-                    if let message = validator.error?.message {
-                        Text("\(message)")
+                    if let error = validator.error {
+                        Text("\(error.message)")
                             .foregroundStyle(Color.red)
                             .font(.callout)
                     }
@@ -203,7 +203,10 @@ struct AddItemView: View {
         do {
             validator.itemName = name
             validator.cartName = cart.displayName
-            try validator.validateItem(context: viewContext)
+            try validator.validateItem(
+                editorKind: .add,
+                context: viewContext
+            )
         } catch {
             if let err = error as? ValidationError {
                 validator.error = err

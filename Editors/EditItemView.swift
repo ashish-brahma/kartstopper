@@ -33,7 +33,7 @@ struct EditItemView: View {
     
     private var isValidName: Bool {
         switch validator.error {
-        case .nameIsEmpty, .containsInvalidCharacters:
+        case .nameIsEmpty, .containsInvalidCharacters, .itemExists(editorKind: .edit):
             false
         default:
             true
@@ -78,11 +78,8 @@ struct EditItemView: View {
                     } header: {
                         Text("Item Name")
                     } footer: {
-                        if let error = validator.error {
-                            if error == .itemExists {
-                                Text("Name remains unchanged.")
-                                    .foregroundStyle(Color.info)
-                            } else if !isValidName {
+                        if !isValidName {
+                            if let error = validator.error {
                                 Text(error.message)
                                     .foregroundStyle(Color.red)
                             }
@@ -206,7 +203,10 @@ struct EditItemView: View {
         do {
             validator.itemName = name
             validator.cartName = cart.displayName
-            try validator.validateItem(context: viewContext)
+            try validator.validateItem(
+                editorKind: .edit,
+                context: viewContext
+            )
         } catch {
             if let err = error as? ValidationError {
                 validator.error = err

@@ -23,7 +23,10 @@ class ValidatorModel: ObservableObject {
     let logger = Logger(subsystem: "com.goldendamsel.kartstopper", category: "validation")
     
     /// Checks if the new inputs for the item being edited are valid.
-    func validateItem(context: NSManagedObjectContext) throws {
+    func validateItem(
+        editorKind: EditorKind,
+        context: NSManagedObjectContext
+    ) throws {
         if itemName.isEmpty {
             throw ValidationError.nameIsEmpty
         }
@@ -40,7 +43,7 @@ class ValidatorModel: ObservableObject {
         )
         
         if existingItemCount > 0 {
-            throw ValidationError.itemExists
+            throw ValidationError.itemExists(editorKind: editorKind)
         }
     }
     
@@ -80,24 +83,34 @@ class ValidatorModel: ObservableObject {
 enum ValidationError: Error, Hashable {
     case nameIsEmpty
     case containsInvalidCharacters
-    case itemExists
+    case itemExists(editorKind: EditorKind)
     case cartExists(editorKind: EditorKind)
     
+    /// String that describes the input validation error.
     var message: String {
         switch self {
         case .nameIsEmpty:
             "Enter a valid name."
         case .containsInvalidCharacters:
             "Name must contain alphabets(A-Z), numbers(0-9), and spaces only."
-        case .itemExists:
-            "Item may already exist."
+        case .itemExists(let editorKind):
+            existenceMessage(of: "Item", for: editorKind)
         case .cartExists(let editorKind):
-            editorKind == .edit ? "Cart may already exist or name entered is same as before." : "Cart already exists."
+            existenceMessage(of: "Cart", for: editorKind)
         }
+    }
+    
+    /// Create appropriate message about an entity's existence
+    /// based on entity being edited and the edit action being performed.
+    func existenceMessage(
+        of entity: String,
+        for editorKind: EditorKind
+    ) -> String {
+        editorKind == .edit ? "\(entity) may already exist or name entered is same as before." : "\(entity) already exists."
     }
 }
 
-/// Type that defines the kind of editor based on action performed.
+/// Type that defines the kind of editor based on the edit action being performed.
 enum EditorKind: Int, Hashable, Identifiable {
     case add
     case edit

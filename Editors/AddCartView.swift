@@ -36,7 +36,7 @@ struct AddCartView: View {
     
     private var isValidName: Bool {
         switch validator.error {
-        case .nameIsEmpty, .containsInvalidCharacters, .cartExists:
+        case .nameIsEmpty, .containsInvalidCharacters, .cartExists(editorKind: .add):
             false
         default:
             true
@@ -53,8 +53,8 @@ struct AddCartView: View {
                 VStack(alignment: .center) {
                     cell()
                     
-                    if let message = validator.error?.message  {
-                        Text("\(message)")
+                    if let error = validator.error  {
+                        Text("\(error.message)")
                             .foregroundStyle(Color.red)
                             .font(.callout)
                     }

@@ -29,7 +29,7 @@ struct EditCartView: View {
     
     private var isValidName: Bool {
         switch validator.error {
-        case .nameIsEmpty, .containsInvalidCharacters:
+        case .nameIsEmpty, .containsInvalidCharacters, .cartExists(editorKind: .edit):
             false
         default:
             true
@@ -62,9 +62,11 @@ struct EditCartView: View {
                 } header: {
                     Text("Cart Name")
                 } footer: {
-                    if let error = validator.error {
-                        Text("\(error.message)")
-                            .foregroundStyle(Color.red)
+                    if !isValidName {
+                        if let error = validator.error {
+                            Text("\(error.message)")
+                                .foregroundStyle(Color.red)
+                        }
                     }
                 }
                 
