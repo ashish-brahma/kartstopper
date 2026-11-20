@@ -31,7 +31,7 @@ class ValidatorModel: ObservableObject {
             throw ValidationError.nameIsEmpty
         }
         
-        let trimmedName = itemName.trimSpaces()
+        let trimmedName = itemName.trimmed
         if !trimmedName.hasValidCharacters(from: .validNameSet) {
             throw ValidationError.containsInvalidCharacters
         }
@@ -56,7 +56,7 @@ class ValidatorModel: ObservableObject {
             throw ValidationError.nameIsEmpty
         }
         
-        let trimmedName = cartName.trimSpaces()
+        let trimmedName = cartName.trimmed
         if !trimmedName.hasValidCharacters(from: .validNameSet) {
             throw ValidationError.containsInvalidCharacters
         }
@@ -92,7 +92,7 @@ enum ValidationError: Error, Hashable {
         case .nameIsEmpty:
             "Enter a valid name."
         case .containsInvalidCharacters:
-            "Name must contain alphabets(A-Z), numbers(0-9), and spaces only."
+            "Name must contain alphabets(A-Z), numbers(0-9), spaces and punctutations &()-:#, only."
         case .itemExists(let editorKind):
             existenceMessage(of: "Item", for: editorKind)
         case .cartExists(let editorKind):
@@ -119,9 +119,19 @@ enum EditorKind: Int, Hashable, Identifiable {
 }
 
 extension String {
+    /// Trims whitespaces  and punctuations at beginning and end of the `String`.
+    var trimmed: String {
+        self.trimSpaces().trimPunctuations()
+    }
+    
     /// Trims whitespaces at beginning and end of the `String`.
     func trimSpaces() -> String {
         self.trimmingCharacters(in: .whitespaces)
+    }
+    
+    /// Trims punctuations at beginning and end of the `String`.
+    func trimPunctuations() -> String {
+        self.trimmingCharacters(in: .punctuationCharacters)
     }
     
     /// Returns `true` if `String` has valid characters.
@@ -131,5 +141,6 @@ extension String {
 }
 
 extension CharacterSet {
-    static let validNameSet = CharacterSet.alphanumerics.union(.whitespaces)
+    static let allowedPunctutations = CharacterSet(charactersIn: "&()-:#,")
+    static let validNameSet = CharacterSet.alphanumerics.union(.whitespaces).union(.allowedPunctutations)
 }

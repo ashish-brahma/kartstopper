@@ -40,14 +40,14 @@ extension CDItem {
         context: NSManagedObjectContext
     ) -> Int {
         let request = CDItem.fetchRequest()
-        
-        // If name contains only one word, find exact matches otherwise look for close ones.
+        var itemName = name
         let query = name.components(separatedBy: " ")
-        let comparator = query.count > 1 ? "CONTAINS" : "LIKE"
-        
-        // Find matches in the specific cart.
-        request.predicate = NSPredicate(format: "name \(comparator)[cd] %@ && cart.name == %@", name, cart)
-        
+        if query.count > 1 {
+            if let firstWord = query.first {
+                itemName = firstWord
+            }
+        }
+        request.predicate = NSPredicate(format: "name LIKE[cd] %@ && cart.name == %@", itemName, cart)
         guard let count = try? context.count(for: request), count != 0
         else { return 0 }
         return count
