@@ -15,11 +15,8 @@ struct AddCartView: View {
     @ObservedObject var validator: ValidatorModel
     
     @Binding var showAddCart: Bool
-    let proxy: GeometryProxy
     
     @Environment(\.managedObjectContext) private var viewContext
-    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
-    @Environment(\.colorScheme) private var colorScheme
     
     private enum Field: Hashable {
         case name
@@ -29,10 +26,6 @@ struct AddCartView: View {
     
     @State private var name = ""
     @State private var notes = ""
-    
-    private var addButtonTextColor: Color {
-        colorScheme == .dark ? .black : .white
-    }
     
     private var isValidName: Bool {
         switch validator.error {
@@ -44,111 +37,104 @@ struct AddCartView: View {
     }
     
     var body: some View {
-        VStack {
-            Spacer()
-            
-            HStack {
-                Spacer()
-                
-                VStack(alignment: .center) {
-                    cell()
-                    
+        NavigationStack {
+            Form {
+                Section {
+                    HStack {
+                        TextField("Enter a name for the cart", text: $name)
+                            .autocorrectionDisabled()
+                            .textInputAutocapitalization(.words)
+                            .focused($focusedField, equals: .name)
+                            .foregroundStyle(isValidName ? Color.primary : Color.red)
+                            .submitLabel(.next)
+                            .onSubmit {
+                                validateInput()
+                                if isValidName {
+                                    focusedField = .notes
+                                }
+                            }
+                        
+                        if focusedField == .name && !name.isEmpty {
+                            clearButton {
+                                name = ""
+                            }
+                        }
+                    }
+                } header: {
+                    Text("Cart Name")
+                } footer: {
                     if let error = validator.error {
                         Text("\(error.message)")
                             .foregroundStyle(Color.red)
                             .font(.callout)
                     }
-                    
-                    buttonToolbar()
                 }
-                .frame(maxWidth: horizontalSizeClass == .regular ?  Design.addCartMaxWidth : proxy.size.width/1.2)
                 
-                Spacer()
-            }
-            .padding(Design.Padding.standard * 2)
-            .padding(.bottom, Design.Padding.bottom * 4)
-            .background {
-                if colorScheme == .light {
-                    Rectangle()
-                        .fill(Material.thick)
-                } else {
-                    Rectangle()
-                        .fill(Color(.systemGroupedBackground))
-                }
-            }
-            
-            Spacer()
-        }
-        .toolbar {
-            ToolbarItemGroup(placement: .keyboard) {
-                CancelToolbarButton {
-                    focusedField = nil
-                }
-                Spacer()
-                ConfirmToolbarButton(action: submitAction)
-                    .disabled(name.isEmpty)
-            }
-        }
-        .onChange(of: name) { _ in
-            validator.error = nil
-        }
-        .onAppear {
-            reset()
-            focusedField = .name
-        }
-    }
-    
-    @ViewBuilder
-    private func cell() -> some View {
-        VStack(alignment: .leading) {
-            TextField("Cart Name", text: $name)
-                .autocorrectionDisabled()
-                .textInputAutocapitalization(.words)
-                .focused($focusedField, equals: .name)
-                .foregroundStyle(isValidName ? Color.primary : Color.red)
-                .submitLabel(.next)
-                .onSubmit {
-                    validateInput()
-                    if isValidName {
-                        focusedField = .notes
+                Section(header: Text("Cart Description")) {
+                    HStack(alignment: .top) {
+                        TextField("Add notes (optional)",
+                                  text: $notes,
+                                  axis: .vertical)
+                        .textInputAutocapitalization(.sentences)
+                        .frame(height: Design.descriptionFieldHeight,
+                               alignment: .top)
+                        .lineLimit(Design.descriptionFieldLineLimit)
+                        .focused($focusedField, equals: .notes)
+                        
+                        if focusedField == .notes && !notes.isEmpty {
+                            clearButton {
+                                notes = ""
+                            }
+                        }
                     }
                 }
-            
-            Divider()
-            
-            TextField("Add notes (optional)",
-                      text: $notes,
-                      axis: .vertical)
-            .textInputAutocapitalization(.sentences)
-            .frame(height: Design.descriptionFieldHeight,
-                   alignment: .top)
-            .lineLimit(Design.descriptionFieldLineLimit)
-            .focused($focusedField, equals: .notes)
+            }
+            .navigationTitle("Add New Cart")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItemGroup(placement: .keyboard) {
+                    Spacer()
+                    Button("Done") {
+                        focusedField = nil
+                    }
+                }
+                ToolbarItem(placement: .cancellationAction) {
+                    CancelToolbarButton {
+                        showAddCart = false
+                        focusedField = nil
+                    }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    ConfirmToolbarButton(action: submitAction)
+                        .disabled(name.isEmpty)
+                }
+            }
+            .onChange(of: name) { _ in
+                validator.error = nil
+            }
+            .onChange(of: focusedField) { newField in
+                if newField == .notes {
+                    validateInput()
+                }
+            }
+            .onAppear {
+                reset()
+                focusedField = .name
+            }
         }
-        .padding(Design.Padding.standard)
-        .background {
-            RoundedRectangle(cornerRadius: Design.cornerRadius)
-                .fill(Color(.secondarySystemGroupedBackground))
-        }
-        
     }
     
-    @ViewBuilder
-    private func buttonToolbar() -> some View {
-        HStack {
-            CancelToolbarButton {
-                showAddCart = false
-                focusedField = nil
-            }
-            .tint(Color.foreground)
-            .buttonStyle(.bordered)
-            
-            Spacer()
-            
-            AddToolbarButton(entityName: "Cart",
-                             action: submitAction)
-                .foregroundStyle(name.isEmpty ? Color.secondary : addButtonTextColor)
-                .disabled(name.isEmpty)
+    private func clearButton(action: @escaping () -> Void) -> some View {
+        ZStack {
+            Circle()
+                .foregroundStyle(Color(.secondarySystemFill))
+            Image(systemName: "xmark")
+                .foregroundStyle(.primary)
+                .imageScale(.small)
+        }
+        .frame(height: 30)
+        .onTapGesture {
+            action()
         }
     }
     
@@ -207,22 +193,19 @@ struct AddCartView: View {
 }
 
 #Preview {
-    GeometryReader { proxy in
-        NavigationSplitView {
-            Section {
-                Text("Cart")
-            }
-        } detail: {
-            Text("Cart Detail")
+    NavigationSplitView {
+        Section {
+            Text("Cart")
         }
-        .navigationTitle("Cart Title")
-        .overlay {
-            AddCartView(
-                viewModel: .preview,
-                validator: ValidatorModel(),
-                showAddCart: .constant(true),
-                proxy: proxy
-            )
-        }
+    } detail: {
+        Text("Cart Detail")
+    }
+    .navigationTitle("Cart Title")
+    .sheet(isPresented: .constant(true)) {
+        AddCartView(
+            viewModel: .preview,
+            validator: ValidatorModel(),
+            showAddCart: .constant(true)
+        )
     }
 }

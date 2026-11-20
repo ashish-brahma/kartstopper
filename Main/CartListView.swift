@@ -49,16 +49,6 @@ struct CartListView: View {
             } detail: {
                 cartsDetail(proxy: proxy)
             }
-            .overlay {
-                if showAddCart {
-                    AddCartView(
-                        viewModel: viewModel,
-                        validator: validator,
-                        showAddCart: $showAddCart,
-                        proxy: proxy
-                    )
-                }
-            }
             .ignoresSafeArea()
         }
     }
@@ -189,6 +179,14 @@ struct CartListView: View {
                 }
                 .disabled(showAddCart && !viewModel.cartQuery.isEmpty)
             }
+        }
+        .sheet(isPresented: $showAddCart) {
+            AddCartView(
+                viewModel: viewModel,
+                validator: validator,
+                showAddCart: $showAddCart
+            )
+            .presentationDetents([.fraction(0.7)])
         }
         .sheet(isPresented: $showEditCart) {
             if let selection = navModel.cartToEdit {
