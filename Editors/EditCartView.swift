@@ -48,16 +48,24 @@ struct EditCartView: View {
                 
                 Section {
                     Group {
-                        TextField("Enter a name for the cart", text: $name)
-                            .autocorrectionDisabled()
-                            .textInputAutocapitalization(.words)
-                            .focused($focusedField, equals: .name)
-                            .foregroundStyle(isValidName ? Color.primary : Color.red)
-                            .submitLabel(.next)
-                            .onSubmit {
-                                validateInput()
-                                focusedField = .notes
+                        HStack {
+                            TextField("Enter a name for the cart", text: $name)
+                                .autocorrectionDisabled()
+                                .textInputAutocapitalization(.words)
+                                .focused($focusedField, equals: .name)
+                                .foregroundStyle(isValidName ? Color.primary : Color.red)
+                                .submitLabel(.next)
+                                .onSubmit {
+                                    validateInput()
+                                    focusedField = .notes
+                                }
+                            
+                            if focusedField == .name && !name.isEmpty {
+                                ClearButton {
+                                    name = ""
+                                }
                             }
+                        }
                     }
                 } header: {
                     Text("Cart Name")
@@ -72,11 +80,19 @@ struct EditCartView: View {
                 
                 Section(header: Text("Cart Description")) {
                     Group {
-                        TextField("Add notes (optional)", text: $notes, axis: .vertical)
-                            .textInputAutocapitalization(.sentences)
-                            .lineLimit(Design.descriptionFieldLineLimit)
-                            .frame(height: Design.descriptionFieldHeight, alignment: .top)
-                            .focused($focusedField, equals: .notes)
+                        HStack(alignment: .top) {
+                            TextField("Add notes (optional)", text: $notes, axis: .vertical)
+                                .textInputAutocapitalization(.sentences)
+                                .lineLimit(Design.descriptionFieldLineLimit)
+                                .frame(height: Design.descriptionFieldHeight, alignment: .top)
+                                .focused($focusedField, equals: .notes)
+                            
+                            if focusedField == .notes && !notes.isEmpty {
+                                ClearButton {
+                                    notes = ""
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -84,23 +100,7 @@ struct EditCartView: View {
             .scrollContentBackground(.hidden)
             .background(Color.background)
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    CancelToolbarButton { dismiss() }
-                }
-                ToolbarItem(placement: .principal) {
-                    Text("Edit Cart Details")
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    ConfirmToolbarButton {
-                        validateInput()
-                        if validator.error == nil {
-                            updateCart()
-                            validator.reset()
-                            dismiss()
-                        }
-                    }
-                    .disabled(name.isEmpty)
-                }
+                toolbarContent()
             }
         }
         .onAppear {
@@ -111,6 +111,27 @@ struct EditCartView: View {
         }
         .onChange(of: name) { _ in
             validator.error = nil
+        }
+    }
+    
+    @ToolbarContentBuilder
+    private func toolbarContent() -> some ToolbarContent {
+        ToolbarItem(placement: .cancellationAction) {
+            CancelToolbarButton { dismiss() }
+        }
+        ToolbarItem(placement: .principal) {
+            Text("Edit Cart Details")
+        }
+        ToolbarItem(placement: .confirmationAction) {
+            ConfirmToolbarButton {
+                validateInput()
+                if validator.error == nil {
+                    updateCart()
+                    validator.reset()
+                    dismiss()
+                }
+            }
+            .disabled(name.isEmpty)
         }
     }
     

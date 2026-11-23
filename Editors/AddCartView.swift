@@ -91,6 +91,8 @@ struct AddCartView: View {
             }
             .navigationTitle("Add New Cart")
             .navigationBarTitleDisplayMode(.inline)
+            .scrollContentBackground(.hidden)
+            .background(Color.background)
             .toolbar {
                 ToolbarItemGroup(placement: .keyboard) {
                     Spacer()

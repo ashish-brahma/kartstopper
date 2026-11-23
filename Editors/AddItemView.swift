@@ -52,6 +52,8 @@ struct AddItemView: View {
         locale.currency?.identifier ?? "USD"
     }
     
+    // MARK: - Views
+    
     var body: some View {
         VStack {
             Spacer()
@@ -195,6 +197,8 @@ struct AddItemView: View {
                 .fill(Color(.secondarySystemGroupedBackground))
         }
     }
+    
+    // MARK: - Methods
     
     private func submitAction() {
         validateInput()

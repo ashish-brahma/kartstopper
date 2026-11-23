@@ -65,16 +65,24 @@ struct EditItemView: View {
                     .listRowBackground(Color(.tertiarySystemFill))
                     
                     Section {
-                        TextField("Enter a name for the item", text: $name)
-                            .autocorrectionDisabled()
-                            .textInputAutocapitalization(.words)
-                            .focused($focusedField, equals: .name)
-                            .foregroundStyle(isValidName ? Color.primary : Color.red)
-                            .submitLabel(.next)
-                            .onSubmit {
-                                validateInput()
-                                focusedField = .price
+                        HStack {
+                            TextField("Enter a name for the item", text: $name)
+                                .autocorrectionDisabled()
+                                .textInputAutocapitalization(.words)
+                                .focused($focusedField, equals: .name)
+                                .foregroundStyle(isValidName ? Color.primary : Color.red)
+                                .submitLabel(.next)
+                                .onSubmit {
+                                    validateInput()
+                                    focusedField = .price
+                                }
+                            
+                            if focusedField == .name && !name.isEmpty {
+                                ClearButton {
+                                    name = ""
+                                }
                             }
+                        }
                     } header: {
                         Text("Item Name")
                     } footer: {
@@ -87,49 +95,41 @@ struct EditItemView: View {
                     }
                     
                     Section(header: Text("Price")) {
-                        TextField("Enter price (\(currencyCode))",
-                                  value: $price,
-                                  format: .currency(code: currencyCode))
-                        .keyboardType(.decimalPad)
-                        .focused($focusedField, equals: .price)
+                        HStack {
+                            TextField("Enter price (\(currencyCode))",
+                                      value: $price,
+                                      format: .currency(code: currencyCode))
+                            .keyboardType(.decimalPad)
+                            .focused($focusedField, equals: .price)
+                            
+                            if focusedField == .price && price != 0 {
+                                ClearButton {
+                                    price = 0
+                                }
+                            }
+                        }
                     }
                     
                     Section(header: Text("Item Description")) {
-                        TextField("Add notes (optional)", text: $notes, axis: .vertical)
-                            .lineLimit(Design.descriptionFieldLineLimit)
-                            .frame(height:Design.descriptionFieldHeight, alignment: .top)
-                            .focused($focusedField, equals: .notes)
+                        HStack(alignment: .top) {
+                            TextField("Add notes (optional)", text: $notes, axis: .vertical)
+                                .lineLimit(Design.descriptionFieldLineLimit)
+                                .frame(height:Design.descriptionFieldHeight, alignment: .top)
+                                .focused($focusedField, equals: .notes)
+                            
+                            if focusedField == .notes && !notes.isEmpty {
+                                ClearButton {
+                                    notes = ""
+                                }
+                            }
+                        }
                     }
                 }
                 .navigationTitle(item.displayName)
                 .scrollContentBackground(.hidden)
                 .background(Color.background)
                 .toolbar {
-                    ToolbarItem(placement: .cancellationAction) {
-                        CancelToolbarButton { dismiss() }
-                    }
-                    ToolbarItem(placement: .principal) {
-                        Text("Edit Item Details")
-                    }
-                    ToolbarItem(placement: .confirmationAction) {
-                        ConfirmToolbarButton {
-                            validateInput()
-                            if validator.error == nil {
-                                updateItem()
-                                validator.reset()
-                                dismiss()
-                            }
-                        }
-                        .disabled(name.isEmpty)
-                    }
-                    if focusedField == .price {
-                        ToolbarItemGroup(placement: .keyboard) {
-                            Spacer()
-                            Button("Next") {
-                                focusedField = .notes
-                            }
-                        }
-                    }
+                    toolbarContent()
                 }
             }
             .onAppear {
@@ -141,6 +141,35 @@ struct EditItemView: View {
             }
             .onChange(of: name) { _ in
                 validator.error = nil
+            }
+        }
+    }
+    
+    @ToolbarContentBuilder
+    private func toolbarContent() -> some ToolbarContent {
+        ToolbarItem(placement: .cancellationAction) {
+            CancelToolbarButton { dismiss() }
+        }
+        ToolbarItem(placement: .principal) {
+            Text("Edit Item Details")
+        }
+        ToolbarItem(placement: .confirmationAction) {
+            ConfirmToolbarButton {
+                validateInput()
+                if validator.error == nil {
+                    updateItem()
+                    validator.reset()
+                    dismiss()
+                }
+            }
+            .disabled(name.isEmpty)
+        }
+        if focusedField == .price {
+            ToolbarItemGroup(placement: .keyboard) {
+                Spacer()
+                Button("Next") {
+                    focusedField = .notes
+                }
             }
         }
     }
