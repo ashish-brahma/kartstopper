@@ -55,7 +55,7 @@ struct AddCartView: View {
                             }
                         
                         if focusedField == .name && !name.isEmpty {
-                            clearButton {
+                            ClearButton {
                                 name = ""
                             }
                         }
@@ -82,7 +82,7 @@ struct AddCartView: View {
                         .focused($focusedField, equals: .notes)
                         
                         if focusedField == .notes && !notes.isEmpty {
-                            clearButton {
+                            ClearButton {
                                 notes = ""
                             }
                         }
@@ -113,28 +113,16 @@ struct AddCartView: View {
                 validator.error = nil
             }
             .onChange(of: focusedField) { newField in
-                if newField == .notes {
+                if newField != .name {
                     validateInput()
+                } else {
+                    validator.error = nil
                 }
             }
             .onAppear {
                 reset()
                 focusedField = .name
             }
-        }
-    }
-    
-    private func clearButton(action: @escaping () -> Void) -> some View {
-        ZStack {
-            Circle()
-                .foregroundStyle(Color(.secondarySystemFill))
-            Image(systemName: "xmark")
-                .foregroundStyle(.primary)
-                .imageScale(.small)
-        }
-        .frame(height: 30)
-        .onTapGesture {
-            action()
         }
     }
     

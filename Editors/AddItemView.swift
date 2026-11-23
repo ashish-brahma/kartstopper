@@ -98,6 +98,13 @@ struct AddItemView: View {
         .onChange(of: name) { _ in
             validator.error = nil
         }
+        .onChange(of: focusedField) { newField in
+            if newField != .name {
+                validateInput()
+            } else {
+                validator.error = nil
+            }
+        }
         .onAppear {
             reset()
             focusedField = .name
@@ -106,22 +113,28 @@ struct AddItemView: View {
     
     @ViewBuilder
     private func buttonToolbar() -> some View {
-        HStack {
-            CancelToolbarButton {
+        VStack {
+            Button(action: submitAction) {
+                Label("Add Item", systemImage: "plus")
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.borderedProminent)
+            .foregroundStyle(name.isEmpty ? Color.secondary : addButtonTextColor)
+            .tint(name.isEmpty ? Color.secondary.opacity(0.7) : Color.accent)
+            .disabled(name.isEmpty)
+            .padding(.bottom, Design.Padding.bottom)
+            
+            Button {
                 showAddItem = false
                 focusedField = nil
+            } label: {
+                Label("Cancel", systemImage: "xmark")
+                    .frame(maxWidth: .infinity)
             }
             .tint(Color.foreground)
             .buttonStyle(.bordered)
-            
-            Spacer()
-            
-            AddToolbarButton(entityName: "Item",
-                             action: submitAction)
-                .foregroundStyle(name.isEmpty ? Color.secondary : addButtonTextColor)
-                .tint(name.isEmpty ? Color.secondary.opacity(0.7) : Color.accent)
-                .disabled(name.isEmpty)
         }
+        .padding()
     }
     
     @ViewBuilder
@@ -134,29 +147,45 @@ struct AddItemView: View {
                 .padding(.trailing, Design.Padding.trailing)
             
             VStack(alignment: .leading) {
-                TextField("Item Name", text: $name)
-                    .autocorrectionDisabled()
-                    .textInputAutocapitalization(.words)
-                    .focused($focusedField, equals: .name)
-                    .foregroundStyle(isValidName ? Color.primary : Color.red)
-                    .submitLabel(.next)
-                    .onSubmit {
-                        validateInput()
-                        if isValidName {
-                            focusedField = .price
+                HStack {
+                    TextField("Item Name", text: $name)
+                        .autocorrectionDisabled()
+                        .textInputAutocapitalization(.words)
+                        .focused($focusedField, equals: .name)
+                        .foregroundStyle(isValidName ? Color.primary : Color.red)
+                        .submitLabel(.next)
+                        .onSubmit {
+                            validateInput()
+                            if isValidName {
+                                focusedField = .price
+                            }
+                        }
+                    
+                    if focusedField == .name && !name.isEmpty {
+                        ClearButton {
+                            name = ""
                         }
                     }
+                }
                 
                 Divider()
                 
-                TextField("Price (\(currencyCode))",
-                          value: $price,
-                          format: .currency(code: currencyCode))
-                .keyboardType(.decimalPad)
-                .focused($focusedField, equals: .price)
-                .submitLabel(.done)
-                .onSubmit {
-                    submitAction()
+                HStack {
+                    TextField("Price (\(currencyCode))",
+                              value: $price,
+                              format: .currency(code: currencyCode))
+                    .keyboardType(.decimalPad)
+                    .focused($focusedField, equals: .price)
+                    .submitLabel(.done)
+                    .onSubmit {
+                        submitAction()
+                    }
+                    
+                    if focusedField == .price && price != nil {
+                        ClearButton {
+                            price = nil
+                        }
+                    }
                 }
             }
         }
