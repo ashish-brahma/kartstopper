@@ -30,7 +30,12 @@ struct CartListView: View {
     
     @State private var showAddCart = false
     @State private var showEditCart = false
+    @State private var showEditButtons = false
     @State private var columnVisibility = NavigationSplitViewVisibility.detailOnly
+    
+    private var allSelected: Bool {
+        navModel.selectedCarts.count == viewModel.totalCarts
+    }
     
     private var isWide: Bool {
         horizontalSizeClass == .regular
@@ -78,7 +83,7 @@ struct CartListView: View {
                 .ignoresSafeArea()
             
             
-            if let cart = navModel.selectedCart {
+            if let cart = navModel.selectedCarts.first {
                 ChecklistView(cart: cart,
                               viewModel: viewModel,
                               navModel: navModel,
@@ -121,7 +126,7 @@ struct CartListView: View {
     
     @ViewBuilder
     private func cartsList() -> some View {
-        List(selection: $navModel.selectedCart) {
+        List(selection: $navModel.selectedCarts) {
             ForEach(carts) { section in
                 Section(header: Text(section.id)) {
                     ForEach(section) { cart in
@@ -134,7 +139,9 @@ struct CartListView: View {
                         }
                         .swipeActions(edge: .trailing) {
                             DeleteSwipeButton {
-                                deleteCart(cart)
+                                withAnimation {
+                                    deleteCart(cart)
+                                }
                             }
                             EditSwipeButton {
                                 navModel.cartToEdit = cart
@@ -142,10 +149,10 @@ struct CartListView: View {
                             }
                         }
                     }
-                    .onDelete { indexSet in
-                        deleteCart(in: Array(section),
-                                   at: indexSet)
-                    }
+//                    .onDelete { indexSet in
+//                        deleteCart(in: Array(section),
+//                                   at: indexSet)
+//                    }
                 }
             }
         }
@@ -170,16 +177,9 @@ struct CartListView: View {
         .navigationTitleColor(Color.foreground)
         .textInputAutocapitalization(.never)
         .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                EditButton()
-            }
-            ToolbarItem(placement: .primaryAction) {
-                AddToolbarButton(entityName: "cart") {
-                    showAddCart = true
-                }
-                .disabled(showAddCart && !viewModel.cartQuery.isEmpty)
-            }
+            toolbarContent()
         }
+        .environment(\.editMode, .constant(showEditButtons ? EditMode.active : EditMode.inactive))
         .sheet(isPresented: $showAddCart) {
             AddCartView(
                 viewModel: viewModel,
@@ -201,13 +201,13 @@ struct CartListView: View {
         .onChange(of: viewModel.totalCarts) { newCount in
             selectLatestCart()
         }
-        .onChange(of: navModel.selectedCart) { cart in
-            if cart == nil {
+        .onChange(of: navModel.selectedCarts) { carts in
+            if carts == Set<CDCart>() {
                 selectLatestCart()
             }
         }
         .task {
-            if navModel.selectedCart == nil {
+            if navModel.selectedCarts == Set<CDCart>() {
                 selectLatestCart()
             }
         }
@@ -217,7 +217,46 @@ struct CartListView: View {
         if isWide {
             if let section = carts.first,
                let cart = section.first {
-                navModel.selectedCart = cart
+                navModel.selectedCarts.insert(cart)
+            }
+        }
+    }
+    
+    @ToolbarContentBuilder
+    private func toolbarContent() -> some ToolbarContent {
+        ToolbarItem(placement: .topBarLeading) {
+            Button(showEditButtons ? "Done" : "Select") {
+                withAnimation {
+                    showEditButtons.toggle()
+                }
+            }
+        }
+        if showEditButtons {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button(allSelected ? "Deselect All" : "Select All") {
+                    if allSelected {
+                        navModel.selectedCarts = Set<CDCart>()
+                    } else {
+                        carts.forEach { $0.forEach { navModel.selectedCarts.insert($0) } }
+                    }
+                }
+            }
+            ToolbarItem(placement: .destructiveAction) {
+                Button("Delete", systemImage: "trash") {
+                    navModel.selectedCarts.forEach { cart in
+                        withAnimation {
+                            deleteCart(cart)
+                        }
+                    }
+                }
+                .disabled(navModel.selectedCarts.count == 0)
+            }
+        } else {
+            ToolbarItem(placement: .primaryAction) {
+                AddToolbarButton(entityName: "cart") {
+                    showAddCart = true
+                }
+                .disabled(showAddCart && !viewModel.cartQuery.isEmpty)
             }
         }
     }
@@ -232,19 +271,19 @@ struct CartListView: View {
         }
     }
     
-    private func deleteCart(
-        in section: [CDCart],
-        at offsets: IndexSet
-    ) {
-        withAnimation {
-            offsets.map { section[$0] }.forEach(deleteCart)
-        }
-    }
+//    private func deleteCart(
+//        in section: [CDCart],
+//        at offsets: IndexSet
+//    ) {
+//        withAnimation {
+//            offsets.map { section[$0] }.forEach(deleteCart)
+//        }
+//    }
     
     private func deleteCart(_ cart: CDCart) {
         viewModel.objectWillChange.send()
-        if cart.objectID == navModel.selectedCart?.objectID {
-            navModel.selectedCart = nil
+        if cart.objectID == navModel.selectedCarts.first?.objectID {
+            navModel.selectedCarts.remove(cart)
         }
         viewContext.delete(cart)
         saveContext(cart: cart)

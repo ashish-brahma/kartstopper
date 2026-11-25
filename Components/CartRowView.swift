@@ -22,7 +22,7 @@ struct CartRowView: View {
     }
     
     private var isSelected: Bool {
-        navModel.selectedCart == cart
+        navModel.selectedCarts.first == cart
     }
     
     var body: some View {
@@ -89,7 +89,7 @@ struct CartRowView: View {
     let cart = CDCart.preview
     
     NavigationSplitView(columnVisibility: .constant(.doubleColumn)) {
-        List(selection: $navModel.selectedCart) {
+        List(selection: $navModel.selectedCarts) {
             NavigationLink(value: cart) {
                 CartRowView(
                     cart: cart,
@@ -104,6 +104,6 @@ struct CartRowView: View {
     .environment(\.managedObjectContext,
                   PersistenceController.preview.container.viewContext)
     .task {
-        navModel.selectedCart = cart
+        navModel.selectedCarts.insert(cart)
     }
 }
