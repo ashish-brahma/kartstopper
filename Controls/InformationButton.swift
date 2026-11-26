@@ -22,7 +22,7 @@ struct InformationButton: View {
             .foregroundStyle(Color.info)
             .labelStyle(.iconOnly)
             .onTapGesture {
-                navModel.selectedItem = item
+                navModel.itemToDescribe = item
                 showItemInfo = true
             }
     }

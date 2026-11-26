@@ -24,7 +24,7 @@ struct Checkcircle: View {
         Label("Checkcircle", systemImage: item.isComplete ? "checkmark.circle.fill" : "circle")
             .imageScale(.large)
             .labelStyle(.iconOnly)
-            .foregroundStyle(Color.accentColor)
+            .foregroundStyle(Color.accent.gradient)
             .onTapGesture {
                 toggleStatus()
             }

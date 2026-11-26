@@ -89,6 +89,7 @@ struct CartListView: View {
             
             if let cart = navModel.selectedCarts.first {
                 ChecklistView(cart: cart,
+                              showEditCart: $showEditCart,
                               viewModel: viewModel,
                               navModel: navModel,
                               validator: validator)

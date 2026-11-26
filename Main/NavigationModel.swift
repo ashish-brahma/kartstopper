@@ -20,7 +20,13 @@ class NavigationModel: ObservableObject, Codable {
     @Published var cartToEdit: CDCart?
     
     /// Currently selected item in checklist.
-    @Published var selectedItem: CDItem?
+    @Published var selectedItems = Set<CDItem.ID>()
+    
+    /// Item which is being currently edited.
+    @Published var itemToEdit: CDItem?
+    
+    /// Item whose details are being currently presented.
+    @Published var itemToDescribe: CDItem?
     
     /// Array of cards pushed on dashboard's navigation stack.
     @Published var presentedCards: [Card] = []
