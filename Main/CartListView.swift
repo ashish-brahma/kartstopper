@@ -34,7 +34,11 @@ struct CartListView: View {
     @State private var columnVisibility = NavigationSplitViewVisibility.detailOnly
     
     private var allSelected: Bool {
-        navModel.selectedCarts.count == viewModel.totalCarts
+        if viewModel.totalCarts > 0 {
+            return navModel.selectedCarts.count == viewModel.totalCarts
+        } else {
+            return false
+        }
     }
     
     private var noneSelected: Bool {
@@ -180,8 +184,25 @@ struct CartListView: View {
         .searchable(text: $viewModel.cartQuery, placement: .navigationBarDrawer)
         .navigationTitle("Carts")
         .navigationTitleColor(Color.foreground)
+        .navigationBarTitleDisplayMode(isEditActive ? .inline : .large)
         .textInputAutocapitalization(.never)
         .toolbar {
+            if isEditActive {
+                ToolbarTitleMenu {
+                    Button(allSelected ? "Deselect All" : "Select All") {
+                        if allSelected {
+                            navModel.selectedCarts = Set<CDCart>()
+                        } else {
+                            carts.forEach {
+                                $0.forEach {
+                                    navModel.selectedCarts.insert($0)
+                                }
+                            }
+                        }
+                    }
+                    .disabled(viewModel.totalCarts == 0)
+                }
+            }
             toolbarContent()
         }
         .environment(\.editMode, .constant(isEditActive ? EditMode.active : EditMode.inactive))
@@ -223,9 +244,19 @@ struct CartListView: View {
     @ToolbarContentBuilder
     private func toolbarContent() -> some ToolbarContent {
         ToolbarItem(placement: .topBarLeading) {
-            Button(isEditActive ? "Done" : "Select") {
-                withAnimation {
-                    isEditActive.toggle()
+            if isEditActive {
+                ConfirmToolbarButton {
+                    withAnimation {
+                        isEditActive = false
+                    }
+                }
+                .buttonStyle(.borderedProminent)
+                .buttonBorderShape(.capsule)
+            } else {
+                Button("Select") {
+                    withAnimation {
+                        isEditActive = true
+                    }
                 }
             }
         }
@@ -233,19 +264,6 @@ struct CartListView: View {
             ToolbarItem(placement: .principal) {
                 Text("\(navModel.selectedCarts.count) selected")
                     .foregroundStyle(.accent)
-            }
-            ToolbarItem(placement: .secondaryAction) {
-                Button(allSelected ? "Deselect All" : "Select All") {
-                    if allSelected {
-                        navModel.selectedCarts = Set<CDCart>()
-                    } else {
-                        carts.forEach {
-                            $0.forEach {
-                                navModel.selectedCarts.insert($0)
-                            }
-                        }
-                    }
-                }
             }
             ToolbarItem(placement: .destructiveAction) {
                 Button("Delete", systemImage: "trash") {

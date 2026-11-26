@@ -149,8 +149,19 @@ struct ChecklistView: View {
                 .navigationBarTitleDisplayMode(.inline)
                 .scrollContentBackground(.hidden)
                 .toolbar {
-                    if !isEditActive {
-                        ToolbarTitleMenu {
+                    ToolbarTitleMenu {
+                        if isEditActive {
+                            Button(allSelected ? "Deselect All" : "Select All") {
+                                if allSelected {
+                                    navModel.selectedItems = Set<CDItem.ID>()
+                                } else {
+                                    itemList.forEach {
+                                        navModel.selectedItems.insert($0.id)
+                                    }
+                                }
+                            }
+                            .disabled(totalItems == 0)
+                        } else {
                             Button("Edit Details", systemImage: "pencil") {
                                 showEditCart = true
                                 navModel.cartToEdit = cart
@@ -202,18 +213,6 @@ struct ChecklistView: View {
             ToolbarItem(placement: .principal) {
                 Text("\(navModel.selectedItems.count) selected")
                     .foregroundStyle(.accent)
-            }
-            ToolbarItem(placement: .secondaryAction) {
-                Button(allSelected ? "Deselect All" : "Select All") {
-                    if allSelected {
-                        navModel.selectedItems = Set<CDItem.ID>()
-                    } else {
-                        itemList.forEach {
-                            navModel.selectedItems.insert($0.id)
-                        }
-                    }
-                }
-                .disabled(totalItems == 0)
             }
             ToolbarItem(placement: .destructiveAction) {
                 Button("Delete", systemImage: "trash") {
