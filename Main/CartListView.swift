@@ -30,11 +30,15 @@ struct CartListView: View {
     
     @State private var showAddCart = false
     @State private var showEditCart = false
-    @State private var showEditButtons = false
+    @State private var isEditActive = false
     @State private var columnVisibility = NavigationSplitViewVisibility.detailOnly
     
     private var allSelected: Bool {
         navModel.selectedCarts.count == viewModel.totalCarts
+    }
+    
+    private var noneSelected: Bool {
+        navModel.selectedCarts.isEmpty
     }
     
     private var isWide: Bool {
@@ -179,7 +183,7 @@ struct CartListView: View {
         .toolbar {
             toolbarContent()
         }
-        .environment(\.editMode, .constant(showEditButtons ? EditMode.active : EditMode.inactive))
+        .environment(\.editMode, .constant(isEditActive ? EditMode.active : EditMode.inactive))
         .sheet(isPresented: $showAddCart) {
             AddCartView(
                 viewModel: viewModel,
@@ -201,20 +205,13 @@ struct CartListView: View {
         .onChange(of: viewModel.totalCarts) { newCount in
             selectLatestCart()
         }
-        .onChange(of: navModel.selectedCarts) { carts in
-            if carts == Set<CDCart>() {
-                selectLatestCart()
-            }
-        }
         .task {
-            if navModel.selectedCarts == Set<CDCart>() {
-                selectLatestCart()
-            }
+            selectLatestCart()
         }
     }
     
     private func selectLatestCart() {
-        if isWide {
+        if isWide && !isEditActive && noneSelected {
             if let section = carts.first,
                let cart = section.first {
                 navModel.selectedCarts.insert(cart)
@@ -225,19 +222,27 @@ struct CartListView: View {
     @ToolbarContentBuilder
     private func toolbarContent() -> some ToolbarContent {
         ToolbarItem(placement: .topBarLeading) {
-            Button(showEditButtons ? "Done" : "Select") {
+            Button(isEditActive ? "Done" : "Select") {
                 withAnimation {
-                    showEditButtons.toggle()
+                    isEditActive.toggle()
                 }
             }
         }
-        if showEditButtons {
-            ToolbarItem(placement: .topBarTrailing) {
+        if isEditActive {
+            ToolbarItem(placement: .principal) {
+                Text("\(navModel.selectedCarts.count) selected")
+                    .foregroundStyle(.accent)
+            }
+            ToolbarItem(placement: .secondaryAction) {
                 Button(allSelected ? "Deselect All" : "Select All") {
                     if allSelected {
                         navModel.selectedCarts = Set<CDCart>()
                     } else {
-                        carts.forEach { $0.forEach { navModel.selectedCarts.insert($0) } }
+                        carts.forEach {
+                            $0.forEach {
+                                navModel.selectedCarts.insert($0)
+                            }
+                        }
                     }
                 }
             }
@@ -282,7 +287,7 @@ struct CartListView: View {
     
     private func deleteCart(_ cart: CDCart) {
         viewModel.objectWillChange.send()
-        if cart.objectID == navModel.selectedCarts.first?.objectID {
+        if navModel.selectedCarts.map(\.objectID).contains(cart.objectID) {
             navModel.selectedCarts.remove(cart)
         }
         viewContext.delete(cart)

@@ -22,7 +22,7 @@ struct CartRowView: View {
     }
     
     private var isSelected: Bool {
-        navModel.selectedCarts.first == cart
+        navModel.selectedCarts.contains(cart)
     }
     
     var body: some View {
