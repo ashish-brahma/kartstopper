@@ -9,6 +9,7 @@
 import SwiftUI
 
 struct AppInformationView: View {
+    @Environment(\.openURL) private var openURL
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     
     private var version: String {
@@ -39,25 +40,8 @@ struct AppInformationView: View {
                 }
                 .listRowBackground(Color.clear)
                 
-                Section("Help & Support") {
-                    ForEach(Constants.Manage.Help.allCases) { link in
-                        LinkButton(urlString: link.urlString,
-                                   title: link.title)
-                    }
-                }
-                
-                Section("Legal") {
-                    ForEach(Constants.Manage.Legal.allCases) { link in
-                        LinkButton(urlString: link.urlString,
-                                   title: link.title)
-                    }
-                }
-                
-                Section("Follow us") {
-                    ForEach(Constants.Manage.Social.allCases) { link in
-                        LinkButton(urlString: link.urlString,
-                                   title: link.title)
-                    }
+                ForEach(Constants.Manage.InformationLinks.allCases) {
+                    linkSection(for: $0)
                 }
             }
             .navigationTitle("About KartStopper")
@@ -65,13 +49,42 @@ struct AppInformationView: View {
         }
     }
     
+    private func linkSection(
+        for collection: Constants.Manage.InformationLinks
+    ) -> some View {
+        Section(collection.groupTitle) {
+            ForEach(collection.externalLinks, id: \.id) {
+                LinkButton(
+                    url: getURL(for: $0, in: collection),
+                    title: $0.labelName,
+                    symbol: $0.symbol,
+                )
+            }
+        }
+    }
+    
+    private func getURL(
+        for link: ExternalLink,
+        in collection: Constants.Manage.InformationLinks
+    ) -> URL? {
+        if let link = link as? Constants.Manage.InformationLinks.Feedback {
+            if link == .storePage {
+                let baseURL = URL(string: link.urlString)
+                let queryItem = URLQueryItem(name: "action", value: "write-review")
+                return baseURL?.appending(queryItems: [queryItem])
+            }
+        } else {
+            return URL(string: link.urlString)
+        }
+        return nil
+    }
+    
     @ViewBuilder
     private func heroView(proxy: GeometryProxy) -> some View {
         LazyVGrid(columns: [GridItem(.flexible())]) {
             VStack(alignment: .center) {
                 if let icon = icon {
-                    appIcon(icon: icon,
-                            proxy: proxy)
+                    appIcon(icon: icon, proxy: proxy)
                 }
                 
                 Text("KartStopper")

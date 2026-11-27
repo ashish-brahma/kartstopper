@@ -38,6 +38,7 @@ struct ManageView: View {
             } detail: {
                 manageDetail()
             }
+            .ignoresSafeArea()
             .task {
                 columnVisibility = .doubleColumn
                 
@@ -45,7 +46,6 @@ struct ManageView: View {
                     navModel.selectedPreference = .budgetAmount
                 }
             }
-            .ignoresSafeArea()
         }
     }
     
@@ -78,14 +78,18 @@ struct ManageView: View {
                 Text("Budget")
             }
             
-            Section {
-                NavigationLink(ManageNavigation.appInformation.name,
-                               value: ManageNavigation.appInformation)
-                
-                NavigationLink(ManageNavigation.developerInformation.name,
-                               value: ManageNavigation.developerInformation)
-            } header: {
-                Text("About")
+            Section("About") {
+                ForEach(ManageNavigation.allCases) { destination in
+                    if destination.kind == .information {
+                        NavigationLink(value: destination) {
+                            Label(destination.name, systemImage: destination.symbol)
+                                .imageScale(.medium)
+                        }
+                        .listItemTint(
+                            getColor(isSelected: navModel.selectedPreference == destination, for: .accent)
+                        )
+                    }
+                }
             }
         }
         .navigationTitle("Preferences")
@@ -132,17 +136,13 @@ struct ManageView: View {
         proxy: GeometryProxy
     ) -> some View {
         LabeledContent {
-            HStack {
-                if !isEmpty {
-                    Text(text)
-                        .foregroundStyle(
-                            getColor(isSelected: isSelected, for: .secondary)
-                        )
-                }
-                
-                if isEmpty {
-                    setupIndicator()
-                }
+            if isEmpty {
+                setupIndicator()
+            } else {
+                Text(text)
+                    .foregroundStyle(
+                        getColor(isSelected: isSelected, for: .secondary)
+                    )
             }
         } label: {
             labeledContentLabel(

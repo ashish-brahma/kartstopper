@@ -30,8 +30,11 @@ struct DeveloperInformationView: View {
                 }
                 .padding(.bottom, Design.Padding.bottom)
                 
-                LinkButton(urlString: Constants.Manage.developerURL,
-                           title: "Personal Website")
+                LinkButton(
+                    url: URL(string: Constants.Manage.developerURL),
+                    title: "Personal Website",
+                    symbol: "person.fill"
+                )
                 .padding(.bottom, Design.Padding.bottom/2)
             }
         }

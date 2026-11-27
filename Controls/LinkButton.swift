@@ -9,18 +9,17 @@
 import SwiftUI
 
 struct LinkButton: View {
-    let urlString: String
+    let url: URL?
     let title: String
+    let symbol: String
     
     @Environment(\.openURL) private var openURL
     
     var body: some View {
-        Button {
-            if let url = URL(string: urlString) {
+        Button(title, systemImage: symbol) {
+            if let url = url {
                 openURL(url)
             }
-        } label: {
-            Label(title, systemImage: "link")
         }
     }
 }
@@ -28,6 +27,10 @@ struct LinkButton: View {
 
 
 #Preview {
-    LinkButton(urlString: Constants.Manage.Social.repository.urlString,
-               title: Constants.Manage.Social.repository.title)
+    let externalLink = Constants.Manage.InformationLinks.Social.repository
+    LinkButton(
+        url: URL(string: externalLink.urlString),
+        title: externalLink.labelName,
+        symbol: externalLink.symbol
+    )
 }

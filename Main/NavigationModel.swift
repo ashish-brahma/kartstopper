@@ -187,11 +187,31 @@ enum ManageNavigation: Int, Hashable, CaseIterable, Identifiable, Codable {
     var symbol: String {
         switch self {
         case .budgetAmount:
-            "number.square"
+            "banknote.fill"
         case .budgetMode:
-            "barometer"
-        default:
-            ""
+            "dial.medium.fill"
+        case .appInformation:
+            if #available(iOS 27,*) {
+                "info.app.fill"
+            } else {
+                "info.square.fill"
+            }
+        case .developerInformation:
+            "lanyardcard.fill"
         }
+    }
+    
+    var kind: Kind {
+        switch self {
+        case .budgetAmount, .budgetMode:
+            .input
+        case .appInformation, .developerInformation:
+            .information
+        }
+    }
+    
+    enum Kind: Int, Hashable {
+        case input
+        case information
     }
 }
